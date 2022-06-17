@@ -1,0 +1,16 @@
+Django
+django-extensions
+djangorestframework
+django-filter
+django-cors-headers
+django-cleanup
+django-celery-beat
+celery
+coverage
+redis
+python-dotenv
+psycopg2
+gunicorn
+whitenoise
+requests
+flake8
