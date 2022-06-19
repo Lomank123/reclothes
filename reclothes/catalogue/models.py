@@ -161,6 +161,10 @@ class ProductAttributeValue(models.Model):
     class Meta:
         verbose_name = _("Product Attribute Value")
         verbose_name_plural = _("Product Attribute Values")
+        # Product can't have duplicate attributes
+        constraints = [
+            models.UniqueConstraint(fields=['product_id', 'attribute_id'], name='unique_value_constraint'),
+        ]
 
     def __str__(self):
         return self.value
