@@ -14,3 +14,5 @@ gunicorn
 whitenoise
 requests
 flake8
+django-mptt
+Pillow

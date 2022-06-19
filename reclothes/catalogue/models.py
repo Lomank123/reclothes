@@ -1,10 +1,15 @@
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
-from django.core.validators import MinValueValidator, MaxValueValidator
+from mptt.models import MPTTModel, TreeForeignKey
 
 from catalogue.utils import get_product_directory_path
+
+
+user_model = get_user_model()
 
 
 class CustomBaseModel(models.Model):
@@ -36,15 +41,22 @@ class CustomBaseModel(models.Model):
         abstract = True
 
 
-class Category(CustomBaseModel):
+class Category(MPTTModel):
+    """
+    Category model implemented with MPTT so each category may have subcategories.
+    """
+    parent = TreeForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="children")
     name = models.CharField(
         max_length=255,
         help_text=_("Required and unique"),
         verbose_name=_("Name"),
         unique=True
     )
-    slug = models.SlugField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True, help_text=_("Category safe URL"))
     is_active = models.BooleanField(default=True)
+
+    class MPTTMeta:
+        order_insertion_by = ["name"]
 
     class Meta:
         verbose_name = _("Category")
@@ -54,7 +66,7 @@ class Category(CustomBaseModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("catalogue:category_list", kwargs={"pk": self.pk})
+        return reverse("catalogue:category_list", kwargs={"category_slug": self.slug})
 
 
 class Tag(CustomBaseModel):
@@ -63,12 +75,12 @@ class Tag(CustomBaseModel):
     """
     name = models.CharField(max_length=64, verbose_name=_("Name"))
 
+    class Meta:
+        verbose_name = _("Tag")
+        verbose_name_plural = _("Tags")
+
     def __str__(self):
         return self.name
-
-    class Meta:
-        verbose_name = "Tag"
-        verbose_name_plural = "Tags"
 
 
 class ProductType(models.Model):
@@ -92,7 +104,7 @@ class ProductAttribute(models.Model):
     Product attribute model which allows to add properties to certain product types (e.g. shoe size).
     """
 
-    product_type = models.ForeignKey(ProductType, on_delete=models.RESTRICT)
+    product_type = models.ForeignKey(ProductType, on_delete=models.RESTRICT, related_name="product_attrs")
     name = models.CharField(max_length=255, verbose_name=_("Attribute name"), help_text=_("Required"))
 
     class Meta:
@@ -104,13 +116,13 @@ class ProductAttribute(models.Model):
 
 
 class Product(CustomBaseModel):
-    product_type = models.ForeignKey(ProductType, on_delete=models.RESTRICT)
-    category = models.ForeignKey(Category, on_delete=models.RESTRICT)
+    product_type = models.ForeignKey(ProductType, on_delete=models.RESTRICT, related_name="products")
+    category = models.ForeignKey(Category, on_delete=models.RESTRICT, related_name="products")
     tags = models.ManyToManyField(Tag, blank=True, related_name="tags")
     title = models.CharField(verbose_name=_("Title"), help_text=_("Required"), max_length=255)
     description = models.TextField(verbose_name=_("Description"), help_text=_("Not required"), blank=True)
-    slug = models.SlugField(max_length=255)
     regular_price = models.DecimalField(
+        validators=[MinValueValidator(0.01)],
         verbose_name=_("Regular_price"),
         help_text=_("Maximum 9999.99"),
         max_digits=6,
@@ -138,11 +150,11 @@ class ProductAttributeValue(models.Model):
     """
     Value of product attribute. Connected with product as well.
     """
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="attr_values")
     attribute = models.ForeignKey(ProductAttribute, on_delete=models.RESTRICT)
     value = models.CharField(
         verbose_name=_("Value"),
-        help_text=_("Product attribute value. Maximum of 255 words."),
+        help_text=_("Product attribute value. Maximum of 255 symbols."),
         max_length=255,
     )
 
@@ -158,7 +170,8 @@ class ProductReview(CustomBaseModel):
     """
     Sort of a comment to product with its own rating.
     """
-    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    user = models.ForeignKey(user_model, on_delete=models.RESTRICT, related_name="reviews")
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT, related_name="reviews")
     text = models.TextField(verbose_name=_("Review text"), help_text=_("Review"), blank=True)
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
@@ -174,7 +187,7 @@ class ProductReview(CustomBaseModel):
 
 
 class ProductImage(CustomBaseModel):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(
         verbose_name=_("Image"),
         help_text=_("Upload a product image"),

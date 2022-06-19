@@ -1,4 +1,6 @@
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
+
 from catalogue import models
 
 
@@ -23,7 +25,6 @@ class ProductTypeAdmin(admin.ModelAdmin):
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug': ('title',), }
     inlines = [
         ProductAttributeValueInline,
         ProductImageInline,
@@ -31,7 +32,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(MPTTModelAdmin):
     prepopulated_fields = {'slug': ('name',), }
 
 
