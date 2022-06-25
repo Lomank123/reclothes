@@ -121,6 +121,7 @@ class Product(CustomBaseModel):
     tags = models.ManyToManyField(Tag, blank=True, related_name="tags")
     title = models.CharField(verbose_name=_("Title"), help_text=_("Required"), max_length=255)
     description = models.TextField(verbose_name=_("Description"), help_text=_("Not required"), blank=True)
+    quantity = models.IntegerField(default=0, verbose_name=_("Quantity"), help_text=_("How many products have left"))
     regular_price = models.DecimalField(
         validators=[MinValueValidator(0.01)],
         verbose_name=_("Regular_price"),
