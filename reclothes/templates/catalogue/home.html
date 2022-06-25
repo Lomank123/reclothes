@@ -1,10 +1,35 @@
 {% extends 'layout/base.html' %}
+{% load i18n %}
+{% load static %}
 
-{% block title %}Home page{% endblock title %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'catalogue/css/styles.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Home page" %}{% endblock title %}
 
 {% block content %}
 
-<h3>Home page</h3>
+<h3>{% translate "Home page" %}</h3>
 <hr />
 
+<h4>{% translate "Best products" %}</h4>
+<hr />
+<div class="best-products-block">
+</div>
+
+<h4>{% translate "Hot products" %}</h4>
+<hr />
+<div class="hot-products-block">
+</div>
+
+<h4>{% translate "Newest products" %}</h4>
+<hr />
+<div class="newest-products-block">
+</div>
+
 {% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'catalogue/js/home.js' %}"></script>
+{% endblock scripts %}
