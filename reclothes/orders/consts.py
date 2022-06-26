@@ -1,0 +1,10 @@
+# Payment choices
+CASH = "CASH"
+CARD = "CARD"
+
+# Status choices
+DECLINED = "DECLINED"
+ACCEPTED = "ACCEPTED"
+DONE = "DONE"
+IN_PROGRESS = "IN_PROGRESS"
+REFUNDED = "REFUNDED"
