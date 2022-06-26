@@ -13,7 +13,8 @@ class Cart(CustomBaseModel):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        verbose_name=_("User")
+        verbose_name=_("User"),
+        related_name="carts"
     )
     is_deleted = models.BooleanField(default=False, verbose_name=_("Deleted"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
@@ -28,11 +29,17 @@ class Cart(CustomBaseModel):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, verbose_name=_("Cart"))
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        verbose_name=_("Cart"),
+        related_name="cart_items"
+    )
     product = models.ForeignKey(
         "catalogue.Product",
         on_delete=models.CASCADE,
-        verbose_name=_("Product")
+        verbose_name=_("Product"),
+        related_name="cart_items"
     )
     quantity = models.IntegerField(default=1, verbose_name=_("Quantity"))
 

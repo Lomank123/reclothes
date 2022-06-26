@@ -1,7 +1,10 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
-from catalogue import models
+from rest_framework.viewsets import ModelViewSet
+
 from catalogue import serializers
+from catalogue.models import Category, Product, Tag
+from catalogue.services import HomeViewService
 
 
 class ProductViewSet(ModelViewSet):
@@ -9,8 +12,12 @@ class ProductViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        qs = models.Product.objects.all()
+        qs = Product.objects.filter(is_active=True)
         return qs
+
+    @action(methods=["get"], detail=False)
+    def get_home_products(self):
+        return HomeViewService().execute()
 
 
 class CategoryViewSet(ModelViewSet):
@@ -18,7 +25,7 @@ class CategoryViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        qs = models.Category.objects.all()
+        qs = Category.objects.filter(is_active=True)
         return qs
 
 
@@ -27,5 +34,5 @@ class TagViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        qs = models.Tag.objects.all()
+        qs = Tag.objects.all()
         return qs

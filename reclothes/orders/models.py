@@ -54,8 +54,18 @@ class Order(CustomBaseModel):
         (consts.DONE, _("Done")),
         (consts.REFUNDED, _("Refunded")),
     ]
-    user = models.ForeignKey(user_model, on_delete=models.CASCADE, verbose_name=_("User"))
-    address = models.ForeignKey(Address, on_delete=models.DO_NOTHING, verbose_name=_("Address"))
+    user = models.ForeignKey(
+        user_model,
+        on_delete=models.CASCADE,
+        verbose_name=_("User"),
+        related_name="orders"
+    )
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.DO_NOTHING,
+        verbose_name=_("Address"),
+        related_name="orders"
+    )
     payment = models.OneToOneField(Payment, on_delete=models.DO_NOTHING, verbose_name=_("Payment"))
     status = models.CharField(
         max_length=20,
@@ -71,7 +81,12 @@ class Order(CustomBaseModel):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name=_("Order"))
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        verbose_name=_("Order"),
+        related_name="order_items"
+    )
     cart_item = models.OneToOneField("carts.CartItem", on_delete=models.CASCADE, verbose_name=_("Cart Item"))
 
     class Meta:

@@ -175,8 +175,8 @@ class ProductReview(CustomBaseModel):
     """
     Sort of a comment to product with its own rating.
     """
-    user = models.ForeignKey(user_model, on_delete=models.RESTRICT, related_name="reviews")
-    product = models.ForeignKey(Product, on_delete=models.RESTRICT, related_name="reviews")
+    user = models.ForeignKey(user_model, on_delete=models.DO_NOTHING, related_name="reviews")
+    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name="reviews")
     text = models.TextField(verbose_name=_("Review text"), help_text=_("Review"), blank=True)
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
