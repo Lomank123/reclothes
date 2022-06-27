@@ -11,6 +11,7 @@ class HomeViewServiceTestCase(TestCase):
 
     def setUp(self):
         self.user = CustomUser.objects.create(username="test1", password="123123123Aa")
+        self.user2 = CustomUser.objects.create(username="test2", password="123123123Aa")
         self.product_type = ProductType.objects.create(name="type1")
         self.category = Category.objects.create(name="category1")
         self.product1 = Product.objects.create(
@@ -28,9 +29,9 @@ class HomeViewServiceTestCase(TestCase):
             regular_price=32.44
         )
         self.review1 = ProductReview.objects.create(product=self.product1, user=self.user, text="testreview1", rating=4)
-        self.review2 = ProductReview.objects.create(product=self.product1, user=self.user, text="testreview2", rating=1)
+        self.review2 = ProductReview.objects.create(product=self.product1, user=self.user2, text="testreview2", rating=1)
         self.review3 = ProductReview.objects.create(product=self.product2, user=self.user, text="testreview3", rating=5)
-        self.review4 = ProductReview.objects.create(product=self.product2, user=self.user, text="testreview4", rating=2)
+        self.review4 = ProductReview.objects.create(product=self.product2, user=self.user2, text="testreview4", rating=2)
 
     def tearDown(self):
         self.review1.delete()
