@@ -16,7 +16,7 @@ class ProductViewSet(ModelViewSet):
         return qs
 
     @action(methods=["get"], detail=False)
-    def get_home_products(self):
+    def get_home_products(self, request):
         return HomeViewService().execute()
 
 

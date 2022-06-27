@@ -1,0 +1,411 @@
+[
+{
+  "model": "catalogue.category",
+  "pk": 1,
+  "fields": {
+    "parent": null,
+    "name": "Best for walking",
+    "slug": "best-for-walking",
+    "is_active": true,
+    "lft": 1,
+    "rght": 2,
+    "tree_id": 1,
+    "level": 0
+  }
+},
+{
+  "model": "catalogue.category",
+  "pk": 2,
+  "fields": {
+    "parent": null,
+    "name": "Club clothes",
+    "slug": "club-clothes",
+    "is_active": true,
+    "lft": 1,
+    "rght": 2,
+    "tree_id": 2,
+    "level": 0
+  }
+},
+{
+  "model": "catalogue.tag",
+  "pk": 1,
+  "fields": {
+    "creation_date": "2022-06-27T18:22:07.770Z",
+    "last_update": "2022-06-27T18:22:07.770Z",
+    "name": "Top sales"
+  }
+},
+{
+  "model": "catalogue.tag",
+  "pk": 2,
+  "fields": {
+    "creation_date": "2022-06-27T18:22:22.249Z",
+    "last_update": "2022-06-27T18:22:22.249Z",
+    "name": "Customer's choice"
+  }
+},
+{
+  "model": "catalogue.producttype",
+  "pk": 1,
+  "fields": {
+    "name": "Boots",
+    "is_active": true
+  }
+},
+{
+  "model": "catalogue.producttype",
+  "pk": 2,
+  "fields": {
+    "name": "T-shirt",
+    "is_active": true
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 1,
+  "fields": {
+    "product_type": 1,
+    "name": "Boot size"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 2,
+  "fields": {
+    "product_type": 1,
+    "name": "Length"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 3,
+  "fields": {
+    "product_type": 2,
+    "name": "Size"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 4,
+  "fields": {
+    "product_type": 2,
+    "name": "Body type"
+  }
+},
+{
+  "model": "catalogue.product",
+  "pk": 1,
+  "fields": {
+    "creation_date": "2022-06-27T18:24:01Z",
+    "last_update": "2022-06-27T18:24:09.869Z",
+    "product_type": 1,
+    "category": null,
+    "title": "Super top shoes",
+    "description": "",
+    "quantity": 41,
+    "regular_price": "313.44",
+    "is_active": true,
+    "tags": [
+      1
+    ]
+  }
+},
+{
+  "model": "catalogue.product",
+  "pk": 2,
+  "fields": {
+    "creation_date": "2022-06-27T18:24:53.685Z",
+    "last_update": "2022-06-27T18:24:53.685Z",
+    "product_type": 2,
+    "category": 2,
+    "title": "Nice T-shirt",
+    "description": "1qweqweq",
+    "quantity": 0,
+    "regular_price": "5.99",
+    "is_active": true,
+    "tags": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 1,
+  "fields": {
+    "product": 1,
+    "attribute": 1,
+    "value": "41"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 2,
+  "fields": {
+    "product": 1,
+    "attribute": 2,
+    "value": "31"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 3,
+  "fields": {
+    "product": 2,
+    "attribute": 3,
+    "value": "31"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 4,
+  "fields": {
+    "product": 2,
+    "attribute": 4,
+    "value": "1"
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 1,
+  "fields": {
+    "creation_date": "2022-06-27T18:25:20.424Z",
+    "last_update": "2022-06-27T18:25:20.424Z",
+    "user": 2,
+    "product": 2,
+    "text": "The best T-shirt!",
+    "rating": 5
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 2,
+  "fields": {
+    "creation_date": "2022-06-27T18:25:37.438Z",
+    "last_update": "2022-06-27T18:25:37.438Z",
+    "user": 3,
+    "product": 2,
+    "text": "Bad!",
+    "rating": 1
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 3,
+  "fields": {
+    "creation_date": "2022-06-27T18:26:03.170Z",
+    "last_update": "2022-06-27T18:26:03.170Z",
+    "user": 2,
+    "product": 1,
+    "text": "Didn't expect",
+    "rating": 2
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 4,
+  "fields": {
+    "creation_date": "2022-06-27T18:26:18.588Z",
+    "last_update": "2022-06-27T18:26:18.588Z",
+    "user": 3,
+    "product": 1,
+    "text": "Good one",
+    "rating": 4
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 1,
+  "fields": {
+    "creation_date": "2022-06-27T18:21:17.109Z",
+    "last_update": "2022-06-27T18:21:17.109Z",
+    "user": 1,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 2,
+  "fields": {
+    "creation_date": "2022-06-27T18:21:22Z",
+    "last_update": "2022-06-27T18:21:32.921Z",
+    "user": 2,
+    "is_deleted": false,
+    "is_archived": true
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 3,
+  "fields": {
+    "creation_date": "2022-06-27T18:21:27.972Z",
+    "last_update": "2022-06-27T18:21:27.972Z",
+    "user": 3,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 1,
+  "fields": {
+    "cart": 2,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 2,
+  "fields": {
+    "cart": 1,
+    "product": 2,
+    "quantity": 4
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 3,
+  "fields": {
+    "cart": 3,
+    "product": 1,
+    "quantity": 12
+  }
+},
+{
+  "model": "orders.address",
+  "pk": 1,
+  "fields": {
+    "name": "Netherlands",
+    "is_available": true
+  }
+},
+{
+  "model": "orders.address",
+  "pk": 2,
+  "fields": {
+    "name": "Moscow",
+    "is_available": true
+  }
+},
+{
+  "model": "orders.address",
+  "pk": 3,
+  "fields": {
+    "name": "Oslo",
+    "is_available": true
+  }
+},
+{
+  "model": "orders.payment",
+  "pk": 1,
+  "fields": {
+    "payment_type": "CASH",
+    "total_price": "312.00"
+  }
+},
+{
+  "model": "orders.payment",
+  "pk": 2,
+  "fields": {
+    "payment_type": "CARD",
+    "total_price": "5345.00"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 1,
+  "fields": {
+    "creation_date": "2022-06-27T18:28:39.108Z",
+    "last_update": "2022-06-27T18:28:39.108Z",
+    "user": 2,
+    "address": 3,
+    "payment": 1,
+    "status": "ACCEPTED"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 2,
+  "fields": {
+    "creation_date": "2022-06-27T18:28:49.673Z",
+    "last_update": "2022-06-27T18:28:49.673Z",
+    "user": 3,
+    "address": 1,
+    "payment": 2,
+    "status": "REFUNDED"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 1,
+  "fields": {
+    "order": 1,
+    "cart_item": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 2,
+  "fields": {
+    "order": 2,
+    "cart_item": 3
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$320000$1wtp5Ueg1IlE0rH9tafOQF$Iymyt2thbv70FB3FNZqh7wpzjaTANEq3RoGvSM/979g=",
+    "last_login": "2022-06-27T18:15:29.284Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2022-06-27T18:14:50.668Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$320000$GLogs99FbUmdrSJOsZzijt$5A1nWhraPAEokcNCh8y99zHL9+rnsvms/de/pP4eFqw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "test1",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-06-27T18:20:53.129Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$320000$A2ryGp4BZQTfti5U848cEA$fcjeJ6IBt/TyEDqaQIztIfDKpjkOAlBBpNwq+ZP+TEI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "test2",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-06-27T18:21:05.926Z",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

@@ -117,14 +117,14 @@ class ProductAttribute(models.Model):
 
 class Product(CustomBaseModel):
     product_type = models.ForeignKey(ProductType, on_delete=models.RESTRICT, related_name="products")
-    category = models.ForeignKey(Category, on_delete=models.RESTRICT, related_name="products")
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.RESTRICT, related_name="products")
     tags = models.ManyToManyField(Tag, blank=True, related_name="tags")
     title = models.CharField(verbose_name=_("Title"), help_text=_("Required"), max_length=255)
     description = models.TextField(verbose_name=_("Description"), help_text=_("Not required"), blank=True)
     quantity = models.IntegerField(default=0, verbose_name=_("Quantity"), help_text=_("How many products have left"))
     regular_price = models.DecimalField(
         validators=[MinValueValidator(0.01)],
-        verbose_name=_("Regular_price"),
+        verbose_name=_("Regular price"),
         help_text=_("Maximum 9999.99"),
         max_digits=6,
         decimal_places=2,
