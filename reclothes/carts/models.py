@@ -47,3 +47,6 @@ class CartItem(models.Model):
         verbose_name_plural = _("Cart items")
         verbose_name = _("Cart item")
         ordering = ["-id"]
+        constraints = [
+            models.UniqueConstraint(fields=['product_id', 'cart_id'], name='unique_cartitem_constraint'),
+        ]

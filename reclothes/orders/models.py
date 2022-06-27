@@ -93,6 +93,9 @@ class OrderItem(models.Model):
         ordering = ["-id"]
         verbose_name = _("Order item")
         verbose_name_plural = _("Order items")
+        constraints = [
+            models.UniqueConstraint(fields=['order_id', 'cart_item_id'], name='unique_orderitem_constraint'),
+        ]
 
 
 # TODO: Implement transactions

@@ -189,6 +189,9 @@ class ProductReview(CustomBaseModel):
     class Meta:
         verbose_name = _("Product Review")
         verbose_name_plural = _("Product Reviews")
+        constraints = [
+            models.UniqueConstraint(fields=['product_id', 'user_id'], name='unique_review_constraint'),
+        ]
 
 
 class ProductImage(CustomBaseModel):
