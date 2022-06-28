@@ -70,8 +70,8 @@ class HomeViewServiceTestCase(TestCase):
         self.assertEqual(response.data["best_products"][0]["avg_rate"], 3.5)
         self.assertEqual(response.data["best_products"][1]["avg_rate"], 2.5)
         # hot_products
-        self.assertEqual(response.data["hot_products"][0]["count"], 2)
-        self.assertEqual(response.data["hot_products"][1]["count"], 1)
+        self.assertEqual(response.data["hot_products"][0]["purchases"], 2)
+        self.assertEqual(response.data["hot_products"][1]["purchases"], 1)
         # newest_products
         self.assertEqual(response.data["newest_products"][0]["title"], "title2")
         self.assertEqual(response.data["newest_products"][1]["title"], "title1")
