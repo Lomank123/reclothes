@@ -10,7 +10,7 @@ header {
 	justify-content: space-between;
 	box-shadow: 0px 0px 1px 0px rgb(61 66 81 / 20%), 0px 1px 4px -1px rgb(61 66 81 / 30%);
   min-height: 60px;
-  background-color: #a2a5a428;
+  background-color: #EFE1BA;
 }
 footer {
   display: flex;
@@ -18,9 +18,9 @@ footer {
 	width: 100%;
 	text-align: center;
 	padding-right: 20px;
-  box-shadow: 0px 0px 1px 0px rgb(61 66 81 / 20%), 0px 1px 4px -1px rgb(61 66 81 / 30%);
+  box-shadow: 0 0px 1px 1px rgb(61 66 81 / 20%);
   min-height: 40px;
-  background-color: #a2a5a428;
+  background-color: #EFE1BA;
 }
 
 .container {
@@ -54,4 +54,15 @@ a.logo, a.logo:hover, a.logo:active, a.logo:visited, a.logo:focus {
 
 .auth-link {
   padding: 5px;
+}
+
+.default-block {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 16%);
+  background-color: #fff;
+  padding: 20px;
+}
+
+.page-label {
+  text-align: center;
 }
