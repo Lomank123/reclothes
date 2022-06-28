@@ -11,7 +11,8 @@ class ProductRepository:
         """
         return list(
             Product.objects
-            .values("title", "description", "regular_price", "product_type")
+            .annotate(type=F("product_type__name"))
+            .values("id", "title", "description", "type", "regular_price", "product_type")
             .order_by("-creation_date")[:num]
         )
 
@@ -24,11 +25,11 @@ class ProductRepository:
         return list(
             Product.objects
             .annotate(
-                count=Count("cart_items__orderitem"),
+                purchases=Count("cart_items__orderitem"),
                 type=F("product_type__name")
             )
-            .values("title", "description", "regular_price", "type", "count")
-            .order_by("-count")[:num]
+            .values("id", "title", "description", "regular_price", "type", "purchases")
+            .order_by("-purchases")[:num]
         )
 
     @staticmethod
@@ -42,7 +43,7 @@ class ProductRepository:
                 avg_rate=Avg("reviews__rating"),
                 type=F("product_type__name")
             )
-            .values("title", "description", "regular_price", "type", "avg_rate")
+            .values("id", "title", "description", "regular_price", "type", "avg_rate")
             .order_by("-avg_rate")[:num]
         )
 

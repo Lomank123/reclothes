@@ -11,16 +11,43 @@
     {% block styles %}
     {% endblock styles %}
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/png" href="{% static 'catalogue/images/favicon.ico' %}"/>
+    <link rel="shortcut icon" type="image/png" href="{% static 'reclothes/images/favicon.ico' %}"/>
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="{% static 'reclothes/css/styles.css' %}">
 		<!-- Title -->
     <title>Reclothes | {% block title %}{% endblock title %}</title>
   </head>
 
   <body>
+    <header>
+			<a class="logo" href="{% url 'catalogue:home' %}">Reclothes</a>
+			<div class="auth-text">
+        {% if user.is_authenticated %} 
+					<span class="auth-link">Welcome, <a href="">{{ user.username }}</a></span>
+          <a href="{% url 'accounts:logout' %}" class="auth-link">Log out</a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="auth-link">Sign in</a> 
+          <a href="{% url 'accounts:signup' %}" class="auth-link">Sign up</a>
+        {% endif %}
+			</div>
+    </header>
+
     <div class="container">
       {% block content %}
       {% endblock content %}
     </div>
+
+    <footer>
+			<span class="author-info-span">
+				Made by 
+				<a
+					href="https://github.com/Lomank123" 
+					target="_blank" 
+					rel="noopener noreferrer">
+					Robert "Lomank" Khakimov
+				</a>
+			</span>
+    </footer>
   </body>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
