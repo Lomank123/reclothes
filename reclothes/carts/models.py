@@ -20,7 +20,7 @@ class Cart(CustomBaseModel):
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
 
     def __str__(self):
-        return f"{self.user.username}'s cart {self.id}"
+        return f"Cart {self.id}"
 
     class Meta:
         verbose_name_plural = _("Carts")
