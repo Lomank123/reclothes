@@ -1,17 +1,22 @@
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponseRedirect
 from django.views.generic.edit import CreateView
 
 from accounts.forms import CustomUserCreationForm
+from accounts.services import LoginViewService
 
-
-# Auth views here
 
 user_model = get_user_model()
 
 
 class AccountsLoginView(LoginView):
     template_name = 'accounts/login.html'
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        LoginViewService(self.request).execute_form_login()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class AccountsLogoutView(LogoutView):

@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from catalogue.urls import router as catalogue_router
 from accounts.urls import router as accounts_router
+from accounts.views import AccountsLoginView
 
 
 # Main API router
@@ -14,6 +15,7 @@ router.registry.extend(catalogue_router.registry)
 router.registry.extend(accounts_router.registry)
 
 urlpatterns = [
+    path('lomank/login/', AccountsLoginView.as_view(), name='login'),
     path('lomank/', admin.site.urls),
     path('api/', include(router.urls)),
     path('', include(('catalogue.urls', 'catalogue'), namespace='catalogue')),

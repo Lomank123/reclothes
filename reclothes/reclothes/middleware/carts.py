@@ -12,6 +12,5 @@ class CartMiddleware(object):
     def __call__(self, request):
         # Before the view (and later middleware) are called
         CartMiddlewareService(request).execute()
-        print(request.session.get("cart_id"))
         response = self.get_response(request)
         return response

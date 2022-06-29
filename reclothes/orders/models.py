@@ -58,6 +58,8 @@ class Order(CustomBaseModel):
         user_model,
         on_delete=models.CASCADE,
         verbose_name=_("User"),
+        blank=True,
+        null=True,
         related_name="orders"
     )
     address = models.ForeignKey(

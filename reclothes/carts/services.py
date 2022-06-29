@@ -10,11 +10,10 @@ logger = logging.getLogger('django')
 
 class CartMiddlewareService:
 
-    __slots__ = 'session_manager', 'request',
+    __slots__ = 'session_manager',
 
     def __init__(self, request):
         self.session_manager = CartSessionManager(request)
-        self.request = request
 
     def _get_or_create_cart_id(self):
         """
@@ -27,8 +26,13 @@ class CartMiddlewareService:
         if not exists:
             forced = True
             new_cart = CartRepository.create()
-            cart_id = new_cart.id
             logger.info(consts.NEW_CART_CREATED_MSG)
+            # In case user cart is gone
+            user = self.session_manager.request.user
+            if user.is_authenticated:
+                CartRepository.attach_user_to_cart_by_id(new_cart.id, user.id)
+                logger.info(consts.NEW_CART_ATTACHED_MSG)
+            cart_id = new_cart.id
         return cart_id, forced
 
     def execute(self):
