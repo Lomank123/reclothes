@@ -28,10 +28,18 @@ class HomeViewServiceTestCase(TestCase):
             quantity=7,
             regular_price=32.44
         )
-        self.review1 = ProductReview.objects.create(product=self.product1, user=self.user, text="testreview1", rating=4)
-        self.review2 = ProductReview.objects.create(product=self.product1, user=self.user2, text="testreview2", rating=1)
-        self.review3 = ProductReview.objects.create(product=self.product2, user=self.user, text="testreview3", rating=5)
-        self.review4 = ProductReview.objects.create(product=self.product2, user=self.user2, text="testreview4", rating=2)
+        self.product3 = Product.objects.create(
+            product_type=self.product_type,
+            category=self.category,
+            title="title3",
+            quantity=7,
+            regular_price=32.44,
+            is_active=False
+        )
+        self.review1 = ProductReview.objects.create(product=self.product1, user=self.user, text="t1", rating=4)
+        self.review2 = ProductReview.objects.create(product=self.product1, user=self.user2, text="t2", rating=1)
+        self.review3 = ProductReview.objects.create(product=self.product2, user=self.user, text="t3", rating=5)
+        self.review4 = ProductReview.objects.create(product=self.product2, user=self.user2, text="t4", rating=2)
 
     def tearDown(self):
         self.review1.delete()
@@ -40,11 +48,12 @@ class HomeViewServiceTestCase(TestCase):
         self.review4.delete()
         self.product1.delete()
         self.product2.delete()
+        self.product3.delete()
         self.user.delete()
         self.product_type.delete()
         self.category.delete()
 
-    def test_get_home_products(self):
+    def test_execute(self):
         # Prerequisites
         cart1 = Cart.objects.create(user=self.user)
         cart_item1 = CartItem.objects.create(cart=cart1, product=self.product1)
@@ -66,6 +75,9 @@ class HomeViewServiceTestCase(TestCase):
         self.assertTrue("best_products" in response.data.keys())
         self.assertTrue("hot_products" in response.data.keys())
         self.assertTrue("newest_products" in response.data.keys())
+        self.assertEqual(len(response.data["best_products"]), 2)
+        self.assertEqual(len(response.data["hot_products"]), 2)
+        self.assertEqual(len(response.data["newest_products"]), 2)
         # best_products
         self.assertEqual(response.data["best_products"][0]["avg_rate"], 3.5)
         self.assertEqual(response.data["best_products"][1]["avg_rate"], 2.5)

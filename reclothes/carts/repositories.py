@@ -23,3 +23,15 @@ class CartRepository:
         cart = Cart.objects.get(id=cart_id)
         cart.user_id = user_id
         cart.save()
+
+    @staticmethod
+    def delete_by_id(cart_id, full_delete=False):
+        """
+        Mark cart as deleted or if full_delete is True then completely delete cart object.
+        """
+        cart = Cart.objects.get(id=cart_id)
+        if full_delete:
+            cart.delete()
+        else:
+            cart.is_deleted = True
+            cart.save()
