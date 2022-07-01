@@ -1,4 +1,5 @@
-from django.db.models import Count, F, Avg
+from django.db.models import Avg, Count, F
+
 from catalogue.models import Product
 
 
@@ -56,10 +57,27 @@ class ProductRepository:
             products = qs[:limit]
         return products
 
+    @staticmethod
+    def get_by_id(product_id):
+        return Product.objects.filter(id=product_id).first()
+
+    @staticmethod
+    def get_product_attrs(product_id):
+        return (
+            Product.objects
+            .filter(id=product_id)
+            .annotate(attr_name=F("attr_values__attribute__name"), attr_value=F("attr_values__value"))
+            .values("attr_name", "attr_value")
+        )
+
 
 class CategoryRepository:
     pass
 
 
 class TagRepository:
+    pass
+
+
+class ProductTypeRepository:
     pass

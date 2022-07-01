@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'catalogue/css/product-detail.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Product detail" %}{% endblock title %}
+
+{% block content %}
+<div id="productId" data-id="{{ product_id }}"></div>
+
+<h3 class="page-label">{% translate "Product detail" %}</h3>
+<hr />
+
+<h4 class="product-detail-label">{% translate "Main info" %}</h4>
+<hr />
+<div id="product-main-info-block" class="default-block">
+</div>
+
+<h4 class="product-detail-label">{% translate "Additional info" %}</h4>
+<hr />
+<div id="product-add-info-block" class="default-block">
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'catalogue/js/productDetail.js' %}"></script>
+{% endblock scripts %}

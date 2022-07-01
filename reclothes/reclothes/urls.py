@@ -1,18 +1,19 @@
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.static import static
-from django.conf import settings
-from rest_framework.routers import DefaultRouter
-
-from catalogue.urls import router as catalogue_router
 from accounts.urls import router as accounts_router
 from accounts.views import AccountsLoginView
+from carts.urls import router as carts_router
+from catalogue.urls import router as catalogue_router
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 
 # Main API router
 router = DefaultRouter()
 router.registry.extend(catalogue_router.registry)
 router.registry.extend(accounts_router.registry)
+router.registry.extend(carts_router.registry)
 
 urlpatterns = [
     path('lomank/login/', AccountsLoginView.as_view(), name='login'),

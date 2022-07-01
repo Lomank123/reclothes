@@ -1,8 +1,8 @@
 import logging
 
-from carts.utils import CartSessionManager
-from carts.repositories import CartRepository
 from carts import consts
+from carts.repositories import CartRepository
+from carts.utils import CartSessionManager
 
 
 logger = logging.getLogger('django')

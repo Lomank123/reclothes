@@ -4,7 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from catalogue import serializers
 from catalogue.models import Category, Product, Tag
-from catalogue.services import HomeViewService
+from catalogue.services import HomeViewService, ProductDetailService
 
 
 class ProductViewSet(ModelViewSet):
@@ -18,6 +18,10 @@ class ProductViewSet(ModelViewSet):
     @action(methods=["get"], detail=False)
     def get_home_products(self, request):
         return HomeViewService().execute()
+
+    @action(methods=["get"], detail=False, url_path=r"get_product_detail/(?P<product_id>[^/.]+)")
+    def get_product_detail(self, request, product_id):
+        return ProductDetailService().execute(product_id)
 
 
 class CategoryViewSet(ModelViewSet):

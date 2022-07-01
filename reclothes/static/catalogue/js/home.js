@@ -26,7 +26,6 @@ function setHomeData(result) {
     `);
     $('#hot-products-block').append(info);
   });
-  
 
   // Best
   result.best_products.forEach(product => {
@@ -40,7 +39,6 @@ function setHomeData(result) {
     `);
     $('#best-products-block').append(info);
   });
-  
 
   // Newest
   result.newest_products.forEach(product => {
@@ -53,8 +51,6 @@ function setHomeData(result) {
     `);
     $('#newest-products-block').append(info);
   });
-  
-
 }
 
 
