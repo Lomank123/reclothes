@@ -6,4 +6,4 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CustomUser
-        fields = '__all__'
+        fields = ('id', 'username',)

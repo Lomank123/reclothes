@@ -1,9 +1,9 @@
-from catalogue.repositories import ProductRepository
+from catalogue.repositories import ProductRepository, ProductImageRepository
 from rest_framework.response import Response
 from rest_framework import status
 
 from catalogue import consts
-from catalogue.serializers import ProductSerializer
+from catalogue import serializers
 
 
 class HomeViewService:
@@ -17,9 +17,10 @@ class HomeViewService:
         }
 
     def execute(self):
-        best_products = ProductRepository.get_best_products()[:consts.BEST_PRODUCT_IN_PAGE_LIMIT]
-        hot_products = ProductRepository.get_hot_products()[:consts.HOT_PRODUCT_IN_PAGE_LIMIT]
-        newest_products = ProductRepository.get_newest_products()[:consts.NEWEST_PRODUCT_IN_PAGE_LIMIT]
+        feature_image = ProductImageRepository.get_feature_image_by_product_id(subquery=True)
+        best_products = ProductRepository.get_best_products(feature_image)[:consts.BEST_PRODUCT_IN_PAGE_LIMIT]
+        hot_products = ProductRepository.get_hot_products(feature_image)[:consts.HOT_PRODUCT_IN_PAGE_LIMIT]
+        newest_products = ProductRepository.get_newest_products(feature_image)[:consts.NEWEST_PRODUCT_IN_PAGE_LIMIT]
         data = self._build_response_data(best_products, hot_products, newest_products)
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -27,11 +28,16 @@ class HomeViewService:
 class ProductDetailService:
 
     @staticmethod
-    def _build_response_data(product, attrs):
-        serializer = ProductSerializer(product)
+    def _build_response_data(product):
+        product_serializer = serializers.ProductSerializer(product)
+        images_serializer = serializers.ProductImageSerializer(product.images, many=True)
+        attrs_serializer = serializers.ProductAttributeValueSerializer(product.attr_values, many=True)
+        reviews_serializer = serializers.ProductReviewSerializer(product.reviews, many=True)
         return {
-            "product": serializer.data,
-            "attrs": list(attrs),
+            "product": product_serializer.data,
+            "attrs": attrs_serializer.data,
+            "images": images_serializer.data,
+            "reviews": reviews_serializer.data,
         }
 
     @staticmethod
@@ -43,6 +49,5 @@ class ProductDetailService:
 
     def execute(self, product_id):
         product = ProductRepository.get_by_id(product_id)
-        attrs = ProductRepository.get_product_attrs(product_id)
-        data = self._build_response_data(product, attrs)
+        data = self._build_response_data(product)
         return self._build_response(data, product is None)

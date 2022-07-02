@@ -60,7 +60,7 @@ function setAdditionalInfo(data) {
   AddInfoBlock.empty();
   data.forEach(item => {
     let info = $(`
-        <span>${item.attr_name} - ${item.attr_value}</span>
+        <span>${item.attribute.name} - ${item.value}</span>
     `);
     AddInfoBlock.append(info);
   });
