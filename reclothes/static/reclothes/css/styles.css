@@ -57,10 +57,19 @@ a.logo, a.logo:hover, a.logo:active, a.logo:visited, a.logo:focus {
 }
 
 .default-block {
+  display: flex;
+  flex-direction: column;
   border-radius: 8px;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 16%);
   background-color: #fff;
   padding: 20px;
+}
+
+.flex-block {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .page-label {

@@ -5,7 +5,7 @@ function getHomeData() {
     dataType: 'json',
     success: (result) => {
       console.log(result);
-      setHomeData(result);
+      displayHomeData(result);
     },
     error: (error) => {
       console.log(error);
@@ -13,43 +13,56 @@ function getHomeData() {
   });
 }
 
-function setHomeData(result) {
-  // Hot
-  result.hot_products.forEach(product => {
-    let info = $(`
-      <div>
-        <p>Type: ${product.type}</p>
-        <p>Title: ${product.title}</p>
-        <p>Price: ${product.regular_price}</p>
-        <p>Purchases: ${product.purchases}</p>
-      </div>
-    `);
-    $('#hot-products-block').append(info);
-  });
+function displayHomeData(result) {
+  setBestProducts(result.best_products);
+  setHotProducts(result.hot_products);
+  setNewestProducts(result.newest_products);
+}
 
-  // Best
-  result.best_products.forEach(product => {
-    let info = $(`
-      <div>
-        <p>Type: ${product.type}</p>
-        <p>Title: ${product.title}</p>
-        <p>Price: ${product.regular_price}</p>
-        <p>Rating: ${product.avg_rate}</p>
+function setBestProducts(data) {
+  const bestProductsBlock = $('#best-products-block');
+  bestProductsBlock.empty();
+  data.forEach(product => {
+    const info = $(`
+      <div class="flex-block">
+        <a href="/product/${product.id}">Title: ${product.title}</a>
+        <span>Type: ${product.type}</span>
+        <span>Price: ${product.regular_price}</span>
+        <span>Rating: ${product.avg_rate}</span>
       </div>
     `);
-    $('#best-products-block').append(info);
+    bestProductsBlock.append(info);
   });
+}
 
-  // Newest
-  result.newest_products.forEach(product => {
-    let info = $(`
-      <div>
-        <p>Type: ${product.type}</p>
-        <p>Title: ${product.title}</p>
-        <p>Price: ${product.regular_price}</p>
+function setHotProducts(data) {
+  const hotProductsBlock = $('#hot-products-block');
+  hotProductsBlock.empty();
+  data.forEach(product => {
+    const info = $(`
+      <div class="flex-block">
+        <a href="/product/${product.id}">Title: ${product.title}</a>
+        <span>Type: ${product.type}</span>
+        <span>Price: ${product.regular_price}</span>
+        <span>Purchases: ${product.purchases}</span>
       </div>
     `);
-    $('#newest-products-block').append(info);
+    hotProductsBlock.append(info);
+  });
+}
+
+function setNewestProducts(data) {
+  const newestProductsBlock = $('#newest-products-block');
+  newestProductsBlock.empty();
+  data.forEach(product => {
+    const info = $(`
+      <div class="flex-block">
+        <a href="/product/${product.id}">Title: ${product.title}</a>
+        <span>Type: ${product.type}</span>
+        <span>Price: ${product.regular_price}</span>
+      </div>
+    `);
+    newestProductsBlock.append(info);
   });
 }
 

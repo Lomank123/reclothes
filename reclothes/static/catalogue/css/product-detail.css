@@ -1,0 +1,12 @@
+.product-detail-label {
+  margin-top: 20px;
+}
+
+.tags-block {
+  display: flex;
+}
+
+.single-tag-block {
+  margin-left: 5px;
+  margin-right: 5px;
+}

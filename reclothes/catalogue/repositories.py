@@ -59,7 +59,12 @@ class ProductRepository:
 
     @staticmethod
     def get_by_id(product_id):
-        return Product.objects.filter(id=product_id).first()
+        return (
+            Product.objects
+            .select_related('category', 'product_type')
+            .filter(id=product_id)
+            .first()
+        )
 
     @staticmethod
     def get_product_attrs(product_id):
