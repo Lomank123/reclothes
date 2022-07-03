@@ -30,9 +30,9 @@ class ProductDetailService:
     @staticmethod
     def _build_response_data(product):
         product_serializer = serializers.ProductSerializer(product)
-        images_serializer = serializers.ProductImageSerializer(product.images, many=True)
+        images_serializer = serializers.ProductImageSerializer(product.images.order_by('-is_feature'), many=True)
         attrs_serializer = serializers.ProductAttributeValueSerializer(product.attr_values, many=True)
-        reviews_serializer = serializers.ProductReviewSerializer(product.reviews, many=True)
+        reviews_serializer = serializers.ProductReviewSerializer(product.reviews.order_by('-creation_date'), many=True)
         return {
             "product": product_serializer.data,
             "attrs": attrs_serializer.data,

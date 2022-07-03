@@ -11,22 +11,25 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    parent_node = serializers.SerializerMethodField()
+    category_tree = serializers.SerializerMethodField()
 
     class Meta:
         depth = 1
         model = models.Category
-        fields = ('id', 'name', 'parent_node',)
+        fields = ('category_tree',)
 
-    def get_parent_node(self, obj):
-        return obj.get_ancestors().values("id", "name")
+    def get_category_tree(self, obj):
+        """
+        Return info about all parent categories including itself.
+        """
+        return obj.get_ancestors(include_self=True).values("id", "name")
 
 
 class ProductTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProductType
-        fields = ('name',)
+        fields = ('id', 'name',)
 
 
 class ProductSerializer(serializers.ModelSerializer):
