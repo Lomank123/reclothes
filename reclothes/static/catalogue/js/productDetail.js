@@ -5,6 +5,7 @@ const topInfoBlock = $('#top-info-block');
 const descrInfoBlock = $('#description-info-block');
 const reviewsInfoBlock = $('#reviews-info-block');
 const bottomInfoBlock = $('#bottom-info-block');
+const noImgUrl = '/static/reclothes/images/empty.jpg';
 
 
 function getProductData() {
@@ -27,9 +28,8 @@ function getProductData() {
 function displayProductInfo(result) {
     setMainInfo(result.product);
     setImages(result.images);
-    if (result.attrs.length > 0) {
-        setAdditionalInfo(result.attrs);
-    }
+    setDescription(result.product.description);
+    setAdditionalInfo(result.attrs);
     if (result.reviews.length > 0) {
         setReviewsInfo(result.reviews);
     }
@@ -148,33 +148,100 @@ function setDatesInfo(creationDate, lastUpdate) {
 function setImages(data) {
     const infoBlock = $('#info-block');
     const imagesBlock = $(`<div class="images-block"></div>`);
-    let imgUrl = '/static/reclothes/images/empty.jpg';
+    let imgUrl = noImgUrl;
+    let altText = "No image";
     // First image will always be feature image if exists
     if (data.length > 0) {
         imgUrl = data[0].image;
+        altText = data[0].alt_text;
     }
     const image = $(`
-        <img class="product-image" src="${imgUrl}"></img>
+        <img class="product-image" src="${imgUrl}" alt="${altText}"></img>
     `);
     imagesBlock.append(image);
     infoBlock.append(imagesBlock);
 }
 
-function setReviewsInfo(data) {
-
-}
-
 function setAdditionalInfo(data) {
+    if (data.length == 0) {
+        addInfoBlock.remove();
+        return;
+    }
     addInfoBlock.empty();
-    const label = $(`
-        <span id="add-label">Additional information</span>
-    `);
+    const label = $(`<span class="block-label">Additional information</span>`);
     addInfoBlock.append(label);
     data.forEach(item => {
         let info = $(`
-            <span>${item.attribute.name} - ${item.value}</span>
+            <div class="attr-block">
+                <span class="attr-span">${item.attribute.name}</span>
+                <span class="attr-value-span">${item.value}</span>
+            </div>
         `);
         addInfoBlock.append(info);
+    });
+}
+
+function setDescription(description) {
+    let text = description;
+    if (description == "") {
+        text = "No information given.";
+    } 
+    descrInfoBlock.empty();
+    const label = $(`<span class="block-label">Description</span>`);
+    descrInfoBlock.append(label);
+    const descr = $(`
+        <div>
+            <p>${text}</p>
+        </div>
+    `);
+    descrInfoBlock.append(descr);
+}
+
+function setReviewsInfo(data) {
+    reviewsInfoBlock.empty();
+    const label = $(`
+        <span class="block-label">Reviews</span>
+        <span class="grey-line"></span>
+    `);
+    reviewsInfoBlock.append(label);
+    if (data.length == 0) {
+        const emptyText = $(`<span>No reviews yet</span>`);
+        reviewsInfoBlock.append(emptyText);
+        return;
+    }
+    data.forEach(reviewData => {
+        const line = $(`<span class="grey-line"></span>`);
+        const rateBar = $(`<div class="rate-bar"></div>`);
+        for (let i = 0; i < parseInt(reviewData.rating); i++) {
+            const star = $(`<i class="d-flex justify-content-center align-items-center bi bi-star-fill rate-star"></i>`);
+            rateBar.append(star);
+        }
+        for (let i = 0; i < 5 - parseInt(reviewData.rating); i++) {
+            const star = $(`<i class="d-flex justify-content-center align-items-center bi bi-star rate-star"></i>`);
+            rateBar.append(star);
+        }
+        const creationDate = formatDate(reviewData.creation_date);
+        const userReviewInfo = $(`
+            <div class="user-review-block">
+                <div class="detail-review-user-block">
+                    <img src="${noImgUrl}" class="user-avatar" />
+                    <a href="#" class="review-username">${reviewData.user.username}</a>
+                </div>
+                
+                <span class="review-date">${creationDate}</span>
+            </div>
+        `);
+        const review = $(`
+            <div class="review-block">
+                <span class="review-comment-label">Comment</span>
+                <span>${reviewData.text}</span>
+            </div>
+        `);
+        reviewsInfoBlock.append(line);
+        reviewsInfoBlock.append(userReviewInfo);
+        reviewsInfoBlock.append(rateBar);
+        reviewsInfoBlock.append(review);
+        reviewsInfoBlock.append(line);
     });
 }
 

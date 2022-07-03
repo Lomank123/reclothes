@@ -17,5 +17,5 @@ function getCookie(name) {
 
 function formatDate(date) {
     const result = new Date(date);
-    return result.toLocaleString();
+    return result.toLocaleDateString();
 }

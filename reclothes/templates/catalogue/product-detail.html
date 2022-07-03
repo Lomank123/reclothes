@@ -11,13 +11,15 @@
 {% block content %}
 <div id="productId" data-id="{{ product_id }}"></div>
 
-<h3 class="page-label">{% translate "Product detail" %}</h3>
-<hr />
-
 <div id="top-info-block"></div>
 
 <div id="product-main-info-block" class="default-block">
   <!-- loading spinner -->
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+</div>
+<div id="bottom-info-block"></div>
+
+<div id="description-info-block" class="default-block">
   <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
 </div>
 
@@ -26,11 +28,9 @@
   <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
 </div>
 
-<div id="description-info-block"></div>
-
-<div id="bottom-info-block"></div>
-
-<div id="reviews-info-block"></div>
+<div id="reviews-info-block" class="default-block">
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+</div>
 
 {% endblock content %}
 

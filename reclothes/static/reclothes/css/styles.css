@@ -57,6 +57,7 @@ a.logo, a.logo:hover, a.logo:active, a.logo:visited, a.logo:focus {
 }
 
 .default-block {
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   border-radius: 8px;
