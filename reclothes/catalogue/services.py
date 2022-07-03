@@ -49,5 +49,7 @@ class ProductDetailService:
 
     def execute(self, product_id):
         product = ProductRepository.get_by_id(product_id)
-        data = self._build_response_data(product)
+        data = {}
+        if product is not None:
+            data = self._build_response_data(product)
         return self._build_response(data, product is None)
