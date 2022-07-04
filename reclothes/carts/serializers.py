@@ -6,11 +6,14 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Cart
-        fields = '__all__'
+        fields = ('id',)
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+    product_title = serializers.CharField()
+    image = serializers.CharField()
 
     class Meta:
+        depth = 1
         model = models.CartItem
-        fields = '__all__'
+        fields = ('id', 'quantity', 'image', 'product_id', 'product_title',)

@@ -4,6 +4,7 @@ from rest_framework import status
 
 from catalogue import consts
 from catalogue import serializers
+from catalogue.decorators import query_debugger
 
 
 class HomeViewService:
@@ -29,6 +30,9 @@ class ProductDetailService:
 
     @staticmethod
     def _build_response_data(product):
+        # TODO: Refactor this
+        # Try to merge it in 1-3 queries
+        # For now it somehow hits db n times which is unacceptable
         product_serializer = serializers.ProductSerializer(product)
         images_serializer = serializers.ProductImageSerializer(product.images.order_by('-is_feature'), many=True)
         attrs_serializer = serializers.ProductAttributeValueSerializer(product.attr_values, many=True)

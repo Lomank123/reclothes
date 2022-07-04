@@ -1,8 +1,13 @@
 import logging
 
+from rest_framework import status
+from rest_framework.response import Response
+
 from carts import consts
-from carts.repositories import CartRepository
+from carts.repositories import CartRepository, CartItemRepository
 from carts.utils import CartSessionManager
+from carts.serializers import CartSerializer, CartItemSerializer
+from catalogue.repositories import ProductImageRepository
 
 
 logger = logging.getLogger('django')
@@ -38,3 +43,44 @@ class CartMiddlewareService:
     def execute(self):
         cart_id, forced = self._get_or_create_cart_id()
         self.session_manager.set_cart_id_if_not_exists(cart_id, forced=forced)
+
+
+class CartViewSetService:
+
+    __slots__ = 'session_manager',
+
+    def __init__(self, request):
+        self.session_manager = CartSessionManager(request)
+
+    def _build_response_data(self, cart, cart_items):
+        cart_serializer = CartSerializer(cart)
+        cart_item_serializer = CartItemSerializer(cart_items, many=True)
+        return {
+            "cart": cart_serializer.data,
+            "cart_items": cart_item_serializer.data,
+        }
+
+    @staticmethod
+    def _build_response(data, is_none):
+        response = Response(data=data, status=status.HTTP_200_OK)
+        if is_none:
+            response.status_code = status.HTTP_404_NOT_FOUND
+        return response
+
+    @staticmethod
+    def _build_cart_items_qs(cart):
+        img_subquery = ProductImageRepository.get_feature_image_by_product_id(
+            subquery=True,
+            outer_ref_value="product_id"
+        )
+        image_qs = CartItemRepository.attach_feature_image(cart.cart_items.all(), img_subquery)
+        return CartItemRepository.attach_product_info(image_qs)
+
+    def execute_get_cart(self):
+        cart_id = self.session_manager.get_cart_id()
+        data = {}
+        if cart_id is not None:
+            cart = CartRepository.get_by_id(cart_id)
+            cart_items = self._build_cart_items_qs(cart)
+            data = self._build_response_data(cart, cart_items)
+        return self._build_response(data, cart_id is None)

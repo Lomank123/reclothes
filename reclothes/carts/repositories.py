@@ -1,3 +1,5 @@
+from django.db.models import Subquery, F
+
 from carts.models import Cart
 
 
@@ -6,6 +8,13 @@ class CartRepository:
     @staticmethod
     def create(*args, **kwargs):
         return Cart.objects.create(*args, **kwargs)
+
+    @staticmethod
+    def get_by_id(cart_id):
+        """
+        Return non-deleted and non-archived cart by its id.
+        """
+        return Cart.objects.filter(id=cart_id, is_archived=False, is_deleted=False).first()
 
     @staticmethod
     def is_cart_exists_by_id(cart_id):
@@ -35,3 +44,14 @@ class CartRepository:
         else:
             cart.is_deleted = True
             cart.save()
+
+
+class CartItemRepository:
+
+    @staticmethod
+    def attach_feature_image(qs, img_subquery):
+        return qs.annotate(image=Subquery(img_subquery))
+
+    @staticmethod
+    def attach_product_info(qs):
+        return qs.annotate(product_title=F('product__title'))

@@ -70,6 +70,14 @@ class ProductRepository:
             .first()
         )
 
+    @staticmethod
+    def get_subquery():
+        return (
+            Product.objects
+            .filter(id=OuterRef("product_id"))
+            .values()
+        )
+
 
 class CategoryRepository:
     pass
@@ -86,13 +94,13 @@ class ProductTypeRepository:
 class ProductImageRepository:
 
     @staticmethod
-    def get_feature_image_by_product_id(product_id=None, subquery=False):
+    def get_feature_image_by_product_id(product_id=None, subquery=False, outer_ref_value="id"):
         """
         Return first feature image. Set subquery=True to return subquery.
         """
         ref_id = product_id
         if subquery:
-            ref_id = OuterRef('id')
+            ref_id = OuterRef(outer_ref_value)
         elif product_id is None:
             raise AttributeError("If subquery is False product_id must not be None.")
         return (
