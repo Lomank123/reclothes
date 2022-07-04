@@ -36,6 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     product_type = ProductTypeSerializer()
     tags = TagSerializer(many=True)
+    avg_rate = serializers.FloatField(default=0.00)
 
     class Meta:
         model = models.Product

@@ -6,6 +6,8 @@ const descrInfoBlock = $('#description-info-block');
 const reviewsInfoBlock = $('#reviews-info-block');
 const bottomInfoBlock = $('#bottom-info-block');
 const noImgUrl = '/static/reclothes/images/empty.jpg';
+let imgs = [];
+let imgIndex = 0;
 
 
 function getProductData() {
@@ -71,12 +73,15 @@ function buildButton(availability) {
 
 function setMainInfo(data) {
     mainInfoBlock.empty();
+
+    const rateBar = buildRating(data.avg_rate);
     const info = $(`
         <div id="info-block">
             <div class="flex-block main-info">
                 <div id="detail-title-block">
                     <span id="detail-title">${data.title}</span>
                 </div>
+                <div id="detail-avg-rating-block"></div>
                 <div id="detail-price-block">
                     <span id="detail-price">${data.regular_price}$</span>
                 </div>
@@ -84,6 +89,8 @@ function setMainInfo(data) {
         </div>
     `);
     mainInfoBlock.append(info);
+    const rateBlock = $('#detail-avg-rating-block');
+    rateBlock.append(rateBar);
 
     // Add to cart button
     const availability = getAvailability(data.is_active, data.quantity);
@@ -152,14 +159,55 @@ function setImages(data) {
     let altText = "No image";
     // First image will always be feature image if exists
     if (data.length > 0) {
+        imgs = data;
         imgUrl = data[0].image;
         altText = data[0].alt_text;
     }
     const image = $(`
-        <img class="product-image" src="${imgUrl}" alt="${altText}"></img>
+        <img id="main-img" class="product-image" src="${imgUrl}" alt="${altText}"></img>
     `);
+    const leftSlideButton = $(`<button type="button" class="btn btn-primary" id="left-btn">\<</button>`);
+    const rightSlideButton = $(`<button type="button" class="btn btn-primary" id="right-btn">\></button>`);
+    leftSlideButton.click(() => {
+        previousImage();
+    });
+    rightSlideButton.click(() => {
+        nextImage();
+    })
+    imagesBlock.append(leftSlideButton);
     imagesBlock.append(image);
+    imagesBlock.append(rightSlideButton);
     infoBlock.append(imagesBlock);
+    imagesBlock.hover(
+        () => {
+            leftSlideButton.show();
+            rightSlideButton.show();
+        },
+        () => {
+            leftSlideButton.hide();
+            rightSlideButton.hide();
+        }
+    )
+}
+
+function nextImage() {
+    const image = $('#main-img');
+    imgIndex++;
+    if (imgIndex > imgs.length - 1) {
+        imgIndex = 0;
+    }
+    image.attr('src', imgs[imgIndex].image);
+    image.attr('alt', imgs[imgIndex].alt_text);
+}
+
+function previousImage() {
+    const image = $('#main-img');
+    imgIndex--;
+    if (imgIndex < 0) {
+        imgIndex = imgs.length - 1;
+    }
+    image.attr('src', imgs[imgIndex].image);
+    image.attr('alt', imgs[imgIndex].alt_text);
 }
 
 function setAdditionalInfo(data) {
@@ -211,15 +259,7 @@ function setReviewsInfo(data) {
     }
     data.forEach(reviewData => {
         const line = $(`<span class="grey-line"></span>`);
-        const rateBar = $(`<div class="rate-bar"></div>`);
-        for (let i = 0; i < parseInt(reviewData.rating); i++) {
-            const star = $(`<i class="d-flex justify-content-center align-items-center bi bi-star-fill rate-star"></i>`);
-            rateBar.append(star);
-        }
-        for (let i = 0; i < 5 - parseInt(reviewData.rating); i++) {
-            const star = $(`<i class="d-flex justify-content-center align-items-center bi bi-star rate-star"></i>`);
-            rateBar.append(star);
-        }
+        const rateBar = buildRating(reviewData.rating);
         const creationDate = formatDate(reviewData.creation_date);
         const userReviewInfo = $(`
             <div class="user-review-block">
@@ -237,12 +277,30 @@ function setReviewsInfo(data) {
                 <span>${reviewData.text}</span>
             </div>
         `);
-        reviewsInfoBlock.append(line);
         reviewsInfoBlock.append(userReviewInfo);
         reviewsInfoBlock.append(rateBar);
         reviewsInfoBlock.append(review);
         reviewsInfoBlock.append(line);
     });
+}
+
+function buildRating(starsNum) {
+    const parsedNum = parseFloat(starsNum).toFixed(2);
+    const roundStarsNum = Math.round(parsedNum);
+    const rateBar = $(`<div class="rate-bar"></div>`);
+    // filled stars
+    for (let i = 0; i < roundStarsNum; i++) {
+        const star = $(`<i class="d-flex justify-content-center align-items-center bi bi-star-fill rate-star"></i>`);
+        rateBar.append(star);
+    }
+    // empty stars
+    for (let i = 0; i < 5 - roundStarsNum; i++) {
+        const star = $(`<i class="d-flex justify-content-center align-items-center bi bi-star rate-star"></i>`);
+        rateBar.append(star);
+    }
+    const rateNum = $(`<span>&nbsp;&nbsp;<b>${parsedNum}</b></span>`);
+    rateBar.append(rateNum);
+    return rateBar;
 }
 
 getProductData();

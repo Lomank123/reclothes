@@ -66,6 +66,7 @@ class ProductRepository:
             Product.objects
             .select_related('category', 'product_type')
             .filter(id=product_id)
+            .annotate(avg_rate=Avg("reviews__rating"))
             .first()
         )
 
