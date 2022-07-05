@@ -45,7 +45,7 @@ class CartMiddlewareService:
         self.session_manager.set_cart_id_if_not_exists(cart_id, forced=forced)
 
 
-class CartViewSetService:
+class CartService:
 
     __slots__ = 'session_manager',
 
@@ -77,11 +77,11 @@ class CartViewSetService:
         image_qs = CartItemRepository.attach_feature_image(cart_items, img_subquery)
         return CartItemRepository.attach_product_info(image_qs)
 
-    def execute_get_cart(self):
+    def execute(self):
         cart_id = self.session_manager.get_cart_id()
+        cart = CartRepository.get_by_id(cart_id)
         data = {}
-        if cart_id is not None:
-            cart = CartRepository.get_by_id(cart_id)
+        if cart is not None:
             cart_items = self._build_cart_items_qs(cart)
             data = self._build_response_data(cart, cart_items)
-        return self._build_response(data, cart_id is None)
+        return self._build_response(data, cart is None)

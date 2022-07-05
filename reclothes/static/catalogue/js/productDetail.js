@@ -32,9 +32,7 @@ function displayProductInfo(result) {
     setImages(result.images);
     setDescription(result.product.description);
     setAdditionalInfo(result.attrs);
-    if (result.reviews.length > 0) {
-        setReviewsInfo(result.reviews);
-    }
+    setReviewsInfo(result.reviews);
 }
 
 function getAvailability(isActive, quantity) {
@@ -59,7 +57,7 @@ function getAvailability(isActive, quantity) {
     };
 }
 
-function buildButton(availability) {
+function setAddToCartButton(availability) {
     const button = $(`
         <button id="add-to-cart-btn" type="button" class="btn btn-primary">
             ${availability.text}
@@ -68,13 +66,12 @@ function buildButton(availability) {
     if (availability.active !== 1) {
         button.prop('disabled', true);
     }
-    return button;
+    const detailPriceBlock = $('#detail-price-block');
+    detailPriceBlock.append(button);
 }
 
 function setMainInfo(data) {
     mainInfoBlock.empty();
-
-    const rateBar = buildRating(data.avg_rate);
     const info = $(`
         <div id="info-block">
             <div class="flex-block main-info">
@@ -89,43 +86,57 @@ function setMainInfo(data) {
         </div>
     `);
     mainInfoBlock.append(info);
-    const rateBlock = $('#detail-avg-rating-block');
-    rateBlock.append(rateBar);
 
-    // Add to cart button
+    // Rating
+    if (data.avg_rate !== null) {
+        const rateBlock = $('#detail-avg-rating-block');
+        const rateBar = buildRating(data.avg_rate);
+        rateBlock.append(rateBar);
+    }
+
     const availability = getAvailability(data.is_active, data.quantity);
-    button = buildButton(availability);
-    const detailPriceBlock = $('#detail-price-block');
-    detailPriceBlock.append(button);
-
-    setCategoriesInfo(data.category.category_tree, data.product_type);
+    setAddToCartButton(availability);
+    setTopInfo(data.product_type, data.category);
     setTagsInfo(data.tags);
     setDatesInfo(data.last_update, data.creation_date);
 }
 
-function setCategoriesInfo(categories, type) {
-    const categoriesBlock = $(`
-        <div class="categories-block">
-            <a href="#" class="category-link">Catalogue&nbsp;</a>
-        </div>
-    `);
+function setTopInfo(type, categories) {
     topInfoBlock.empty();
+    setProductTypeInfo(type);
+    if (categories !== null) {
+        setCategoriesInfo(categories.category_tree);
+    }
+}
+
+function setCategoriesInfo(categories) {
+    const categoriesBlock = $(`
+    <div class="categories-block">
+        <a href="#" class="category-link">Catalogue&nbsp;</a>
+    </div>
+    `);
     categories.forEach(category => {
         const categoryBlock = $(`
             <div class="single-category-block">
-                <span class="category-span">\> <a class="category-link" href="/category/${category.id}">${category.name}</a></span>
+                <span class="category-span">
+                    \> <a class="category-link" href="/category/${category.id}">${category.name}</a>
+                </span>
             </div>
         `);
         categoriesBlock.append(categoryBlock);
     });
+    topInfoBlock.append(categoriesBlock);
+}
 
+function setProductTypeInfo(type) {
     const typeBlock = $(`
         <div>
-            <span>Type: <a href="/filter?product_type=${type.id}" class="category-link">${type.name}</a></span>
+            <span>
+                Type: <a href="/filter?product_type=${type.id}" class="category-link">${type.name}</a>
+            </span>
         </div>
     `);
     topInfoBlock.append(typeBlock);
-    topInfoBlock.append(categoriesBlock);
 }
 
 function setTagsInfo(data) {
@@ -162,23 +173,24 @@ function setImages(data) {
         imgs = data;
         imgUrl = data[0].image;
         altText = data[0].alt_text;
+        // buttons
+        setImageButtons(imagesBlock);
     }
     const image = $(`
         <img id="main-img" class="product-image" src="${imgUrl}" alt="${altText}"></img>
     `);
+    imagesBlock.append(image);
+    infoBlock.append(imagesBlock);
+}
+
+function setImageButtons(parent) {
     const leftSlideButton = $(`<button type="button" class="btn btn-primary" id="left-btn">\<</button>`);
     const rightSlideButton = $(`<button type="button" class="btn btn-primary" id="right-btn">\></button>`);
-    leftSlideButton.click(() => {
-        previousImage();
-    });
-    rightSlideButton.click(() => {
-        nextImage();
-    })
-    imagesBlock.append(leftSlideButton);
-    imagesBlock.append(image);
-    imagesBlock.append(rightSlideButton);
-    infoBlock.append(imagesBlock);
-    imagesBlock.hover(
+    leftSlideButton.click(() => { previousImage(); });
+    rightSlideButton.click(() => { nextImage(); });
+    parent.append(leftSlideButton);
+    parent.append(rightSlideButton);
+    parent.hover(
         () => {
             leftSlideButton.show();
             rightSlideButton.show();
@@ -187,7 +199,7 @@ function setImages(data) {
             leftSlideButton.hide();
             rightSlideButton.hide();
         }
-    )
+    );
 }
 
 function nextImage() {
@@ -253,7 +265,7 @@ function setReviewsInfo(data) {
     `);
     reviewsInfoBlock.append(label);
     if (data.length == 0) {
-        const emptyText = $(`<span>No reviews yet</span>`);
+        const emptyText = $(`<span id="no-reviews-text">No reviews yet.</span>`);
         reviewsInfoBlock.append(emptyText);
         return;
     }

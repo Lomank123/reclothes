@@ -4,7 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from carts import serializers
 from carts.models import Cart, CartItem
-from carts.services import CartViewSetService
+from carts.services import CartService
 
 
 class CartViewSet(ModelViewSet):
@@ -17,7 +17,7 @@ class CartViewSet(ModelViewSet):
 
     @action(methods=["get"], detail=False)
     def get_cart_from_session(self, request):
-        return CartViewSetService(request).execute_get_cart()
+        return CartService(request).execute()
 
 
 class CartItemViewSet(ModelViewSet):

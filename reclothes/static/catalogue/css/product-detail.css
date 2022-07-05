@@ -219,6 +219,10 @@ a.category-link:hover {
 }
 
 /* reviews */
+#no-reviews-text {
+  margin-top: 20px;
+}
+
 .review-block {
   display: flex;
   flex-direction: column;
