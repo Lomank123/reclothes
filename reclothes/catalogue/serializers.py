@@ -11,7 +11,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'name',)
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategoryDetailSerializer(serializers.ModelSerializer):
     category_tree = serializers.SerializerMethodField()
 
     class Meta:
@@ -34,7 +34,7 @@ class ProductTypeSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = CategoryDetailSerializer()
     product_type = ProductTypeSerializer()
     tags = TagSerializer(many=True)
     avg_rate = serializers.FloatField(default=0.00)
@@ -42,6 +42,21 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Product
         fields = '__all__'
+
+
+class ProductCatalogueSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Product
+        fields = ('id', 'title', 'regular_price', 'is_active', 'quantity',)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        depth = 1
+        model = models.Category
+        fields = ('id', 'name', )
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):

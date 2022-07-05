@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register("product", viewsets.ProductViewSet, basename="product")
 router.register("category", viewsets.CategoryViewSet, basename="category")
 router.register("tag", viewsets.TagViewSet, basename="tag")
+router.register("catalogue", viewsets.CatalogueViewSet, basename="catalogue")
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name="home"),
