@@ -57,8 +57,14 @@ class CartItemRepository:
 
     @staticmethod
     def attach_feature_image(qs, img_subquery):
+        """
+        Annotate image to cart item queryset.
+        """
         return qs.annotate(image=Subquery(img_subquery))
 
     @staticmethod
     def attach_product_info(qs):
+        """
+        Annotate product info to cart item queryset.
+        """
         return qs.annotate(product_title=F('product__title'))

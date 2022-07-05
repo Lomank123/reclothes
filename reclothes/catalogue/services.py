@@ -1,9 +1,8 @@
-from catalogue.repositories import ProductRepository, ProductImageRepository
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
 
-from catalogue import consts
-from catalogue import serializers
+from catalogue import consts, serializers
+from catalogue.repositories import ProductImageRepository, ProductRepository
 
 
 class HomeViewService:

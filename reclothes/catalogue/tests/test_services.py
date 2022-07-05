@@ -1,11 +1,12 @@
-from django.test import TestCase
-from catalogue.services import HomeViewService, ProductDetailService
-from catalogue.models import Product, Category, ProductReview, ProductType, ProductImage, \
-    ProductAttribute, ProductAttributeValue
-from carts.models import Cart, CartItem
-from orders.models import Order, OrderItem, Address, Payment
 from accounts.models import CustomUser
+from carts.models import Cart, CartItem
+from catalogue.models import (Category, Product, ProductAttribute,
+                              ProductAttributeValue, ProductImage,
+                              ProductReview, ProductType)
+from catalogue.services import HomeViewService, ProductDetailService
+from django.test import TestCase
 from orders.consts import CASH, IN_PROGRESS
+from orders.models import Address, Order, OrderItem, Payment
 
 
 class CatalogueServicesTestCase(TestCase):

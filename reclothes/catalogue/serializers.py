@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from catalogue import models
 from accounts.serializers import CustomUserSerializer
+from rest_framework import serializers
+
+from catalogue import models
 
 
 class TagSerializer(serializers.ModelSerializer):

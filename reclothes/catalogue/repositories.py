@@ -62,6 +62,9 @@ class ProductRepository:
 
     @staticmethod
     def get_by_id(product_id):
+        """
+        Return product with selected related and annotated average rating.
+        """
         return (
             Product.objects
             .select_related('category', 'product_type')

@@ -1,13 +1,13 @@
 import logging
 
+from catalogue.repositories import ProductImageRepository
 from rest_framework import status
 from rest_framework.response import Response
 
 from carts import consts
-from carts.repositories import CartRepository, CartItemRepository
+from carts.repositories import CartItemRepository, CartRepository
+from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
-from carts.serializers import CartSerializer, CartItemSerializer
-from catalogue.repositories import ProductImageRepository
 
 
 logger = logging.getLogger('django')
