@@ -12,3 +12,7 @@ class ProductDetailView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["product_id"] = kwargs.get("pk")
         return context
+
+
+class CatalogueView(TemplateView):
+    template_name = 'catalogue/catalogue.html'
