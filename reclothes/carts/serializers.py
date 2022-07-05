@@ -4,10 +4,11 @@ from carts import models
 
 
 class CartSerializer(serializers.ModelSerializer):
+    cart_items_count = serializers.IntegerField()
 
     class Meta:
         model = models.Cart
-        fields = ('id',)
+        fields = ('id', 'cart_items_count',)
 
 
 class CartItemSerializer(serializers.ModelSerializer):

@@ -1,4 +1,4 @@
-from django.db.models import Subquery, F
+from django.db.models import Subquery, F, Count
 
 from carts.models import Cart
 
@@ -14,7 +14,12 @@ class CartRepository:
         """
         Return non-deleted and non-archived cart by its id.
         """
-        return Cart.objects.filter(id=cart_id, is_archived=False, is_deleted=False).first()
+        return (
+            Cart.objects
+            .filter(id=cart_id, is_archived=False, is_deleted=False)
+            .annotate(cart_items_count=Count('cart_items'))
+            .first()
+        )
 
     @staticmethod
     def is_cart_exists_by_id(cart_id):

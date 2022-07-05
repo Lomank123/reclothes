@@ -24,6 +24,9 @@
     <header>
 			<a class="logo" href="{% url 'catalogue:home' %}">Reclothes</a>
 			<div class="auth-text">
+
+        <div id="cart-header-block"></div>
+
         {% if user.is_authenticated %} 
 					<span class="auth-link">Welcome, <a href="">{{ user.username }}</a></span>
           <a href="{% url 'accounts:logout' %}" class="auth-link">Log out</a>

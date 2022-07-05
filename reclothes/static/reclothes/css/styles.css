@@ -1,4 +1,5 @@
 /* General */
+
 a, a:hover, a:active, a:visited, a:focus {
 	text-decoration:none;
 }
@@ -75,4 +76,34 @@ a.logo, a.logo:hover, a.logo:active, a.logo:visited, a.logo:focus {
 
 .page-label {
   text-align: center;
+}
+
+/* header */
+
+.auth-text {
+  display: flex;
+  align-items: center;
+}
+
+#cart-header-block {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#cart-btn {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  background-color: transparent;
+  overflow: hidden;
+  font-size: larger;
+  outline: none !important;
+  box-shadow: none;
+  color: black;
+}
+
+.cart-icon {
+  margin-right: 5px;
 }
