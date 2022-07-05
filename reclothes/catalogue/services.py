@@ -4,7 +4,6 @@ from rest_framework import status
 
 from catalogue import consts
 from catalogue import serializers
-from catalogue.decorators import query_debugger
 
 
 class HomeViewService:
@@ -29,14 +28,11 @@ class HomeViewService:
 class ProductDetailService:
 
     @staticmethod
-    def _build_response_data(product):
-        # TODO: Refactor this
-        # Try to merge it in 1-3 queries
-        # For now it somehow hits db n times which is unacceptable
+    def _build_response_data(product, images, attr_values, reviews):
         product_serializer = serializers.ProductSerializer(product)
-        images_serializer = serializers.ProductImageSerializer(product.images.order_by('-is_feature'), many=True)
-        attrs_serializer = serializers.ProductAttributeValueSerializer(product.attr_values, many=True)
-        reviews_serializer = serializers.ProductReviewSerializer(product.reviews.order_by('-creation_date'), many=True)
+        images_serializer = serializers.ProductImageSerializer(images, many=True)
+        attrs_serializer = serializers.ProductAttributeValueSerializer(attr_values, many=True)
+        reviews_serializer = serializers.ProductReviewSerializer(reviews, many=True)
         return {
             "product": product_serializer.data,
             "attrs": attrs_serializer.data,
@@ -55,5 +51,8 @@ class ProductDetailService:
         product = ProductRepository.get_by_id(product_id)
         data = {}
         if product is not None:
-            data = self._build_response_data(product)
+            images = ProductRepository.get_images(product)
+            attr_values = ProductRepository.get_values_with_attrs(product)
+            reviews = ProductRepository.get_reviews_with_user(product)
+            data = self._build_response_data(product, images, attr_values, reviews)
         return self._build_response(data, product is None)

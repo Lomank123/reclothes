@@ -71,12 +71,25 @@ class ProductRepository:
         )
 
     @staticmethod
-    def get_subquery():
-        return (
-            Product.objects
-            .filter(id=OuterRef("product_id"))
-            .values()
-        )
+    def get_values_with_attrs(product):
+        """
+        Return queryset of attrs with values by product.
+        """
+        return product.attr_values.select_related('attribute')
+
+    @staticmethod
+    def get_reviews_with_user(product):
+        """
+        Return queryset of reviews with user info by product ordered by date.
+        """
+        return product.reviews.select_related('user').order_by('-creation_date')
+
+    @staticmethod
+    def get_images(product):
+        """
+        Return product images ordered by is_feature.
+        """
+        return product.images.order_by('-is_feature')
 
 
 class CategoryRepository:
@@ -108,3 +121,7 @@ class ProductImageRepository:
             .filter(product_id=ref_id, is_feature=True)
             .values('image')[:1]
         )
+
+
+class ProductAttributeValueRepository:
+    pass

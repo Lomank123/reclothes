@@ -73,7 +73,8 @@ class CartViewSetService:
             subquery=True,
             outer_ref_value="product_id"
         )
-        image_qs = CartItemRepository.attach_feature_image(cart.cart_items.all(), img_subquery)
+        cart_items = CartRepository.get_cart_items(cart)
+        image_qs = CartItemRepository.attach_feature_image(cart_items, img_subquery)
         return CartItemRepository.attach_product_info(image_qs)
 
     def execute_get_cart(self):

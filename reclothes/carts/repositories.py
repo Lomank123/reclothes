@@ -45,6 +45,13 @@ class CartRepository:
             cart.is_deleted = True
             cart.save()
 
+    @staticmethod
+    def get_cart_items(cart):
+        """
+        Return cart items by cart object.
+        """
+        return cart.cart_items.all()
+
 
 class CartItemRepository:
 
