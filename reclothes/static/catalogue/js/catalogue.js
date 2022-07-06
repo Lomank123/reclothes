@@ -1,8 +1,3 @@
-const apiUrl = "/api";
-const catalogueUrl = `${apiUrl}/catalogue`;
-const categoriesUrl = `${apiUrl}/category`;
-const tagsUrl = `${apiUrl}/tag`;
-
 function getData(url, callback) {
     $.ajax({
         url: url,
@@ -19,17 +14,17 @@ function getData(url, callback) {
 }
 
 function setCatalogue(data) {
-    console.log("catalogue");
+    console.log(catalogueUrl.href);
 }
 
 function setCategories(data) {
-    console.log("categories");
+    console.log(categoriesUrl);
 }
 
 function setTags(data) {
-    console.log("tags");
+    console.log(tagsUrl);
 }
 
-getData(catalogueUrl, setCatalogue);
+getData(catalogueUrl.href, setCatalogue);
 getData(categoriesUrl, setCategories);
 getData(tagsUrl, setTags);

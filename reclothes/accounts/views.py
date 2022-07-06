@@ -15,7 +15,7 @@ class AccountsLoginView(LoginView):
 
     def form_valid(self, form):
         login(self.request, form.get_user())
-        LoginViewService(self.request).execute_form_login()
+        LoginViewService(self.request).execute()
         return HttpResponseRedirect(self.get_success_url())
 
 

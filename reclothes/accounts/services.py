@@ -36,6 +36,6 @@ class LoginViewService:
             cart_id = user_cart.id
         return cart_id
 
-    def execute_form_login(self):
+    def execute(self):
         cart_id = self._get_user_cart_id()
         self.session_manager.set_cart_id_if_not_exists(cart_id, forced=True)

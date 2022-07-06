@@ -6,38 +6,49 @@ from carts.models import Cart
 
 class LoginViewServiceTestCase(TestCase):
 
-    def setUp(self):
-        self.user1 = CustomUser.objects.create(username="test1", password="123123123Aa")
-        self.user2 = CustomUser.objects.create(username="test2", password="123123123Aa")
-        self.cart1 = Cart.objects.create(user=self.user1)
-        self.cart2 = Cart.objects.create(user=self.user2, is_deleted=True)
-        self.cart3 = Cart.objects.create(user=self.user2, is_archived=True)
+    @staticmethod
+    def _create_user(username, password="123123123Aa"):
+        return CustomUser.objects.create(username=username, password=password)
 
-    def tearDown(self):
-        self.user1.delete()
-        self.user2.delete()
-        self.cart1.delete()
-        self.cart2.delete()
-        self.cart3.delete()
+    @staticmethod
+    def _create_cart(user_id, **kwargs):
+        return Cart.objects.create(user_id=user_id, **kwargs)
 
-    def test_execute_form_login(self):
-        self.assertEqual(Cart.objects.count(), 3)
-        # 1st case with existing user cart
-        client1 = Client()
-        client1.get("/")
+    def test_login_with_existing_cart(self):
+        # Arrange
+        user = self._create_user("test1")
+        cart = self._create_cart(user.id)
+        self.assertEqual(Cart.objects.count(), 1)
+        client = Client()
+        client.get("/")
         request = RequestFactory().request()
-        request.user = self.user1
-        request.session = client1.session
-        LoginViewService(request).execute_form_login()
-        self.assertTrue(request.session["cart_id"] == self.cart1.id)
-        self.assertEqual(Cart.objects.count(), 4)
-        # 2nd case without valid user cart
-        client2 = Client()
-        client2.get("/")
-        request.user = self.user2
-        request.session = client2.session
-        LoginViewService(request).execute_form_login()
-        self.assertFalse(request.session["cart_id"] == self.cart1.id)
-        self.assertEqual(Cart.objects.count(), 5)
-        self.assertTrue(Cart.objects.filter(user=self.user2, is_archived=False, is_deleted=False).exists())
-        self.assertEqual(Cart.objects.filter(user=self.user2).count(), 3)
+        request.user = user
+        request.session = client.session
+
+        # Act
+        LoginViewService(request).execute()
+
+        # Assert
+        self.assertEqual(Cart.objects.count(), 2)
+        self.assertEqual(Cart.objects.filter(is_deleted=True).count(), 1)
+        self.assertTrue(request.session["cart_id"] == cart.id)
+
+    def test_login_without_valid_user_cart(self):
+        # Arrange
+        user = self._create_user("test1")
+        self._create_cart(user.id, is_deleted=True)
+        self._create_cart(user.id, is_archived=True)
+        client = Client()
+        client.get("/")
+        request = RequestFactory().request()
+        request.user = user
+        request.session = client.session
+
+        # Act
+        LoginViewService(request).execute()
+
+        # Assert
+        self.assertEqual(Cart.objects.filter(user=user).count(), 3)
+        user_cart = Cart.objects.filter(user=user, is_archived=False, is_deleted=False)
+        self.assertTrue(user_cart.exists())
+        self.assertTrue(request.session["cart_id"] == user_cart.first().id)

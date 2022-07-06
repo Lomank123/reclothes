@@ -112,14 +112,14 @@ function setTopInfo(type, categories) {
 function setCategoriesInfo(categories) {
     const categoriesBlock = $(`
     <div class="categories-block">
-        <a href="#" class="category-link">Catalogue&nbsp;</a>
+        <a href="/catalogue" class="category-link">Catalogue&nbsp;</a>
     </div>
     `);
     categories.forEach(category => {
         const categoryBlock = $(`
             <div class="single-category-block">
                 <span class="category-span">
-                    \> <a class="category-link" href="/category/${category.id}">${category.name}</a>
+                    \> <a class="category-link" href="/catalogue?category_id=${category.id}">${category.name}</a>
                 </span>
             </div>
         `);
@@ -132,7 +132,7 @@ function setProductTypeInfo(type) {
     const typeBlock = $(`
         <div>
             <span>
-                Type: <a href="/filter?product_type=${type.id}" class="category-link">${type.name}</a>
+                Type: <a href="/catalogue?product_type_id=${type.id}" class="category-link">${type.name}</a>
             </span>
         </div>
     `);
@@ -144,7 +144,7 @@ function setTagsInfo(data) {
     data.forEach(tag => {
         const tagBlock = $(`
             <div class="single-tag-block">
-            <a href="#" class="tag">${tag.name}</a>
+            <a href="/catalogue?tags=${tag.id}" class="tag">${tag.name}</a>
             </div>
         `);
         tagsInfo.append(tagBlock);
