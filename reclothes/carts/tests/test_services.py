@@ -1,88 +1,145 @@
 from accounts.models import CustomUser
 from carts.models import Cart, CartItem
-from carts.services import CartService
+from carts.services import CartMiddlewareService, CartService
 from catalogue.models import Product, ProductType
-from django.test import Client, RequestFactory, TestCase
+from django.contrib import auth
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.backends.db import SessionStore
+from django.test import RequestFactory, TestCase
+
+
+def create_user(username=None, password="123123123Aa"):
+    """
+    Create and return user. If username is none then return AnonymousUser.
+    """
+    if username is None:
+        return AnonymousUser()
+    return CustomUser.objects.create(username=username, password=password)
+
+
+def create_cart(user_id=None):
+    return Cart.objects.create(user_id=user_id)
+
+
+def create_cart_item(cart_id, product_id):
+    return CartItem.objects.create(cart_id=cart_id, product_id=product_id)
+
+
+def create_session(user):
+    """
+    Create and return new session. User must be either User or AnonymousUser object.
+    """
+    session = SessionStore(None)
+    session.clear()
+    session.cycle_key()
+    if user.is_authenticated:
+        session[auth.SESSION_KEY] = user._meta.pk.value_to_string(user)
+        session[auth.BACKEND_SESSION_KEY] = 'django.contrib.auth.backends.ModelBackend'
+        session[auth.HASH_SESSION_KEY] = user.get_session_auth_hash()
+    session.save()
+    return session
+
+
+def create_request(user=None, session=None):
+    request = RequestFactory().request()
+    request.user = user
+    request.session = session
+    return request
 
 
 class CartMiddlewareServiceTestCase(TestCase):
 
-    def setUp(self):
-        self.user1 = CustomUser.objects.create(username="test1", password="123123123Aa")
-        self.user2 = CustomUser.objects.create(username="test2", password="123123123Aa")
-        self.cart1 = Cart.objects.create(user=self.user1)
+    def test_create_anonymous_cart_and_set_to_session(self):
+        user = create_user(username="test1")
+        session = create_session(user)
+        request = create_request(user, session)
 
-    def tearDown(self):
-        self.user1.delete()
-        self.user2.delete()
-        self.cart1.delete()
+        CartMiddlewareService(request).execute()
 
-    def test_execute(self):
-        self.assertEqual(Cart.objects.count(), 1)
-        # 1st case without authenticated user
-        client1 = Client()
-        client1.get("/")
-        request = RequestFactory().request()
-        request.session = client1.session
         self.assertTrue(request.session["cart_id"])
-        self.assertEqual(Cart.objects.count(), 2)
-        Cart.objects.filter(user=None).first().delete()
-        client1.get("/")
-        self.assertEqual(Cart.objects.count(), 2)
-        # 2nd case with user
-        client2 = Client()
-        client2.force_login(self.user2)
-        client2.get("/")
-        self.assertEqual(Cart.objects.count(), 3)
-        self.assertEqual(Cart.objects.filter(user=self.user2).count(), 1)
+        self.assertEqual(Cart.objects.count(), 1)
+
+    def test_create_and_attach_cart_to_user_and_set_to_session(self):
+        user = create_user(username="test1")
+        session = create_session(user)
+        request = create_request(user, session)
+
+        CartMiddlewareService(request).execute()
+
+        self.assertEqual(Cart.objects.count(), 1)
+        self.assertEqual(Cart.objects.filter(user=user).count(), 1)
+
+    def test_check_user_cart_in_session(self):
+        user = create_user(username="test1")
+        session = create_session(user)
+        cart = create_cart(user.id)
+        session["cart_id"] = cart.id
+        request = create_request(user, session)
+
+        CartMiddlewareService(request).execute()
+
+        self.assertEqual(Cart.objects.count(), 1)
+        self.assertEqual(Cart.objects.filter(user=user).count(), 1)
 
 
 class CartServiceTestCase(TestCase):
 
-    def setUp(self):
-        self.user1 = CustomUser.objects.create(username="test1", password="123123123Aa")
-        self.user2 = CustomUser.objects.create(username="test2", password="123123123Aa")
-        self.cart1 = Cart.objects.create(user=self.user1)
-        self.product_type = ProductType.objects.create(name="type1")
-        self.product1 = Product.objects.create(
-            product_type=self.product_type,
-            title="title1",
-            quantity=10,
-            regular_price=100.00
+    @staticmethod
+    def _create_product_type(name):
+        return ProductType.objects.create(name=name)
+
+    @staticmethod
+    def _create_product(type_id, title="test", quantity=10, regular_price=100.00):
+        return Product.objects.create(
+            product_type_id=type_id,
+            title=title,
+            quantity=quantity,
+            regular_price=regular_price
         )
 
-    def tearDown(self):
-        self.user1.delete()
-        self.user2.delete()
-        self.cart1.delete()
-        self.product1.delete()
-        self.product_type.delete()
+    @staticmethod
+    def _delete_cart_by_id(cart_id):
+        Cart.objects.get(id=cart_id).delete()
 
-    def test_execute_ok(self):
-        client = Client()
-        client.get("/")
-        request = RequestFactory().request()
-        request.session = client.session
-        # empty cart
+    def test_get_empty_cart(self):
+        user = create_user()
+        session = create_session(user)
+        cart = create_cart()
+        session["cart_id"] = cart.id
+        request = create_request(user, session)
+
         response = CartService(request).execute()
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["cart"]["cart_items_count"], 0)
         self.assertEqual(len(response.data["cart_items"]), 0)
-        # filled cart
-        cart = Cart.objects.get(id=request.session.get("cart_id"))
-        CartItem.objects.create(cart_id=cart.id, product=self.product1)
+
+    def test_get_filled_cart(self):
+        user = create_user()
+        session = create_session(user)
+        cart = create_cart()
+        product_type = self._create_product_type("test1")
+        product = self._create_product(type_id=product_type.id)
+        create_cart_item(cart.id, product.id)
+        session["cart_id"] = cart.id
+        request = create_request(user, session)
+
         response = CartService(request).execute()
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["cart"]["cart_items_count"], 1)
         self.assertEqual(len(response.data["cart_items"]), 1)
         self.assertTrue("image" in response.data["cart_items"][0])
         self.assertTrue("product_title" in response.data["cart_items"][0])
 
-    def test_execute_not_found(self):
-        client = Client()
-        client.get("/")
-        request = RequestFactory().request()
-        request.session = client.session
-        Cart.objects.get(id=request.session.get("cart_id")).delete()
+    def test_cart_not_found(self):
+        user = create_user()
+        session = create_session(user)
+        cart = create_cart()
+        session["cart_id"] = cart.id
+        request = create_request(user, session)
+        self._delete_cart_by_id(cart.id)
+
         response = CartService(request).execute()
+
         self.assertEqual(response.status_code, 404)
