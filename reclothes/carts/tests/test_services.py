@@ -21,10 +21,6 @@ def create_cart(user_id=None):
     return Cart.objects.create(user_id=user_id)
 
 
-def create_cart_item(cart_id, product_id):
-    return CartItem.objects.create(cart_id=cart_id, product_id=product_id)
-
-
 def create_session(user):
     """
     Create and return new session. User must be either User or AnonymousUser object.
@@ -85,6 +81,10 @@ class CartMiddlewareServiceTestCase(TestCase):
 class CartServiceTestCase(TestCase):
 
     @staticmethod
+    def _create_cart_item(cart_id, product_id):
+        return CartItem.objects.create(cart_id=cart_id, product_id=product_id)
+
+    @staticmethod
     def _create_product_type(name):
         return ProductType.objects.create(name=name)
 
@@ -120,7 +120,7 @@ class CartServiceTestCase(TestCase):
         cart = create_cart()
         product_type = self._create_product_type("test1")
         product = self._create_product(type_id=product_type.id)
-        create_cart_item(cart.id, product.id)
+        self._create_cart_item(cart.id, product.id)
         session["cart_id"] = cart.id
         request = create_request(user, session)
 

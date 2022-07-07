@@ -1,118 +1,117 @@
 from accounts.models import CustomUser
 from carts.models import Cart, CartItem
-from catalogue.models import (Category, Product, ProductAttribute,
-                              ProductAttributeValue, ProductImage,
-                              ProductReview, ProductType)
+from catalogue.models import (Product, ProductAttribute, ProductAttributeValue,
+                              ProductImage, ProductReview, ProductType)
 from catalogue.services import HomeViewService, ProductDetailService
 from django.test import TestCase
 from orders.consts import CASH, IN_PROGRESS
 from orders.models import Address, Order, OrderItem, Payment
 
 
+def create_product_type(name):
+    return ProductType.objects.create(name=name)
+
+
+def create_product(type_id, title="test", quantity=10, regular_price=100.00):
+    return Product.objects.create(
+        product_type_id=type_id,
+        title=title,
+        quantity=quantity,
+        regular_price=regular_price
+    )
+
+
 class CatalogueServicesTestCase(TestCase):
 
-    def setUp(self):
+    @staticmethod
+    def _create_user(username, password="123123123Aa"):
+        return CustomUser.objects.create(username=username, password=password)
+
+    @staticmethod
+    def _create_product_attr(name, type_id):
+        return ProductAttribute.objects.create(name=name, product_type_id=type_id)
+
+    @staticmethod
+    def _create_product_attr_value(product_id, attr_id, value="12"):
+        return ProductAttributeValue.objects.create(product_id=product_id, attribute_id=attr_id, value=value)
+
+    @staticmethod
+    def _create_product_review(product_id, user_id, rating=5, text="test"):
+        return ProductReview.objects.create(product_id=product_id, user_id=user_id, rating=rating, text=text)
+
+    @staticmethod
+    def _create_image(product_id, alt_text="img", is_feature=False):
+        return ProductImage.objects.create(product_id=product_id, alt_text=alt_text, is_feature=is_feature)
+
+    @staticmethod
+    def _create_cart(user_id=None):
+        return Cart.objects.create(user_id=user_id)
+
+    @staticmethod
+    def _create_cart_item(product_id, cart_id):
+        return CartItem.objects.create(product_id=product_id, cart_id=cart_id)
+
+    @staticmethod
+    def _create_address(name):
+        return Address.objects.create(name=name)
+
+    @staticmethod
+    def _create_payment(type=CASH, total_price=123):
+        return Payment.objects.create(payment_type=type, total_price=total_price)
+
+    @staticmethod
+    def _create_order(user_id, address_id, payment_id, status=IN_PROGRESS):
+        return Order.objects.create(user_id=user_id, address_id=address_id, payment_id=payment_id, status=status)
+
+    @staticmethod
+    def _create_order_item(order_id, cart_item_id):
+        return OrderItem.objects.create(order_id=order_id, cart_item_id=cart_item_id)
+
+    def _create_data(self):
         # Users
-        self.user = CustomUser.objects.create(username="test1", password="123123123Aa")
-        self.user2 = CustomUser.objects.create(username="test2", password="123123123Aa")
+        user = self._create_user("test1")
+        user2 = self._create_user("test2")
         # Products
-        self.product_type = ProductType.objects.create(name="type1")
-        self.attr1 = ProductAttribute.objects.create(name="attr1", product_type=self.product_type)
-        self.attr2 = ProductAttribute.objects.create(name="attr2", product_type=self.product_type)
-        self.category = Category.objects.create(name="category1")
-        self.product1 = Product.objects.create(
-            product_type=self.product_type,
-            category=self.category,
-            title="title1",
-            quantity=10,
-            regular_price=100.00
-        )
-        self.product2 = Product.objects.create(
-            product_type=self.product_type,
-            category=self.category,
-            title="title2",
-            quantity=7,
-            regular_price=32.44
-        )
-        self.product3 = Product.objects.create(
-            product_type=self.product_type,
-            category=self.category,
-            title="title3",
-            quantity=7,
-            regular_price=32.44,
-            is_active=False
-        )
-        self.attr_value1 = ProductAttributeValue.objects.create(product=self.product1, attribute=self.attr1, value="1")
-        self.attr_value2 = ProductAttributeValue.objects.create(product=self.product1, attribute=self.attr2, value="2")
-        self.review1 = ProductReview.objects.create(product=self.product1, user=self.user, text="t1", rating=4)
-        self.review2 = ProductReview.objects.create(product=self.product1, user=self.user2, text="t2", rating=1)
-        self.review3 = ProductReview.objects.create(product=self.product2, user=self.user, text="t3", rating=5)
-        self.review4 = ProductReview.objects.create(product=self.product2, user=self.user2, text="t4", rating=2)
-        self.image1 = ProductImage.objects.create(product=self.product1, alt_text="testimg1", is_feature=True)
-        self.image2 = ProductImage.objects.create(product=self.product1, alt_text="testimg2", is_feature=False)
-        self.image3 = ProductImage.objects.create(product=self.product2, alt_text="testimg3", is_feature=False)
+        product_type = create_product_type("type1")
+        attr1 = self._create_product_attr("attr1", type_id=product_type.id)
+        attr2 = self._create_product_attr("attr2", type_id=product_type.id)
+        product1 = create_product(type_id=product_type.id)
+        product2 = create_product(type_id=product_type.id)
+        self._create_product_attr_value(product_id=product1.id, attr_id=attr1.id)
+        self._create_product_attr_value(product_id=product1.id, attr_id=attr2.id)
+        # Reviews
+        self._create_product_review(product_id=product1.id, user_id=user.id, rating=4)
+        self._create_product_review(product_id=product1.id, user_id=user2.id, rating=1)
+        self._create_product_review(product_id=product2.id, user_id=user.id, rating=5)
+        self._create_product_review(product_id=product2.id, user_id=user2.id, rating=2)
+        # Images
+        self._create_image(product_id=product1.id, is_feature=True)
+        self._create_image(product_id=product1.id)
+        self._create_image(product_id=product2.id)
         # Carts
-        self.cart1 = Cart.objects.create(user=self.user)
-        self.cart_item1 = CartItem.objects.create(cart=self.cart1, product=self.product1)
-        self.cart_item2 = CartItem.objects.create(cart=self.cart1, product=self.product2)
-        self.cart2 = Cart.objects.create(user=self.user)
-        self.cart_item3 = CartItem.objects.create(cart=self.cart2, product=self.product1)
-        self.cart_item4 = CartItem.objects.create(cart=self.cart2, product=self.product2)
+        cart1 = self._create_cart(user_id=user.id)
+        cart2 = self._create_cart(user_id=user.id)
+        # Cart items
+        cart_item1 = self._create_cart_item(product_id=product1.id, cart_id=cart1.id)
+        cart_item2 = self._create_cart_item(product_id=product2.id, cart_id=cart1.id)
+        cart_item3 = self._create_cart_item(product_id=product1.id, cart_id=cart2.id)
+        self._create_cart_item(product_id=product2.id, cart_id=cart2.id)
         # Orders
-        self.address = Address.objects.create(name="Address1")
-        self.payment1 = Payment.objects.create(payment_type=CASH, total_price=1234)
-        self.order1 = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            payment=self.payment1,
-            status=IN_PROGRESS
-        )
-        self.order_item1 = OrderItem.objects.create(order=self.order1, cart_item=self.cart_item1)
-        self.order_item2 = OrderItem.objects.create(order=self.order1, cart_item=self.cart_item2)
-        self.payment2 = Payment.objects.create(payment_type=CASH, total_price=1234)
-        self.order2 = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            payment=self.payment2,
-            status=IN_PROGRESS
-        )
-        self.order_item3 = OrderItem.objects.create(order=self.order2, cart_item=self.cart_item3)
+        address = self._create_address("addr1")
+        payment1 = self._create_payment()
+        payment2 = self._create_payment()
+        order1 = self._create_order(user_id=user.id, address_id=address.id, payment_id=payment1.id)
+        order2 = self._create_order(user_id=user.id, address_id=address.id, payment_id=payment2.id)
+        # Order items
+        self._create_order_item(order_id=order1.id, cart_item_id=cart_item1.id)
+        self._create_order_item(order_id=order1.id, cart_item_id=cart_item2.id)
+        self._create_order_item(order_id=order2.id, cart_item_id=cart_item3.id)
 
-    def tearDown(self):
-        self.attr_value1.delete()
-        self.attr_value2.delete()
-        self.attr1.delete()
-        self.attr2.delete()
-        self.review1.delete()
-        self.review2.delete()
-        self.review3.delete()
-        self.review4.delete()
-        self.product1.delete()
-        self.product2.delete()
-        self.product3.delete()
-        self.user.delete()
-        self.product_type.delete()
-        self.category.delete()
-        self.image1.delete()
-        self.image2.delete()
-        self.image3.delete()
-        self.cart_item1.delete()
-        self.cart_item2.delete()
-        self.cart_item3.delete()
-        self.cart_item4.delete()
-        self.cart1.delete()
-        self.cart2.delete()
-        self.order_item1.delete()
-        self.order_item2.delete()
-        self.order_item3.delete()
-        self.order1.delete()
-        self.order2.delete()
-        self.payment1.delete()
-        self.payment2.delete()
-        self.address.delete()
+    def test_get_products_data(self):
+        self._create_data()
 
-    def test_homeview_service(self):
         response = HomeViewService().execute()
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue("best_products" in response.data.keys())
         self.assertTrue("hot_products" in response.data.keys())
@@ -123,29 +122,32 @@ class CatalogueServicesTestCase(TestCase):
         # best_products
         self.assertEqual(response.data["best_products"][0]["avg_rate"], 3.5)
         self.assertEqual(response.data["best_products"][1]["avg_rate"], 2.5)
-        # Image tests
-        self.assertTrue("feature_image" in response.data["best_products"][0].keys())
-        self.assertTrue(response.data["best_products"][0]["feature_image"] is None)
-        self.assertTrue(response.data["best_products"][1]["feature_image"] is not None)
         # hot_products
         self.assertEqual(response.data["hot_products"][0]["purchases"], 2)
         self.assertEqual(response.data["hot_products"][1]["purchases"], 1)
-        self.assertTrue("feature_image" in response.data["hot_products"][0].keys())
-        # newest_products
-        self.assertEqual(response.data["newest_products"][0]["title"], "title2")
-        self.assertEqual(response.data["newest_products"][1]["title"], "title1")
+        # Image tests
+        self.assertTrue("feature_image" in response.data["best_products"][0].keys())
         self.assertTrue("feature_image" in response.data["newest_products"][0].keys())
+        self.assertTrue("feature_image" in response.data["hot_products"][0].keys())
+
+
+class ProductDetailServiceTestCase(TestCase):
+
+    def test_product_not_found(self):
+        product_id = 123123
+
+        response = ProductDetailService().execute(product_id)
+
+        self.assertEqual(response.status_code, 404)
 
     def test_product_detail_service(self):
-        response = ProductDetailService().execute(123123)
-        self.assertEqual(response.status_code, 404)
-        # 2nd case
-        response = ProductDetailService().execute(self.product1.id)
+        product_type = create_product_type("type1")
+        product = create_product(product_type.id)
+
+        response = ProductDetailService().execute(product.id)
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue("product" in response.data.keys())
         self.assertTrue("reviews" in response.data.keys())
-        self.assertEqual(len(response.data["reviews"]), 2)
         self.assertTrue("attrs" in response.data.keys())
-        self.assertEqual(len(response.data["attrs"]), 2)
         self.assertTrue("images" in response.data.keys())
-        self.assertEqual(len(response.data["images"]), 2)
