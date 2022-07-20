@@ -6,8 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from catalogue import serializers
 from catalogue.filters import CatalogueFilter
-from catalogue.models import Category, Product, Tag
-from catalogue.services import HomeViewService, ProductDetailService
+from catalogue import services
 
 
 class ProductViewSet(ModelViewSet):
@@ -15,15 +14,14 @@ class ProductViewSet(ModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True)
+        return services.ProductViewSetService().execute()
+
+    def retrieve(self, request, pk):
+        return services.ProductDetailService().execute(pk)
 
     @action(methods=["get"], detail=False)
     def get_home_products(self, request):
-        return HomeViewService().execute()
-
-    @action(methods=["get"], detail=False, url_path=r"get_product_detail/(?P<product_id>[^/.]+)")
-    def get_product_detail(self, request, product_id):
-        return ProductDetailService().execute(product_id)
+        return services.HomeViewService().execute()
 
 
 class CatalogueViewSet(ModelViewSet):
@@ -34,7 +32,7 @@ class CatalogueViewSet(ModelViewSet):
     search_fields = ('title', 'description',)
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True)
+        return services.CatalogueViewSetService().execute()
 
 
 class CategoryViewSet(ModelViewSet):
@@ -42,7 +40,7 @@ class CategoryViewSet(ModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return Category.objects.filter(is_active=True)
+        return services.CategoryViewSetService().execute()
 
 
 class TagViewSet(ModelViewSet):
@@ -50,4 +48,4 @@ class TagViewSet(ModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return Tag.objects.all()
+        return services.TagViewSetService().execute()

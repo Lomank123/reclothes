@@ -26,5 +26,5 @@ function setTags(data) {
 }
 
 getData(catalogueUrl.href, setCatalogue);
-getData(categoriesUrl, setCategories);
+// getData(categoriesUrl, setCategories);
 getData(tagsUrl, setTags);

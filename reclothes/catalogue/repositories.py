@@ -1,9 +1,17 @@
 from django.db.models import Avg, Count, F, Subquery, OuterRef
 
-from catalogue.models import Product, ProductImage
+from catalogue.models import Product, ProductImage, Category, Tag
 
 
 class ProductRepository:
+
+    @staticmethod
+    def get_active():
+        return Product.objects.filter(is_active=True)
+
+    @staticmethod
+    def get_active_with_category():
+        return Product.objects.select_related('category').filter(is_active=True)
 
     @staticmethod
     def get_newest_products(image, limit=None):
@@ -96,11 +104,17 @@ class ProductRepository:
 
 
 class CategoryRepository:
-    pass
+
+    @staticmethod
+    def get_active():
+        return Category.objects.filter(is_active=True)
 
 
 class TagRepository:
-    pass
+
+    @staticmethod
+    def get_all():
+        return Tag.objects.all()
 
 
 class ProductTypeRepository:

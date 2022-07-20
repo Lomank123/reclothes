@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from catalogue import consts, serializers
-from catalogue.repositories import ProductImageRepository, ProductRepository
+from catalogue.repositories import ProductImageRepository, ProductRepository, CategoryRepository, TagRepository
 
 
 class HomeViewService:
@@ -55,3 +55,27 @@ class ProductDetailService:
             reviews = ProductRepository.get_reviews_with_user(product)
             data = self._build_response_data(product, images, attr_values, reviews)
         return self._build_response(data, product is None)
+
+
+class ProductViewSetService:
+
+    def execute(self):
+        return ProductRepository.get_active()
+
+
+class CatalogueViewSetService:
+
+    def execute(self):
+        return ProductRepository.get_active_with_category()
+
+
+class CategoryViewSetService:
+
+    def execute(self):
+        return CategoryRepository.get_active()
+
+
+class TagViewSetService:
+
+    def execute(self):
+        return TagRepository.get_all()

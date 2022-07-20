@@ -11,6 +11,13 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'name',)
 
 
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Category
+        fields = ('id', 'name',)
+
+
 class CategoryDetailSerializer(serializers.ModelSerializer):
     category_tree = serializers.SerializerMethodField()
 
@@ -45,10 +52,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductCatalogueSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
 
     class Meta:
         model = models.Product
-        fields = ('id', 'title', 'regular_price', 'is_active', 'quantity',)
+        fields = ('id', 'title', 'regular_price', 'is_active', 'quantity', 'category',)
 
 
 class CategorySerializer(serializers.ModelSerializer):

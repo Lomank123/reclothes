@@ -13,7 +13,7 @@ let imgIndex = 0;
 function getProductData() {
     const csrftoken = getCookie('csrftoken');
     $.ajax({
-        url: `/api/product/get_product_detail/${productId}`,
+        url: `/api/product/${productId}`,
         headers: {"X-CSRFToken": csrftoken},
         method: 'GET',
         dataType: 'json',
