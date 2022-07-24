@@ -1,0 +1,27 @@
+#catalogue-container-block {
+  display: flex;
+}
+
+#catalogue-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#filters-block {
+  width: 70%;
+  margin-right: 20px;
+}
+
+#pagination-block {
+  width: 100%;
+  display: flex;
+  flex-direction: row !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-btn {
+  margin-left: 5px;
+  margin-right: 5px;
+}

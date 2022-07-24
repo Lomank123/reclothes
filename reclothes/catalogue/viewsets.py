@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from catalogue import serializers
 from catalogue.filters import CatalogueFilter
 from catalogue import services
+from catalogue.pagination import DefaultCustomPagination
 
 
 class ProductViewSet(ModelViewSet):
@@ -30,6 +31,7 @@ class CatalogueViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = CatalogueFilter
     search_fields = ('title', 'description',)
+    pagination_class = DefaultCustomPagination
 
     def get_queryset(self):
         return services.CatalogueViewSetService().execute()

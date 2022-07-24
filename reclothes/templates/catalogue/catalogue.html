@@ -13,6 +13,24 @@
 <h3 class="page-label">{% translate "Catalogue" %}</h3>
 <hr />
 
+<div id="catalogue-container-block">
+  <div id="filters-block" class="default-block">
+    <div id="search-block"><p>Search</p></div>
+    <div id="default-filters-block"><p>Default filters</p></div>
+    <div id="additional-filters-block"><p>Additional filters</p></div>
+  </div>
+  <div id="catalogue-block">
+    <div id="products-block"></div>
+    <div id="pagination-block" class="default-block">
+      <button id="first-btn" class="btn btn-primary pagination-btn">First</button>
+      <button id="previous-btn" class="btn btn-primary pagination-btn">Previous</button>
+      <span id="pagination-text">Page</span>
+      <button id="next-btn" class="btn btn-primary pagination-btn">Next</button>
+      <button id="last-btn" class="btn btn-primary pagination-btn">Last</button>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
 
 {% block scripts %}
