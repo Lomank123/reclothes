@@ -2,6 +2,12 @@ const catalogueBlock = $('#catalogue-block');
 const productsBlock = $('#products-block');
 
 
+function handleFilterClick(url) {
+    const apiURL = new URL(url);
+    window.location.search = apiURL.searchParams.toString();
+}
+
+
 function getCatalogueData(url, callback) {
     $.ajax({
         url: url,
@@ -12,10 +18,11 @@ function getCatalogueData(url, callback) {
             callback(result);
         },
         error: (error) => {
-            //console.log(error);
+            console.log(error);
         },
     });
 }
+
 
 function setCatalogue(data) {
     // Cleaning block
@@ -33,6 +40,7 @@ function setCatalogue(data) {
     setPagination(data);
 }
 
+
 function setPagination(paginationData) {
     const firstButton = $('#first-btn');
     const previousButton = $('#previous-btn');
@@ -44,22 +52,12 @@ function setPagination(paginationData) {
     nextButton.prop('disabled', paginationData.next === null);
     lastButton.prop('disabled', paginationData.last === null);
 
-    firstButton.unbind().click(() => { getCatalogueData(paginationData.first, setCatalogue); });
-    previousButton.unbind().click(() => { getCatalogueData(paginationData.previous, setCatalogue); });
-    nextButton.unbind().click(() => { getCatalogueData(paginationData.next, setCatalogue); });
-    lastButton.unbind().click(() => { getCatalogueData(paginationData.last, setCatalogue); });
-
-    console.log("Pagination set!");
+    // .unbind() to prevent multiple click events
+    firstButton.unbind().click(() => { handleFilterClick(paginationData.first); });
+    previousButton.unbind().click(() => { handleFilterClick(paginationData.previous); });
+    nextButton.unbind().click(() => { handleFilterClick(paginationData.next); });
+    lastButton.unbind().click(() => { handleFilterClick(paginationData.last); });
 }
 
-function setCategories(data) {
-    console.log(categoriesUrl);
-}
-
-function setTags(data) {
-    console.log(tagsUrl);
-}
 
 getCatalogueData(catalogueUrl.href, setCatalogue);
-// getCatalogueData(categoriesUrl, setCategories);
-// getCatalogueData(tagsUrl, setTags);
