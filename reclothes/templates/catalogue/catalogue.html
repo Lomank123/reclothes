@@ -14,11 +14,68 @@
 <hr />
 
 <div id="catalogue-container-block">
+
   <div id="filters-block" class="default-block">
-    <div id="search-block"><p>Search</p></div>
-    <div id="default-filters-block"><p>Default filters</p></div>
-    <div id="additional-filters-block"><p>Additional filters</p></div>
+    <div id="search-block">
+      <div class="input-group mb-3">
+        <input
+          id="search-input"
+          type="text"
+          class="form-control"
+          placeholder="Search..."
+          aria-label="Search..."
+          aria-describedby="basic-addon2"
+        >
+        <div class="input-group-append">
+          <button
+            id="search-btn"
+            class="btn btn-primary"
+            type="button"
+          >
+            <i class="d-flex justify-content-center align-items-center bi bi-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="default-filters-block">
+      <h5>Price</h5>
+      <div id="price-filter-block">
+        <div class="input-group mb-3 price-from-input-block">
+          <input
+            id="price-from-input"
+            type="number"
+            class="form-control"
+            placeholder="Price from"
+            aria-label="Price from"
+            aria-describedby="basic-addon2"
+          >
+        </div>
+        <div class="input-group mb-3 price-to-input-block">
+          <input
+            id="price-to-input"
+            type="number"
+            class="form-control"
+            placeholder="Price to"
+            aria-label="Price to"
+            aria-describedby="basic-addon2"
+          >
+        </div>
+      </div>
+    </div>
+
+    <div id="additional-filters-block">
+      <p>Additional filters</p>
+    </div>
+
+    <div id="apply-filters-block">
+      <button id="apply-filters-btn" class="btn btn-primary">Apply</button>
+    </div>
+
   </div>
+
+
   <div id="catalogue-block">
     <div id="products-block"></div>
     <div id="pagination-block" class="default-block">
@@ -29,6 +86,7 @@
       <button id="last-btn" class="btn btn-primary pagination-btn">Last</button>
     </div>
   </div>
+
 </div>
 
 {% endblock content %}

@@ -1,5 +1,9 @@
 const catalogueBlock = $('#catalogue-block');
 const productsBlock = $('#products-block');
+const applyButton = $('#apply-filters-btn');
+applyButton.click(setFilterData);
+const searchButton = $('#search-btn');
+searchButton.click(setSearchData);
 
 
 function handleFilterClick(url) {
@@ -42,6 +46,11 @@ function setCatalogue(data) {
 
 
 function setPagination(paginationData) {
+    // Set pagination text
+    const pageText = $('#pagination-text');
+    pageText.text(`${paginationData.number} of ${paginationData.num_pages}`);
+
+    // Set buttons
     const firstButton = $('#first-btn');
     const previousButton = $('#previous-btn');
     const nextButton = $('#next-btn');
@@ -60,4 +69,44 @@ function setPagination(paginationData) {
 }
 
 
+function setSearchData() {
+    let searchData = {
+        'search': $('#search-input').val(),
+    }
+    handleFilter(searchData);
+}
+
+
+function setFilterData() {
+    let filterData = {
+        'price_from': $('#price-from-input').val(),
+        'price_to': $('#price-to-input').val(),
+    }
+    handleFilter(filterData);
+}
+
+
+function handleFilter(filterData) {
+    const newUrl = new URL(catalogueUrl.href);
+    for (const [key, value] of Object.entries(filterData)) {
+        if (value !== '' && value !== null) {
+            newUrl.searchParams.set(key, value);
+        } else {
+            newUrl.searchParams.delete(key);
+        }
+    }
+    handleFilterClick(newUrl);
+}
+
+
+function setFilters() {
+    const params = new URLSearchParams(window.location.search);
+    $('#price-from-input').val(params.get('price_from'));
+    $('#price-to-input').val(params.get('price_to'));
+    // Search
+    $('#search-input').val(params.get('search'));
+}
+
+
 getCatalogueData(catalogueUrl.href, setCatalogue);
+setFilters();
