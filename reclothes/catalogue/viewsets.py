@@ -44,6 +44,13 @@ class CategoryViewSet(ModelViewSet):
     def get_queryset(self):
         return services.CategoryViewSetService().execute()
 
+    def retrieve(self, request, pk):
+        return services.CategoryDetailService().execute(pk)
+
+    @action(methods=["get"], detail=False, url_path="root")
+    def get_root_categories(self, request):
+        return services.CategoryRootService().execute()
+
 
 class TagViewSet(ModelViewSet):
     serializer_class = serializers.TagSerializer

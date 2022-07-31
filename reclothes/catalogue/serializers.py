@@ -33,6 +33,21 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
         return obj.get_ancestors(include_self=True).values("id", "name")
 
 
+class SubCategorySerializer(serializers.ModelSerializer):
+    category_tree = serializers.SerializerMethodField()
+
+    class Meta:
+        depth = 1
+        model = models.Category
+        fields = ('category_tree',)
+
+    def get_category_tree(self, obj):
+        """
+        Return info about all parent categories including itself.
+        """
+        return obj.get_children().values("id", "name")
+
+
 class ProductTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -56,7 +71,14 @@ class ProductCatalogueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ('id', 'title', 'regular_price', 'is_active', 'quantity', 'category',)
+        fields = (
+            'id',
+            'title',
+            'regular_price',
+            'is_active',
+            'quantity',
+            'category',
+        )
 
 
 class CategorySerializer(serializers.ModelSerializer):
