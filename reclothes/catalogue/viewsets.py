@@ -30,7 +30,7 @@ class CatalogueViewSet(ModelViewSet):
     permission_classes = (AllowAny,)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = CatalogueFilter
-    search_fields = ('title', 'description',)
+    search_fields = ('title',)
     pagination_class = DefaultCustomPagination
 
     def get_queryset(self):

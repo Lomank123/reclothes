@@ -15,7 +15,7 @@ class DefaultCustomPagination(PageNumberPagination):
         - 'first' - url to the first page
         - 'last' - url to the last page
     """
-    page_size = 10
+    page_size = 5
     page_query_param = 'page'
     max_page_size = 20
 

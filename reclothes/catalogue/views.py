@@ -16,3 +16,7 @@ class ProductDetailView(TemplateView):
 
 class CatalogueView(TemplateView):
     template_name = 'catalogue/catalogue.html'
+
+
+class CategoriesView(TemplateView):
+    template_name = 'catalogue/categories.html'

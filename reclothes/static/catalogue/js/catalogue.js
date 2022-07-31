@@ -95,6 +95,10 @@ function handleFilter(filterData) {
             newUrl.searchParams.delete(key);
         }
     }
+
+    // Reset page count
+    newUrl.searchParams.delete('page');
+
     handleFilterClick(newUrl);
 }
 
