@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 
+from reclothes.services import APIService
 from catalogue import consts, serializers
 from catalogue.repositories import ProductImageRepository, ProductRepository, \
     CategoryRepository, TagRepository
@@ -8,8 +9,9 @@ from catalogue.repositories import ProductImageRepository, ProductRepository, \
 
 class HomeViewService:
 
+    # TODO: Rewrite using serializers
     @staticmethod
-    def _build_response_data(best, hot, newest):
+    def _get_response_data(best, hot, newest):
         return {
             "best_products": list(best),
             "hot_products": list(hot),
@@ -23,7 +25,7 @@ class HomeViewService:
         best_products = ProductRepository.get_best_products(feature_image)
         hot_products = ProductRepository.get_hot_products(feature_image)
         newest_products = ProductRepository.get_newest_products(feature_image)
-        data = self._build_response_data(
+        data = self._get_response_data(
             best_products[:consts.BEST_PRODUCT_IN_PAGE_LIMIT],
             hot_products[:consts.HOT_PRODUCT_IN_PAGE_LIMIT],
             newest_products[:consts.NEWEST_PRODUCT_IN_PAGE_LIMIT]
@@ -31,7 +33,7 @@ class HomeViewService:
         return Response(data=data, status=status.HTTP_200_OK)
 
 
-class ProductDetailService:
+class ProductDetailService(APIService):
 
     @staticmethod
     def _get_response_data(product):
@@ -68,13 +70,6 @@ class ProductDetailService:
             data.update(complete_data)
         return data
 
-    @staticmethod
-    def _get_response(data):
-        response = Response(data=data, status=status.HTTP_200_OK)
-        if len(data) == 0:
-            response.status_code = status.HTTP_404_NOT_FOUND
-        return response
-
     def execute(self, product_id):
         product = ProductRepository.get_by_id(product_id)
         data = self._get_response_data(product)
@@ -99,64 +94,39 @@ class CategoryViewSetService:
         return CategoryRepository.get_active()
 
 
-class CategoryDetailService:
-
-    @staticmethod
-    def _get_response(data):
-        response = Response(data=data, status=status.HTTP_200_OK)
-        if len(data) == 0:
-            response.status_code = status.HTTP_404_NOT_FOUND
-        return response
-
-    @staticmethod
-    def _get_response_data(category):
-        data = {}
-        if category is not None:
-            category_serializer = serializers.CategoryDetailSerializer(
-                category
-            )
-            complete_data = {
-                "category": category_serializer.data,
-            }
-            data.update(complete_data)
-        return data
-
-    def execute(self, id):
-        category = CategoryRepository.get_by_id(id)
-        data = self._get_response_data(category)
-        return self._get_response(data)
-
-
-class CategoryRootService:
-
-    @staticmethod
-    def _get_response(data):
-        response = Response(data=data, status=status.HTTP_200_OK)
-        if len(data) == 0:
-            response.status_code = status.HTTP_404_NOT_FOUND
-        return response
-
-    @staticmethod
-    def _get_response_data(categories):
-        data = {}
-        if categories is not None:
-            category_serializer = serializers.CategoryDetailSerializer(
-                categories,
-                many=True
-            )
-            complete_data = {
-                "roots": category_serializer.data,
-            }
-            data.update(complete_data)
-        return data
-
-    def execute(self):
-        root_categories = CategoryRepository.get_roots()
-        data = self._get_response_data(root_categories)
-        return self._get_response(data)
-
-
 class TagViewSetService:
 
     def execute(self):
         return TagRepository.get_all()
+
+
+class CategoryService(APIService):
+
+    @staticmethod
+    def _get_serializer_class(is_root=False):
+        if is_root:
+            return serializers.CategorySerializer
+        return serializers.SubCategorySerializer
+
+    @staticmethod
+    def _get_queryset(id):
+        filters = {}
+        if id is None:
+            filters["parent__isnull"] = True
+        else:
+            filters["id"] = id
+        return CategoryRepository.get_filtered_queryset(**filters)
+
+    def _get_response_data(self, queryset, is_root=False):
+        data = {}
+        if queryset.exists():
+            serializer_class = self._get_serializer_class(is_root)
+            category_serializer = serializer_class(queryset, many=True)
+            complete_data = {"items": category_serializer.data}
+            data.update(complete_data)
+        return data
+
+    def execute(self, id=None):
+        queryset = self._get_queryset(id)
+        data = self._get_response_data(queryset, id is None)
+        return self._get_response(data)

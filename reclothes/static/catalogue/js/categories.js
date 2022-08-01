@@ -1,7 +1,8 @@
 const subCategoriesBlock = $('#subcategories-block');
+let isSubCategories = false;
 
 
-function getSubCategories(url, callback) {
+function getCategories(url, callback) {
     $.ajax({
         url: url,
         method: "GET",
@@ -23,19 +24,25 @@ function handleCategoryClick(id) {
 }
 
 
-// TODO: Fix this when get root or sub ones
-function setSubCategories(data) {
-    // Adding items
-    data.roots.forEach(root => {
-        root.category_tree.forEach(category => {
-            const alink = $(`<button type="button" class="btn btn-link">${category.name}</button>`);
-            alink.click(() => {handleCategoryClick(category.id);});
-            const subCategoryBlock = $(`
-                <div class="default-block"></div>
-            `);
-            subCategoryBlock.append(alink);
-            subCategoriesBlock.append(subCategoryBlock);
-        });
+function setCategories(data) {
+    if (isSubCategories) {
+        console.log("It is sub categories");
+        displayCategories(data.items[0].category_tree);
+    } else {
+        console.log("It is root categories");
+        // display root categories
+        displayCategories(data.items);
+    }
+}
+
+
+function displayCategories(categories) {
+    categories.forEach(category => {
+        const alink = $(`<button type="button" class="btn btn-link">${category.name}</button>`);
+        const subCategoryBlock = $(`<div class="default-block"></div>`);
+        alink.click(() => {handleCategoryClick(category.id);});
+        subCategoryBlock.append(alink);
+        subCategoriesBlock.append(subCategoryBlock);
     });
 }
 
@@ -46,10 +53,11 @@ function getURL() {
     let url = rootCategoriesUrl.href;
     if (id !== '' && id !== null) {
         url = `${defaultCategoriesUrl}/${id}`;
+        isSubCategories = true;
     }
     return url;
 }
 
 
 const apiCallURL = getURL();
-getSubCategories(apiCallURL, setSubCategories);
+getCategories(apiCallURL, setCategories);

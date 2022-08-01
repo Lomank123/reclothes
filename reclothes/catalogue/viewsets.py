@@ -45,11 +45,11 @@ class CategoryViewSet(ModelViewSet):
         return services.CategoryViewSetService().execute()
 
     def retrieve(self, request, pk):
-        return services.CategoryDetailService().execute(pk)
+        return services.CategoryService().execute(pk)
 
     @action(methods=["get"], detail=False, url_path="root")
     def get_root_categories(self, request):
-        return services.CategoryRootService().execute()
+        return services.CategoryService().execute()
 
 
 class TagViewSet(ModelViewSet):

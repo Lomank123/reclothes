@@ -145,17 +145,14 @@ class ProductRepository:
 
 class CategoryRepository:
 
+    # TODO: Unite with get_queryset
     @staticmethod
     def get_active():
         return Category.objects.filter(is_active=True)
 
     @staticmethod
-    def get_by_id(id):
-        return Category.objects.filter(id=id).first()
-
-    @staticmethod
-    def get_roots():
-        return Category.objects.filter(parent__isnull=True)
+    def get_filtered_queryset(**kwargs):
+        return Category.objects.filter(**kwargs)
 
 
 class TagRepository:
