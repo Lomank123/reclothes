@@ -146,6 +146,18 @@ class Product(CustomBaseModel):
     def get_absolute_url(self):
         return reverse("catalogue:product_detail", kwargs={"pk": self.pk})
 
+    @property
+    def all_images(self):
+        return self.images.order_by('-is_feature')
+
+    @property
+    def attrs_with_values(self):
+        return self.attr_values.select_related('attribute')
+
+    @property
+    def reviews_with_users(self):
+        return self.reviews.select_related('user').order_by('-creation_date')
+
 
 class ProductAttributeValue(models.Model):
     """

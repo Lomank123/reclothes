@@ -1,15 +1,11 @@
-from rest_framework import status
-from rest_framework.response import Response
-
 from reclothes.services import APIService
 from catalogue import consts, serializers
 from catalogue.repositories import ProductImageRepository, ProductRepository, \
     CategoryRepository, TagRepository
 
 
-class HomeViewService:
+class HomeViewService(APIService):
 
-    # TODO: Rewrite using serializers
     @staticmethod
     def _get_response_data(best, hot, newest):
         return {
@@ -19,8 +15,9 @@ class HomeViewService:
         }
 
     def execute(self):
-        feature_image = ProductImageRepository.get_feature_image_by_product_id(
-            subquery=True
+        feature_image = (
+            ProductImageRepository
+            .get_feature_image_by_product_id(subquery=True)
         )
         best_products = ProductRepository.get_best_products(feature_image)
         hot_products = ProductRepository.get_hot_products(feature_image)
@@ -30,7 +27,7 @@ class HomeViewService:
             hot_products[:consts.HOT_PRODUCT_IN_PAGE_LIMIT],
             newest_products[:consts.NEWEST_PRODUCT_IN_PAGE_LIMIT]
         )
-        return Response(data=data, status=status.HTTP_200_OK)
+        return self._get_response(data)
 
 
 class ProductDetailService(APIService):
@@ -39,27 +36,20 @@ class ProductDetailService(APIService):
     def _get_response_data(product):
         data = {}
         if product is not None:
-            # Querysets
-            images = ProductRepository.get_images(product)
-            attr_values = ProductRepository.get_values_with_attrs(product)
-            reviews = ProductRepository.get_reviews_with_user(product)
-
-            # Serialization
             product_serializer = serializers.ProductSerializer(product)
             images_serializer = serializers.ProductImageSerializer(
-                images,
+                product.all_images,
                 many=True
             )
             attrs_serializer = serializers.ProductAttributeValueSerializer(
-                attr_values,
+                product.attrs_with_values,
                 many=True
             )
             reviews_serializer = serializers.ProductReviewSerializer(
-                reviews,
+                product.reviews_with_users,
                 many=True
             )
 
-            # Final data representation
             complete_data = {
                 "product": product_serializer.data,
                 "attrs": attrs_serializer.data,
@@ -71,33 +61,9 @@ class ProductDetailService(APIService):
         return data
 
     def execute(self, product_id):
-        product = ProductRepository.get_by_id(product_id)
+        product = ProductRepository.get_detailed_by_id(id=product_id)
         data = self._get_response_data(product)
         return self._get_response(data)
-
-
-class ProductViewSetService:
-
-    def execute(self):
-        return ProductRepository.get_active()
-
-
-class CatalogueViewSetService:
-
-    def execute(self):
-        return ProductRepository.get_active_with_category()
-
-
-class CategoryViewSetService:
-
-    def execute(self):
-        return CategoryRepository.get_active()
-
-
-class TagViewSetService:
-
-    def execute(self):
-        return TagRepository.get_all()
 
 
 class CategoryService(APIService):
@@ -130,3 +96,27 @@ class CategoryService(APIService):
         queryset = self._get_queryset(id)
         data = self._get_response_data(queryset, id is None)
         return self._get_response(data)
+
+
+class ProductViewSetService:
+
+    def execute(self):
+        return ProductRepository.get_filtered_queryset(is_active=True)
+
+
+class CatalogueViewSetService:
+
+    def execute(self):
+        return ProductRepository.get_active_with_category()
+
+
+class CategoryViewSetService:
+
+    def execute(self):
+        return CategoryRepository.get_filtered_queryset(is_active=True)
+
+
+class TagViewSetService:
+
+    def execute(self):
+        return TagRepository.get_all()

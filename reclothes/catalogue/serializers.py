@@ -43,7 +43,7 @@ class SubCategorySerializer(serializers.ModelSerializer):
 
     def get_category_tree(self, obj):
         """
-        Return info about all parent categories including itself.
+        Return info about all children.
         """
         return obj.get_children().values("id", "name")
 

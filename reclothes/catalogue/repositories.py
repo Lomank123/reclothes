@@ -6,8 +6,8 @@ from catalogue.models import Product, ProductImage, Category, Tag
 class ProductRepository:
 
     @staticmethod
-    def get_active():
-        return Product.objects.filter(is_active=True)
+    def get_filtered_queryset(**kwargs):
+        return Product.objects.filter(**kwargs)
 
     @staticmethod
     def get_active_with_category():
@@ -18,7 +18,7 @@ class ProductRepository:
         )
 
     @staticmethod
-    def get_by_id(product_id):
+    def get_detailed_by_id(product_id):
         """
         Return product with selected related and annotated average rating.
         """
@@ -117,38 +117,8 @@ class ProductRepository:
             products = qs[:limit]
         return products
 
-    @staticmethod
-    def get_values_with_attrs(product):
-        """
-        Return queryset of attrs with values by product.
-        """
-        return product.attr_values.select_related('attribute')
-
-    @staticmethod
-    def get_reviews_with_user(product):
-        """
-        Return queryset of reviews with user info by product ordered by date.
-        """
-        return (
-            product.reviews
-            .select_related('user')
-            .order_by('-creation_date')
-        )
-
-    @staticmethod
-    def get_images(product):
-        """
-        Return product images ordered by is_feature.
-        """
-        return product.images.order_by('-is_feature')
-
 
 class CategoryRepository:
-
-    # TODO: Unite with get_queryset
-    @staticmethod
-    def get_active():
-        return Category.objects.filter(is_active=True)
 
     @staticmethod
     def get_filtered_queryset(**kwargs):
@@ -160,10 +130,6 @@ class TagRepository:
     @staticmethod
     def get_all():
         return Tag.objects.all()
-
-
-class ProductTypeRepository:
-    pass
 
 
 class ProductImageRepository:
@@ -189,6 +155,10 @@ class ProductImageRepository:
             .filter(product_id=ref_id, is_feature=True)
             .values('image')[:1]
         )
+
+
+class ProductTypeRepository:
+    pass
 
 
 class ProductAttributeValueRepository:

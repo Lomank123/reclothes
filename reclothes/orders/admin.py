@@ -6,7 +6,15 @@ from orders import models
 # TODO: Maybe payment shouldn't be here
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "status", "user", "address", "payment", "last_update", "creation_date", )
+    list_display = (
+        "id",
+        "status",
+        "user",
+        "address",
+        "payment",
+        "last_update",
+        "creation_date",
+    )
 
 
 @admin.register(models.OrderItem)
