@@ -61,7 +61,7 @@ class ProductDetailService(APIService):
         return data
 
     def execute(self, product_id):
-        product = ProductRepository.get_detailed_by_id(id=product_id)
+        product = ProductRepository.get_detailed_by_id(product_id)
         data = self._get_response_data(product)
         return self._get_response(data)
 
