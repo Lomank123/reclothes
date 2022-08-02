@@ -9,13 +9,13 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <!-- Optional CSS -->
     {% block styles %}
     {% endblock styles %}
-    <!-- Favicon -->
-    <link rel="shortcut icon" type="image/png" href="{% static 'reclothes/images/favicon.ico' %}"/>
-    <!-- Styles -->
     <link rel="stylesheet" type="text/css" href="{% static 'reclothes/css/styles.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'reclothes/css/utils.css' %}">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/png" href="{% static 'reclothes/images/favicon.ico' %}"/>
 		<!-- Title -->
     <title>Reclothes | {% block title %}{% endblock title %}</title>
   </head>
@@ -32,9 +32,7 @@
       </div>
 
 			<div class="auth-text">
-
         <div id="cart-header-block"></div>
-
         {% if user.is_authenticated %} 
 					<span class="auth-link">Welcome, <a href="#">{{ user.username }}</a></span>
           <a href="{% url 'accounts:logout' %}" class="auth-link">Log out</a>
@@ -64,7 +62,7 @@
     </footer>
   </body>
 
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="{% static 'reclothes/js/urls.js' %}"></script>
   <script src="{% static 'reclothes/js/base.js' %}"></script>

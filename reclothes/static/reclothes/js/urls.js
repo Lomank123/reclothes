@@ -10,6 +10,7 @@ const catalogueUrl = getUrlWithSearch(defaultCatalogueUrl);
 const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 
+const cataloguePageUrl = `${baseUrl}/catalogue`;
 
 function getUrlWithSearch(defaultUrl) {
     let url = new URL(defaultUrl, baseUrl);

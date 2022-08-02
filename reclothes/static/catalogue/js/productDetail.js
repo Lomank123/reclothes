@@ -119,7 +119,7 @@ function setCategoriesInfo(categories) {
         const categoryBlock = $(`
             <div class="single-category-block">
                 <span class="category-span">
-                    \> <a class="category-link" href="/catalogue?category_id=${category.id}">${category.name}</a>
+                    \> <a class="category-link" href="/categories?category_id=${category.id}">${category.name}</a>
                 </span>
             </div>
         `);

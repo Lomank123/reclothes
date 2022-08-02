@@ -26,10 +26,13 @@ function handleCategoryClick(id) {
 
 function setCategories(data) {
     if (isSubCategories) {
-        console.log("It is sub categories");
-        displayCategories(data.items[0].category_tree);
+        const subCategories = data.items[0].category_tree;
+        if (subCategories.length == 0) {
+            window.location.replace(`${cataloguePageUrl}${window.location.search}`);
+            return;
+        }
+        displayCategories(subCategories);
     } else {
-        console.log("It is root categories");
         // display root categories
         displayCategories(data.items);
     }

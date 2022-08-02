@@ -1,6 +1,5 @@
 {% extends 'layout/base.html' %}
-{% load i18n %}
-{% load static %}
+{% load i18n static %}
 
 {% block styles %}
 <link rel="stylesheet" type="text/css" href="{% static 'catalogue/css/categories.css' %}">
@@ -10,7 +9,7 @@
 
 {% block content %}
 
-<h3 class="page-label">{% translate "Categories" %}</h3>
+<h3 id="categories-label" class="page-label">{% translate "Categories" %}</h3>
 <hr />
 
 <div id="subcategories-block" class="flex-block"></div>
