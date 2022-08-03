@@ -34,14 +34,11 @@ class CatalogueViewSet(ModelViewSet):
     pagination_class = DefaultCustomPagination
 
     def get_queryset(self):
-        return services.CatalogueViewSetService().get_products_queryset()
+        return services.CatalogueViewSetService().execute()
 
     @action(methods=["get"], detail=False, url_path="prods-and-tags")
     def get_products_with_popular_tags(self, request):
-        # This is where filters are implied
-        filtered_queryset = self.filter_queryset(self.get_queryset())
-        return services.CatalogueViewSetService().get_tags_with_products(
-            filtered_queryset, self)
+        return services.CatalogueService(self).execute()
 
 
 class CategoryViewSet(ModelViewSet):

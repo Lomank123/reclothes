@@ -124,6 +124,7 @@ function applySearch() {
 
 function handleTagClick(tagId) {
     searchParams.set('tags', tagId);
+    searchParams.delete('page');
     window.location.search = searchParams.toString();
 }
 

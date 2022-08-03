@@ -100,13 +100,12 @@ class CategoryService(APIService):
         return self._get_response(data)
 
 
-class ProductViewSetService:
+class CatalogueService(APIService):
 
-    def execute(self):
-        return ProductRepository.get_filtered_queryset(is_active=True)
+    __slots__ = 'viewset',
 
-
-class CatalogueViewSetService(APIService):
+    def __init__(self, viewset):
+        self.viewset = viewset
 
     def _get_popular_tags(self, products, limit=consts.MOST_POPULAR_TAGS_LIMIT):
         """Get most popular tags based on products queryset."""
@@ -117,25 +116,36 @@ class CatalogueViewSetService(APIService):
         most_popular_tags = TagRepository().get_by_ids(most_popular_tags_id)
         return most_popular_tags
 
-    def _get_response_data(self, tags, products, viewset):
+    def _get_response_data(self, tags, products):
         data = {}
         if tags.exists():
             serializer = serializers.TagSerializer(tags, many=True)
             data["popular_tags"] = serializer.data
         if products.exists():
-            page = viewset.paginate_queryset(products)
-            serializer = viewset.get_serializer(page, many=True)
-            data["products"] = viewset.get_paginated_response(
+            page = self.viewset.paginate_queryset(products)
+            serializer = self.viewset.get_serializer(page, many=True)
+            data["products"] = self.viewset.get_paginated_response(
                 serializer.data).data
         return data
 
-    def get_tags_with_products(self, products, viewset):
+    def execute(self):
         """Return popular tags with filtered products queryset."""
+        initial_qs = self.viewset.get_queryset()
+        products = self.viewset.filter_queryset(initial_qs)
         popular_tags = self._get_popular_tags(products)
-        data = self._get_response_data(popular_tags, products, viewset)
+        data = self._get_response_data(popular_tags, products)
         return self._get_response(data)
 
-    def get_products_queryset(self):
+
+class ProductViewSetService:
+
+    def execute(self):
+        return ProductRepository.get_filtered_queryset(is_active=True)
+
+
+class CatalogueViewSetService(APIService):
+
+    def execute(self):
         return ProductRepository.get_active_with_category()
 
 
