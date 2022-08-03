@@ -33,14 +33,15 @@ class CatalogueViewSet(ModelViewSet):
     search_fields = ('title', 'tags__name')
     pagination_class = DefaultCustomPagination
 
-    def list(self, request, *args, **kwargs):
+    def get_queryset(self):
+        return services.CatalogueViewSetService().get_products_queryset()
+
+    @action(methods=["get"], detail=False, url_path="prods-and-tags")
+    def get_products_with_popular_tags(self, request):
         # This is where filters are implied
         filtered_queryset = self.filter_queryset(self.get_queryset())
         return services.CatalogueViewSetService().get_tags_with_products(
             filtered_queryset, self)
-
-    def get_queryset(self):
-        return services.CatalogueViewSetService().get_products_queryset()
 
 
 class CategoryViewSet(ModelViewSet):

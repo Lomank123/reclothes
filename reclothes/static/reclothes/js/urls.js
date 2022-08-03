@@ -5,8 +5,10 @@ const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultCatalogueUrl = `${apiUrl}/catalogue`;
 const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
+const defaultCatalogueDataUrl = `${defaultCatalogueUrl}/prods-and-tags`;
 
 const catalogueUrl = getUrlWithSearch(defaultCatalogueUrl);
+const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
 const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;

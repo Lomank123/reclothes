@@ -135,7 +135,7 @@ function handleFilterClick(url) {
 
 
 function handleFilter(filterData) {
-    const newUrl = new URL(catalogueUrl.href);
+    const newUrl = new URL(catalogueDataUrl.href);
     for (const [key, value] of Object.entries(filterData)) {
         if (value !== '' && value !== null) {
             newUrl.searchParams.set(key, value);
@@ -170,7 +170,7 @@ function discardFilters() {
 
 
 // Get catalogue data
-ajaxGet(catalogueUrl.href, setData);
+ajaxGet(catalogueDataUrl.href, setData);
 // Get current category data if exists
 getCurrentCategory();
 setFilters();
