@@ -1,3 +1,5 @@
+import collections
+
 from reclothes.services import APIService
 from catalogue import consts, serializers
 from catalogue.repositories import ProductImageRepository, ProductRepository, \
@@ -104,9 +106,36 @@ class ProductViewSetService:
         return ProductRepository.get_filtered_queryset(is_active=True)
 
 
-class CatalogueViewSetService:
+class CatalogueViewSetService(APIService):
 
-    def execute(self):
+    def _get_popular_tags(self, products, limit=consts.MOST_POPULAR_TAGS_LIMIT):
+        """Get most popular tags based on products queryset."""
+        tags_id = ProductRepository().get_values_list(
+            products, "tags__id")
+        counter = collections.Counter(tags_id)
+        most_popular_tags_id = [key for key, _ in counter.most_common(limit)]
+        most_popular_tags = TagRepository().get_by_ids(most_popular_tags_id)
+        return most_popular_tags
+
+    def _get_response_data(self, tags, products, viewset):
+        data = {}
+        if tags.exists():
+            serializer = serializers.TagSerializer(tags, many=True)
+            data["popular_tags"] = serializer.data
+        if products.exists():
+            page = viewset.paginate_queryset(products)
+            serializer = viewset.get_serializer(page, many=True)
+            data["products"] = viewset.get_paginated_response(
+                serializer.data).data
+        return data
+
+    def get_tags_with_products(self, products, viewset):
+        """Return popular tags with filtered products queryset."""
+        popular_tags = self._get_popular_tags(products)
+        data = self._get_response_data(popular_tags, products, viewset)
+        return self._get_response(data)
+
+    def get_products_queryset(self):
         return ProductRepository.get_active_with_category()
 
 

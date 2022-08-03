@@ -144,7 +144,7 @@ function setTagsInfo(data) {
     data.forEach(tag => {
         const tagBlock = $(`
             <div class="single-tag-block">
-            <a href="/catalogue?tags=${tag.id}" class="tag">${tag.name}</a>
+                <a href="/catalogue?tags=${tag.id}" class="tag">${tag.name}</a>
             </div>
         `);
         tagsInfo.append(tagBlock);

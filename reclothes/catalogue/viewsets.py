@@ -30,11 +30,17 @@ class CatalogueViewSet(ModelViewSet):
     permission_classes = (AllowAny,)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = CatalogueFilter
-    search_fields = ('title',)
+    search_fields = ('title', 'tags__name')
     pagination_class = DefaultCustomPagination
 
+    def list(self, request, *args, **kwargs):
+        # This is where filters are implied
+        filtered_queryset = self.filter_queryset(self.get_queryset())
+        return services.CatalogueViewSetService().get_tags_with_products(
+            filtered_queryset, self)
+
     def get_queryset(self):
-        return services.CatalogueViewSetService().execute()
+        return services.CatalogueViewSetService().get_products_queryset()
 
 
 class CategoryViewSet(ModelViewSet):
@@ -44,7 +50,8 @@ class CategoryViewSet(ModelViewSet):
     def get_queryset(self):
         return services.CategoryViewSetService().execute()
 
-    def retrieve(self, request, pk):
+    @action(methods=["get"], detail=False, url_path=r"sub/(?P<pk>\w+)")
+    def get_sub_categories(self, request, pk):
         return services.CategoryService().execute(pk)
 
     @action(methods=["get"], detail=False, url_path="root")

@@ -36,6 +36,11 @@
   width: 100%;
 }
 
+#discard-filters-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
 
 /* Pagination */
 
@@ -52,3 +57,9 @@
   margin-right: 5px;
 }
 
+
+/* Tags */
+
+#tags-block {
+  flex-direction: row !important;
+}

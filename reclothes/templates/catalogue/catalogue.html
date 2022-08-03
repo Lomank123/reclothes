@@ -9,7 +9,7 @@
 
 {% block content %}
 
-<h3 class="page-label">{% translate "Catalogue" %}</h3>
+<h3 id="catalogue-main-label" class="page-label">{% translate "Catalogue" %}</h3>
 <hr />
 
 <div id="catalogue-container-block">
@@ -36,7 +36,6 @@
         </div>
       </div>
     </div>
-
 
     <div id="default-filters-block">
       <h5>Price</h5>
@@ -70,12 +69,14 @@
 
     <div id="apply-filters-block">
       <button id="apply-filters-btn" class="btn btn-primary">Apply</button>
+      <button id="discard-filters-btn" class="btn btn-danger" disabled>Discard</button>
     </div>
 
   </div>
 
 
   <div id="catalogue-block">
+    <div id="tags-block" class="default-block"></div>
     <div id="products-block"></div>
     <div id="pagination-block" class="default-block">
       <button id="first-btn" class="btn btn-primary pagination-btn">First</button>

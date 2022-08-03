@@ -9,6 +9,7 @@ const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
 const catalogueUrl = getUrlWithSearch(defaultCatalogueUrl);
 const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
+const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 

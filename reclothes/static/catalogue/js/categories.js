@@ -55,7 +55,7 @@ function getURL() {
     const id = params.get('category_id');
     let url = rootCategoriesUrl.href;
     if (id !== '' && id !== null) {
-        url = `${defaultCategoriesUrl}/${id}`;
+        url = `${subCategoriesUrl}/${id}`;
         isSubCategories = true;
     }
     return url;
@@ -63,4 +63,5 @@ function getURL() {
 
 
 const apiCallURL = getURL();
+console.log(apiCallURL);
 getCategories(apiCallURL, setCategories);

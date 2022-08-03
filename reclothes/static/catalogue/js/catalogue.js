@@ -1,18 +1,38 @@
-const catalogueBlock = $('#catalogue-block');
 const productsBlock = $('#products-block');
+const tagsBlock = $('#tags-block');
+const mainLabel = $('#catalogue-main-label');
+
+const searchParams = new URLSearchParams(window.location.search);
+
+// Buttons
 const applyButton = $('#apply-filters-btn');
-applyButton.click(setFilterData);
+applyButton.click(applyFilters);
+
+const discardButton = $('#discard-filters-btn');
+discardButton.click(discardFilters);
+if (window.location.search !== "") {
+    discardButton.prop('disabled', false);
+}
+
 const searchButton = $('#search-btn');
-searchButton.click(setSearchData);
+searchButton.click(applySearch);
 
 
-function handleFilterClick(url) {
-    const apiURL = new URL(url);
-    window.location.search = apiURL.searchParams.toString();
+function getCurrentCategory() {
+    const categoryId = searchParams.get('category_id');
+    if (categoryId !== null) {
+        const currentCategoryUrl = `${defaultCategoriesUrl}/${categoryId}`;
+        ajaxGet(currentCategoryUrl, setCurrentCategory);
+    }
 }
 
 
-function getCatalogueData(url, callback) {
+function setCurrentCategory(data) {
+    mainLabel.text(data.name);
+}
+
+
+function ajaxGet(url, callback) {
     $.ajax({
         url: url,
         method: "GET",
@@ -28,11 +48,18 @@ function getCatalogueData(url, callback) {
 }
 
 
+function setData(data) {
+    setTags(data.popular_tags);
+    setCatalogue(data.products.results);
+    setPagination(data.products);
+}
+
+
 function setCatalogue(data) {
     // Cleaning block
     productsBlock.empty();
     // Adding items
-    data.results.forEach(product => {
+    data.forEach(product => {
         const productBlock = $(`
             <div class="default-block">
                 <a href="/product/${product.id}">${product.title}</a>
@@ -41,7 +68,17 @@ function setCatalogue(data) {
         `);
         productsBlock.append(productBlock);
     });
-    setPagination(data);
+}
+
+
+function setTags(data) {
+    data.forEach(tag => {
+        const tagButton = $(`<button type="button" class="btn btn-link tag">${tag.name}</button>`);
+        tagButton.click(() => { handleTagClick(tag.id); });
+        const tagBlock = $(`<div></div>`);
+        tagBlock.append(tagButton);
+        tagsBlock.append(tagBlock);
+    });
 }
 
 
@@ -69,7 +106,15 @@ function setPagination(paginationData) {
 }
 
 
-function setSearchData() {
+function setFilters() {
+    $('#price-from-input').val(searchParams.get('price_from'));
+    $('#price-to-input').val(searchParams.get('price_to'));
+    // Search
+    $('#search-input').val(searchParams.get('search'));
+}
+
+
+function applySearch() {
     let searchData = {
         'search': $('#search-input').val(),
     }
@@ -77,12 +122,15 @@ function setSearchData() {
 }
 
 
-function setFilterData() {
-    let filterData = {
-        'price_from': $('#price-from-input').val(),
-        'price_to': $('#price-to-input').val(),
-    }
-    handleFilter(filterData);
+function handleTagClick(tagId) {
+    searchParams.set('tags', tagId);
+    window.location.search = searchParams.toString();
+}
+
+
+function handleFilterClick(url) {
+    const apiURL = new URL(url);
+    window.location.search = apiURL.searchParams.toString();
 }
 
 
@@ -95,7 +143,6 @@ function handleFilter(filterData) {
             newUrl.searchParams.delete(key);
         }
     }
-
     // Reset page count
     newUrl.searchParams.delete('page');
 
@@ -103,14 +150,27 @@ function handleFilter(filterData) {
 }
 
 
-function setFilters() {
-    const params = new URLSearchParams(window.location.search);
-    $('#price-from-input').val(params.get('price_from'));
-    $('#price-to-input').val(params.get('price_to'));
-    // Search
-    $('#search-input').val(params.get('search'));
+function applyFilters() {
+    let filterData = {
+        'price_from': $('#price-from-input').val(),
+        'price_to': $('#price-to-input').val(),
+    }
+    handleFilter(filterData);
 }
 
 
-getCatalogueData(catalogueUrl.href, setCatalogue);
+function discardFilters() {
+    for (const [key, value] of searchParams.entries()) {
+        if (key !== 'category_id') {
+            searchParams.delete(key);
+        }
+    }
+    window.location.search = searchParams.toString();
+}
+
+
+// Get catalogue data
+ajaxGet(catalogueUrl.href, setData);
+// Get current category data if exists
+getCurrentCategory();
 setFilters();
