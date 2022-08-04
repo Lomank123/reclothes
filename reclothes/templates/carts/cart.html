@@ -1,0 +1,23 @@
+{% extends 'layout/base.html' %}
+{% load i18n static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'carts/css/cart.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Your cart" %}{% endblock title %}
+
+{% block content %}
+
+<h3 class="page-label">{% translate "Your cart" %}</h3>
+<hr />
+
+<div id="cart-block">
+  <p>Cart block</p>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'carts/js/cart.js' %}"></script>
+{% endblock scripts %}

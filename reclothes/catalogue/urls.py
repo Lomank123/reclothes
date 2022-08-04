@@ -11,7 +11,11 @@ router.register("catalogue", viewsets.CatalogueViewSet, basename="catalogue")
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name="home"),
-    path('product/<int:pk>/', views.ProductDetailView.as_view(), name="product-detail"),
+    path(
+        'product/<int:pk>/',
+        views.ProductDetailView.as_view(),
+        name="product-detail",
+    ),
     path('catalogue/', views.CatalogueView.as_view(), name="catalogue"),
     path('categories/', views.CategoriesView.as_view(), name="categories"),
 ]

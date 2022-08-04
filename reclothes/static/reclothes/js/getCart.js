@@ -20,7 +20,7 @@ function getCartData() {
 
 function setCartData(data) {
     const cartButton = $(`
-        <a href="#" class="btn btn-lg" id="cart-btn">
+        <a href="/cart" class="btn btn-lg" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
             ${data.cart.cart_items_count}
         </a>
