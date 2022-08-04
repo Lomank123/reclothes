@@ -72,7 +72,7 @@ function setCatalogue(data) {
 
 
 function setTags(data) {
-    if (data.length() == 0) {
+    if (data.length == 0) {
         tagsBlock.hide();
     }
     data.forEach(tag => {
