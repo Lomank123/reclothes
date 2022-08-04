@@ -1,11 +1,15 @@
 from accounts.models import CustomUser
 from carts.models import Cart, CartItem
-from catalogue.models import (Product, ProductAttribute, ProductAttributeValue,
-                              ProductImage, ProductReview, ProductType)
-from catalogue.services import HomeViewService, ProductDetailService
-from django.test import TestCase
+from catalogue.models import (Category, Product, ProductAttribute,
+                              ProductAttributeValue, ProductImage,
+                              ProductReview, ProductType, Tag)
+from catalogue.services import (CatalogueService, CategoryService,
+                                HomeViewService, ProductDetailService)
+from catalogue.viewsets import CatalogueViewSet
+from django.test import RequestFactory, TestCase
 from orders.consts import CASH, IN_PROGRESS
 from orders.models import Address, Order, OrderItem, Payment
+from rest_framework.request import Request
 
 
 def create_product_type(name):
@@ -29,19 +33,23 @@ class CatalogueServicesTestCase(TestCase):
 
     @staticmethod
     def _create_product_attr(name, type_id):
-        return ProductAttribute.objects.create(name=name, product_type_id=type_id)
+        return ProductAttribute.objects.create(
+            name=name, product_type_id=type_id)
 
     @staticmethod
     def _create_product_attr_value(product_id, attr_id, value="12"):
-        return ProductAttributeValue.objects.create(product_id=product_id, attribute_id=attr_id, value=value)
+        return ProductAttributeValue.objects.create(
+            product_id=product_id, attribute_id=attr_id, value=value)
 
     @staticmethod
     def _create_product_review(product_id, user_id, rating=5, text="test"):
-        return ProductReview.objects.create(product_id=product_id, user_id=user_id, rating=rating, text=text)
+        return ProductReview.objects.create(
+            product_id=product_id, user_id=user_id, rating=rating, text=text)
 
     @staticmethod
     def _create_image(product_id, alt_text="img", is_feature=False):
-        return ProductImage.objects.create(product_id=product_id, alt_text=alt_text, is_feature=is_feature)
+        return ProductImage.objects.create(
+            product_id=product_id, alt_text=alt_text, is_feature=is_feature)
 
     @staticmethod
     def _create_cart(user_id=None):
@@ -57,15 +65,22 @@ class CatalogueServicesTestCase(TestCase):
 
     @staticmethod
     def _create_payment(type=CASH, total_price=123):
-        return Payment.objects.create(payment_type=type, total_price=total_price)
+        return Payment.objects.create(
+            payment_type=type, total_price=total_price)
 
     @staticmethod
     def _create_order(user_id, address_id, payment_id, status=IN_PROGRESS):
-        return Order.objects.create(user_id=user_id, address_id=address_id, payment_id=payment_id, status=status)
+        return Order.objects.create(
+            user_id=user_id,
+            address_id=address_id,
+            payment_id=payment_id,
+            status=status
+        )
 
     @staticmethod
     def _create_order_item(order_id, cart_item_id):
-        return OrderItem.objects.create(order_id=order_id, cart_item_id=cart_item_id)
+        return OrderItem.objects.create(
+            order_id=order_id, cart_item_id=cart_item_id)
 
     def _create_data(self):
         # Users
@@ -77,13 +92,19 @@ class CatalogueServicesTestCase(TestCase):
         attr2 = self._create_product_attr("attr2", type_id=product_type.id)
         product1 = create_product(type_id=product_type.id)
         product2 = create_product(type_id=product_type.id)
-        self._create_product_attr_value(product_id=product1.id, attr_id=attr1.id)
-        self._create_product_attr_value(product_id=product1.id, attr_id=attr2.id)
+        self._create_product_attr_value(
+            product_id=product1.id, attr_id=attr1.id)
+        self._create_product_attr_value(
+            product_id=product1.id, attr_id=attr2.id)
         # Reviews
-        self._create_product_review(product_id=product1.id, user_id=user.id, rating=4)
-        self._create_product_review(product_id=product1.id, user_id=user2.id, rating=1)
-        self._create_product_review(product_id=product2.id, user_id=user.id, rating=5)
-        self._create_product_review(product_id=product2.id, user_id=user2.id, rating=2)
+        self._create_product_review(
+            product_id=product1.id, user_id=user.id, rating=4)
+        self._create_product_review(
+            product_id=product1.id, user_id=user2.id, rating=1)
+        self._create_product_review(
+            product_id=product2.id, user_id=user.id, rating=5)
+        self._create_product_review(
+            product_id=product2.id, user_id=user2.id, rating=2)
         # Images
         self._create_image(product_id=product1.id, is_feature=True)
         self._create_image(product_id=product1.id)
@@ -92,16 +113,21 @@ class CatalogueServicesTestCase(TestCase):
         cart1 = self._create_cart(user_id=user.id)
         cart2 = self._create_cart(user_id=user.id)
         # Cart items
-        cart_item1 = self._create_cart_item(product_id=product1.id, cart_id=cart1.id)
-        cart_item2 = self._create_cart_item(product_id=product2.id, cart_id=cart1.id)
-        cart_item3 = self._create_cart_item(product_id=product1.id, cart_id=cart2.id)
+        cart_item1 = self._create_cart_item(
+            product_id=product1.id, cart_id=cart1.id)
+        cart_item2 = self._create_cart_item(
+            product_id=product2.id, cart_id=cart1.id)
+        cart_item3 = self._create_cart_item(
+            product_id=product1.id, cart_id=cart2.id)
         self._create_cart_item(product_id=product2.id, cart_id=cart2.id)
         # Orders
         address = self._create_address("addr1")
         payment1 = self._create_payment()
         payment2 = self._create_payment()
-        order1 = self._create_order(user_id=user.id, address_id=address.id, payment_id=payment1.id)
-        order2 = self._create_order(user_id=user.id, address_id=address.id, payment_id=payment2.id)
+        order1 = self._create_order(
+            user_id=user.id, address_id=address.id, payment_id=payment1.id)
+        order2 = self._create_order(
+            user_id=user.id, address_id=address.id, payment_id=payment2.id)
         # Order items
         self._create_order_item(order_id=order1.id, cart_item_id=cart_item1.id)
         self._create_order_item(order_id=order1.id, cart_item_id=cart_item2.id)
@@ -126,9 +152,12 @@ class CatalogueServicesTestCase(TestCase):
         self.assertEqual(response.data["hot_products"][0]["purchases"], 2)
         self.assertEqual(response.data["hot_products"][1]["purchases"], 1)
         # Image tests
-        self.assertTrue("feature_image" in response.data["best_products"][0].keys())
-        self.assertTrue("feature_image" in response.data["newest_products"][0].keys())
-        self.assertTrue("feature_image" in response.data["hot_products"][0].keys())
+        self.assertTrue(
+            "feature_image" in response.data["best_products"][0].keys())
+        self.assertTrue(
+            "feature_image" in response.data["newest_products"][0].keys())
+        self.assertTrue(
+            "feature_image" in response.data["hot_products"][0].keys())
 
 
 class ProductDetailServiceTestCase(TestCase):
@@ -151,3 +180,97 @@ class ProductDetailServiceTestCase(TestCase):
         self.assertTrue("reviews" in response.data.keys())
         self.assertTrue("attrs" in response.data.keys())
         self.assertTrue("images" in response.data.keys())
+
+
+class CategoryServiceTestCase(TestCase):
+
+    @staticmethod
+    def _create_category(**kwargs):
+        return Category.objects.create(**kwargs)
+
+    def test_get_root_categories(self):
+        root_category = self._create_category(name="root1", slug="root1")
+        self._create_category(name="root2", slug="root2")
+        self._create_category(parent=root_category, name="s1", slug="s1")
+
+        response = CategoryService().execute()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Category.objects.count(), 3)
+        self.assertEqual(len(response.data["items"]), 2)
+
+    def test_get_sub_categories(self):
+        root_category = self._create_category(name="root1", slug="root1")
+        self._create_category(name="root2", slug="root2")
+        sub_category = self._create_category(
+            parent=root_category, name="s1", slug="s1")
+
+        response = CategoryService().execute(root_category.id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Category.objects.count(), 3)
+        self.assertEqual(len(response.data["items"]), 1)
+        self.assertEqual(
+            response.data["items"][0]['category_tree'][0]["id"],
+            sub_category.id
+        )
+
+    def test_sub_categories_not_found(self):
+        category_id = 123123
+
+        response = CategoryService().execute(category_id)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_root_categories_not_found(self):
+        response = CategoryService().execute()
+
+        self.assertEqual(response.status_code, 404)
+
+
+class CatalogueServiceTestCase(TestCase):
+
+    @staticmethod
+    def _create_request():
+        return Request(request=RequestFactory().request())
+
+    @staticmethod
+    def _create_viewset(request):
+        return CatalogueViewSet(request=request)
+
+    @staticmethod
+    def _create_tag(**kwargs):
+        return Tag.objects.create(**kwargs)
+
+    def test_get_products_with_tags(self):
+        # Test data
+        product_type = create_product_type(name="type1")
+        product1 = create_product(type_id=product_type.id, title="test1")
+        product2 = create_product(type_id=product_type.id, title="test2")
+        tag1 = self._create_tag(name="tag1")
+        tag2 = self._create_tag(name="tag2")
+        tag3 = self._create_tag(name="tag3")
+        product1.tags.add(tag1)
+        product1.tags.add(tag2)
+        product2.tags.add(tag3)
+        # Viewset
+        request = self._create_request()
+        viewset = self._create_viewset(request)
+        viewset.format_kwarg = None
+
+        response = CatalogueService(viewset).execute()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data.get('products', False))
+        self.assertTrue(response.data.get('popular_tags', False))
+        self.assertTrue(response.data['products'].get('results', False))
+        self.assertEqual(len(response.data['products']['results']), 2)
+        self.assertEqual(len(response.data['popular_tags']), 3)
+
+    def test_data_not_found(self):
+        request = self._create_request()
+        viewset = self._create_viewset(request)
+
+        response = CatalogueService(viewset).execute()
+
+        self.assertEqual(response.status_code, 404)

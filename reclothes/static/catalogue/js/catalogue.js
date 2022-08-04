@@ -72,6 +72,9 @@ function setCatalogue(data) {
 
 
 function setTags(data) {
+    if (data.length() == 0) {
+        tagsBlock.hide();
+    }
     data.forEach(tag => {
         const tagButton = $(`<button type="button" class="btn btn-link tag">${tag.name}</button>`);
         tagButton.click(() => { handleTagClick(tag.id); });

@@ -11,7 +11,8 @@ user_model = get_user_model()
 
 class Address(models.Model):
     name = models.CharField(max_length=100, verbose_name=_("Name"))
-    is_available = models.BooleanField(default=True, verbose_name=_("Is available"))
+    is_available = models.BooleanField(
+        default=True, verbose_name=_("Is available"))
 
     def __str__(self):
         return self.name
@@ -33,9 +34,10 @@ class Payment(models.Model):
         max_length=10,
         choices=PAYMENT_CHOICES,
         default=consts.CASH,
-        verbose_name=_("Type")
+        verbose_name=_("Type"),
     )
-    total_price = models.DecimalField(max_digits=7, decimal_places=2, verbose_name=_("Total price"))
+    total_price = models.DecimalField(
+        max_digits=7, decimal_places=2, verbose_name=_("Total price"))
 
     def __str__(self):
         return f"{self.payment_type} ({self.id})"
@@ -60,20 +62,21 @@ class Order(CustomBaseModel):
         verbose_name=_("User"),
         blank=True,
         null=True,
-        related_name="orders"
+        related_name="orders",
     )
     address = models.ForeignKey(
         Address,
         on_delete=models.DO_NOTHING,
         verbose_name=_("Address"),
-        related_name="orders"
+        related_name="orders",
     )
-    payment = models.OneToOneField(Payment, on_delete=models.DO_NOTHING, verbose_name=_("Payment"))
+    payment = models.OneToOneField(
+        Payment, on_delete=models.DO_NOTHING, verbose_name=_("Payment"))
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default=consts.IN_PROGRESS,
-        verbose_name=_("Status")
+        verbose_name=_("Status"),
     )
 
     class Meta:
@@ -87,16 +90,23 @@ class OrderItem(models.Model):
         Order,
         on_delete=models.CASCADE,
         verbose_name=_("Order"),
-        related_name="order_items"
+        related_name="order_items",
     )
-    cart_item = models.OneToOneField("carts.CartItem", on_delete=models.CASCADE, verbose_name=_("Cart Item"))
+    cart_item = models.OneToOneField(
+        "carts.CartItem",
+        on_delete=models.CASCADE,
+        verbose_name=_("Cart Item"),
+    )
 
     class Meta:
         ordering = ["-id"]
         verbose_name = _("Order item")
         verbose_name_plural = _("Order items")
         constraints = [
-            models.UniqueConstraint(fields=['order_id', 'cart_item_id'], name='unique_orderitem_constraint'),
+            models.UniqueConstraint(
+                fields=['order_id', 'cart_item_id'],
+                name='unique_orderitem_constraint',
+            ),
         ]
 
 

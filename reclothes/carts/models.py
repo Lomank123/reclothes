@@ -17,7 +17,8 @@ class Cart(CustomBaseModel):
         related_name="carts"
     )
     is_deleted = models.BooleanField(default=False, verbose_name=_("Deleted"))
-    is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
+    is_archived = models.BooleanField(
+        default=False, verbose_name=_("Archived"))
 
     def __str__(self):
         return f"Cart {self.id}"
@@ -33,13 +34,13 @@ class CartItem(models.Model):
         Cart,
         on_delete=models.CASCADE,
         verbose_name=_("Cart"),
-        related_name="cart_items"
+        related_name="cart_items",
     )
     product = models.ForeignKey(
         "catalogue.Product",
         on_delete=models.CASCADE,
         verbose_name=_("Product"),
-        related_name="cart_items"
+        related_name="cart_items",
     )
     quantity = models.IntegerField(default=1, verbose_name=_("Quantity"))
 
@@ -48,5 +49,8 @@ class CartItem(models.Model):
         verbose_name = _("Cart item")
         ordering = ["-id"]
         constraints = [
-            models.UniqueConstraint(fields=['product_id', 'cart_id'], name='unique_cartitem_constraint'),
+            models.UniqueConstraint(
+                fields=['product_id', 'cart_id'],
+                name='unique_cartitem_constraint',
+            ),
         ]

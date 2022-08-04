@@ -95,6 +95,7 @@ class CategoryService(APIService):
         return data
 
     def execute(self, id=None):
+        """Return root categories if id is None otherwise sub categories."""
         queryset = self._get_queryset(id)
         data = self._get_response_data(queryset, id is None)
         return self._get_response(data)
@@ -143,7 +144,7 @@ class ProductViewSetService:
         return ProductRepository.get_filtered_queryset(is_active=True)
 
 
-class CatalogueViewSetService(APIService):
+class CatalogueViewSetService:
 
     def execute(self):
         return ProductRepository.get_active_with_category()
