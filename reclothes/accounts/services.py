@@ -27,12 +27,13 @@ class LoginViewService:
         # We always have cart id because of middleware
         cart_id = self.session_manager.get_cart_id()
         if user_cart is None:
-            CartRepository.attach_user_to_cart(
-                user_id=user_id, id=cart_id)
+            cart = CartRepository.get(id=cart_id)
+            CartRepository.attach_user_to_cart(cart, user_id)
             logger.info(consts.USER_CART_NOT_FOUND_MSG)
         else:
             # Delete old cart
-            CartRepository.delete(id=cart_id)
+            old_cart = CartRepository.get(id=cart_id)
+            CartRepository.delete(old_cart)
             logger.info(consts.DELETE_OLD_CART_MSG)
             cart_id = user_cart.id
         return cart_id

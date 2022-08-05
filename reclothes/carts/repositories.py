@@ -18,23 +18,17 @@ class CartRepository:
             is_archived=False, is_deleted=False, **kwargs).first()
 
     @staticmethod
-    def exists(**kwargs):
-        return Cart.objects.filter(**kwargs).exists()
-
-    @staticmethod
-    def attach_user_to_cart(user_id, **kwargs):
-        cart = Cart.objects.get(**kwargs)
+    def attach_user_to_cart(cart, user_id):
         cart.user_id = user_id
         cart.save()
 
     @staticmethod
-    def delete(full_delete=False, **kwargs):
+    def delete(cart, full_delete=False):
         """
         Mark cart as deleted.
 
         If full_delete is True then completely delete cart.
         """
-        cart = Cart.objects.get(**kwargs)
         if full_delete:
             cart.delete()
         else:

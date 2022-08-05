@@ -27,7 +27,7 @@ class CartMiddlewareService:
         """
         cart_id = self.session_manager.get_cart_id()
         forced = False
-        exists = CartRepository.exists(id=cart_id)
+        exists = CartRepository.get_filtered_queryset(id=cart_id).exists()
         if not exists:
             forced = True
             new_cart = CartRepository.create()
@@ -35,8 +35,8 @@ class CartMiddlewareService:
             # In case user cart is gone
             user = self.session_manager.request.user
             if user.is_authenticated:
-                CartRepository.attach_user_to_cart(
-                    user_id=user.id, id=new_cart.id)
+                cart = CartRepository.get(id=new_cart.id)
+                CartRepository.attach_user_to_cart(cart, user.id)
                 logger.info(consts.NEW_CART_ATTACHED_MSG)
             cart_id = new_cart.id
         return cart_id, forced

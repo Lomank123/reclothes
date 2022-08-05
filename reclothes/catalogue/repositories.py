@@ -18,12 +18,12 @@ class ProductRepository:
         )
 
     @staticmethod
-    def get_detailed_by_id(product_id):
+    def get_detail(**kwargs):
         """Return product with average rating."""
         return (
             Product.objects
             .select_related('category', 'product_type')
-            .filter(id=product_id)
+            .filter(**kwargs)
             .annotate(avg_rate=Avg("reviews__rating"))
             .first()
         )
