@@ -111,8 +111,7 @@ class CartServiceTestCase(TestCase):
         response = CartService(request).execute()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["cart"]["cart_items_count"], 0)
-        self.assertEqual(len(response.data["cart_items"]), 0)
+        self.assertEqual(len(response.data), 1)
 
     def test_get_filled_cart(self):
         user = create_user()
@@ -127,7 +126,6 @@ class CartServiceTestCase(TestCase):
         response = CartService(request).execute()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["cart"]["cart_items_count"], 1)
         self.assertEqual(len(response.data["cart_items"]), 1)
         self.assertTrue("image" in response.data["cart_items"][0])
         self.assertTrue("product_title" in response.data["cart_items"][0])
