@@ -23,6 +23,10 @@ class Cart(CustomBaseModel):
     def __str__(self):
         return f"Cart {self.id}"
 
+    @property
+    def all_cart_items(self):
+        return self.cart_items.all()
+
     class Meta:
         verbose_name_plural = _("Carts")
         verbose_name = _("Cart")

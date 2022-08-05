@@ -1,6 +1,7 @@
 const baseUrl = 'http://127.0.0.1:8000';
 const apiUrl = "/api";
 
+const defaultCartUrl = `${apiUrl}/cart`;
 const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultCatalogueUrl = `${apiUrl}/catalogue`;
@@ -12,6 +13,7 @@ const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
 const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
+const cartFromSessionUrl = `${defaultCartUrl}/get_cart_from_session`;
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 

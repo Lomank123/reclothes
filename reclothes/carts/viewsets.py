@@ -3,8 +3,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from carts import serializers
-from carts.models import Cart, CartItem
-from carts.services import CartService
+from carts.services import CartService, CartItemViewSetService, \
+    CartViewSetService
 
 
 class CartViewSet(ModelViewSet):
@@ -12,8 +12,7 @@ class CartViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        qs = Cart.objects.filter(is_archived=False, is_deleted=False)
-        return qs
+        return CartViewSetService().execute()
 
     @action(methods=["get"], detail=False)
     def get_cart_from_session(self, request):
@@ -25,5 +24,4 @@ class CartItemViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        qs = CartItem.objects.all()
-        return qs
+        return CartItemViewSetService().execute()

@@ -1,16 +1,16 @@
 const cartBlock = $('#cart-header-block');
 
 // Get cart from session cookies
-function getCartData() {
+function getCartData(url, callback) {
     const csrftoken = getCookie('csrftoken');
     $.ajax({
-        url: `/api/cart/get_cart_from_session`,
+        url: url,
         headers: {"X-CSRFToken": csrftoken},
         method: 'GET',
         dataType: 'json',
         success: (result) => {
             console.log(result);
-            setCartData(result);
+            callback(result);
         },
         error: (error) => {
             console.log(error);
@@ -19,13 +19,17 @@ function getCartData() {
 }
 
 function setCartData(data) {
+    let count = 0;
+    if (data.cart_items !== undefined) {
+        count = Object.keys(data.cart_items).length;
+    }
     const cartButton = $(`
         <a href="/cart" class="btn btn-lg" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
-            ${data.cart.cart_items_count}
+            ${count}
         </a>
     `);
     cartBlock.append(cartButton);
 }
 
-getCartData();
+getCartData(cartFromSessionUrl, setCartData);
