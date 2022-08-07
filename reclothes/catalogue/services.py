@@ -40,7 +40,7 @@ class ProductDetailService(APIService):
         if product is not None:
             product_serializer = serializers.ProductSerializer(product)
             images_serializer = serializers.ProductImageSerializer(
-                product.all_images,
+                product.ordered_images,
                 many=True
             )
             attrs_serializer = serializers.ProductAttributeValueSerializer(

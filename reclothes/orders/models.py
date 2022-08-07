@@ -1,24 +1,30 @@
 from catalogue.models import CustomBaseModel
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from orders import consts
+
+class PaymentTypes(models.TextChoices):
+    CASH = _("Cash")
+    CARD = _("Card")
 
 
-user_model = get_user_model()
+class StatusTypes(models.TextChoices):
+    DECLINED = _("Declined")
+    ACCEPTED = _("Accepted")
+    DONE = _("Done")
+    IN_PROGRESS = _("In progress")
+    REFUNDED = _("Refunded")
 
 
 class Address(models.Model):
-    name = models.CharField(max_length=100, verbose_name=_("Name"))
+    name = models.CharField(max_length=255, verbose_name=_("Address"))
     is_available = models.BooleanField(
-        default=True, verbose_name=_("Is available"))
+        default=True, verbose_name=_("Available"))
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ["-id"]
         verbose_name = _("Address")
         verbose_name_plural = _("Addresses")
 
@@ -26,42 +32,29 @@ class Address(models.Model):
 # TODO: This should be created automatically with order
 # Use signals for example
 class Payment(models.Model):
-    PAYMENT_CHOICES = [
-        (consts.CASH, _("Cash")),
-        (consts.CARD, _("Card")),
-    ]
     payment_type = models.CharField(
         max_length=10,
-        choices=PAYMENT_CHOICES,
-        default=consts.CASH,
-        verbose_name=_("Type"),
+        choices=PaymentTypes.choices,
+        default=PaymentTypes.CASH,
+        verbose_name=_("Payment Type"),
     )
     total_price = models.DecimalField(
         max_digits=7, decimal_places=2, verbose_name=_("Total price"))
 
     def __str__(self):
-        return f"{self.payment_type} ({self.id})"
+        return f"Payment ({self.pk})"
 
     class Meta:
-        ordering = ["-id"]
         verbose_name = _("Payment")
         verbose_name_plural = _("Payments")
 
 
 class Order(CustomBaseModel):
-    STATUS_CHOICES = [
-        (consts.IN_PROGRESS, _("In progress")),
-        (consts.ACCEPTED, _("Accepted")),
-        (consts.DECLINED, _("Declined")),
-        (consts.DONE, _("Done")),
-        (consts.REFUNDED, _("Refunded")),
-    ]
     user = models.ForeignKey(
-        user_model,
+        "accounts.CustomUser",
         on_delete=models.CASCADE,
         verbose_name=_("User"),
-        blank=True,
-        null=True,
+        blank=True, null=True,
         related_name="orders",
     )
     address = models.ForeignKey(
@@ -71,18 +64,21 @@ class Order(CustomBaseModel):
         related_name="orders",
     )
     payment = models.OneToOneField(
-        Payment, on_delete=models.DO_NOTHING, verbose_name=_("Payment"))
+        Payment, on_delete=models.RESTRICT, verbose_name=_("Payment"))
     status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default=consts.IN_PROGRESS,
-        verbose_name=_("Status"),
+        max_length=255,
+        choices=StatusTypes.choices,
+        default=StatusTypes.IN_PROGRESS,
+        verbose_name=_("Order status"),
     )
 
     class Meta:
-        ordering = ["-creation_date"]
+        ordering = ["-created_at"]
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
+
+    def __str__(self):
+        return f"Order ({self.pk})"
 
 
 class OrderItem(models.Model):
@@ -99,17 +95,8 @@ class OrderItem(models.Model):
     )
 
     class Meta:
-        ordering = ["-id"]
         verbose_name = _("Order item")
         verbose_name_plural = _("Order items")
-        constraints = [
-            models.UniqueConstraint(
-                fields=['order_id', 'cart_item_id'],
-                name='unique_orderitem_constraint',
-            ),
-        ]
 
-
-# TODO: Implement transactions
-class Transaction(models.Model):
-    pass
+    def __str__(self):
+        return f"Order item ({self.pk})"

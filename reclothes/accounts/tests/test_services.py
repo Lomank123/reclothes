@@ -17,7 +17,7 @@ class LoginViewServiceTestCase(TestCase):
     def test_login_with_existing_cart(self):
         # Arrange
         user = self._create_user("test1")
-        cart = self._create_cart(user.id)
+        cart = self._create_cart(user.pk)
         self.assertEqual(Cart.objects.count(), 1)
         client = Client()
         client.get("/")
@@ -31,13 +31,13 @@ class LoginViewServiceTestCase(TestCase):
         # Assert
         self.assertEqual(Cart.objects.count(), 2)
         self.assertEqual(Cart.objects.filter(is_deleted=True).count(), 1)
-        self.assertTrue(request.session["cart_id"] == cart.id)
+        self.assertTrue(request.session["cart_id"] == cart.pk)
 
     def test_login_without_valid_user_cart(self):
         # Arrange
         user = self._create_user("test1")
-        self._create_cart(user.id, is_deleted=True)
-        self._create_cart(user.id, is_archived=True)
+        self._create_cart(user.pk, is_deleted=True)
+        self._create_cart(user.pk, is_archived=True)
         client = Client()
         client.get("/")
         request = RequestFactory().request()
@@ -51,4 +51,4 @@ class LoginViewServiceTestCase(TestCase):
         self.assertEqual(Cart.objects.filter(user=user).count(), 3)
         user_cart = Cart.objects.filter(user=user, is_archived=False, is_deleted=False)
         self.assertTrue(user_cart.exists())
-        self.assertTrue(request.session["cart_id"] == user_cart.first().id)
+        self.assertTrue(request.session["cart_id"] == user_cart.first().pk)

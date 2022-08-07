@@ -44,8 +44,8 @@ class ProductRepository:
         qs = (
             Product.objects
             .filter(is_active=True)
-            .annotate(type=F("product_type__name"))
-            .annotate(feature_image=Subquery(image))
+            .annotate(
+                type=F("product_type__name"), feature_image=Subquery(image))
             .values(
                 "id",
                 "title",
@@ -55,7 +55,7 @@ class ProductRepository:
                 "product_type",
                 "feature_image",
             )
-            .order_by("-creation_date")
+            .order_by("-created_at")
         )
         products = qs
         if limit:
@@ -76,8 +76,8 @@ class ProductRepository:
             .annotate(
                 purchases=Count("cart_items__orderitem"),
                 type=F("product_type__name"),
+                feature_image=Subquery(image),
             )
-            .annotate(feature_image=Subquery(image))
             .values(
                 "id",
                 "title",
@@ -107,8 +107,8 @@ class ProductRepository:
             .annotate(
                 avg_rate=Avg("reviews__rating"),
                 type=F("product_type__name"),
+                feature_image=Subquery(image),
             )
-            .annotate(feature_image=Subquery(image))
             .values(
                 "id",
                 "title",

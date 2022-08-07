@@ -5,7 +5,7 @@ from carts import models
 
 @admin.register(models.Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'is_deleted', 'is_archived', 'last_update', 'creation_date', )
+    list_display = ('id', 'user', 'is_deleted', 'is_archived', 'updated_at', 'created_at', )
 
 
 @admin.register(models.CartItem)

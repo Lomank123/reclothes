@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
             name='Cart',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
-                ('last_update', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
+                ('created_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
+                ('updated_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
                 ('is_deleted', models.BooleanField(default=False, verbose_name='Deleted')),
                 ('is_archived', models.BooleanField(default=False, verbose_name='Archived')),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='User')),
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Cart',
                 'verbose_name_plural': 'Carts',
-                'ordering': ['-creation_date'],
+                'ordering': ['-created_at'],
             },
         ),
         migrations.CreateModel(

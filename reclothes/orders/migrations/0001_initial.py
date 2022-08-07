@@ -32,14 +32,14 @@ class Migration(migrations.Migration):
             name='Order',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
-                ('last_update', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
+                ('created_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
+                ('updated_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
                 ('address', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='orders.address', verbose_name='Address')),
             ],
             options={
                 'verbose_name': 'Order',
                 'verbose_name_plural': 'Orders',
-                'ordering': ['-creation_date'],
+                'ordering': ['-created_at'],
             },
         ),
         migrations.CreateModel(

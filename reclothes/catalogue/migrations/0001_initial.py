@@ -39,8 +39,8 @@ class Migration(migrations.Migration):
             name='Product',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
-                ('last_update', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
+                ('created_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
+                ('updated_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
                 ('title', models.CharField(help_text='Required', max_length=255, verbose_name='Title')),
                 ('description', models.TextField(blank=True, help_text='Not required', verbose_name='Description')),
                 ('regular_price', models.DecimalField(decimal_places=2, help_text='Maximum 9999.99', max_digits=6, validators=[django.core.validators.MinValueValidator(0.01)], verbose_name='Regular_price')),
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Product',
                 'verbose_name_plural': 'Products',
-                'ordering': ['-creation_date'],
+                'ordering': ['-created_at'],
             },
         ),
         migrations.CreateModel(
@@ -80,8 +80,8 @@ class Migration(migrations.Migration):
             name='Tag',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
-                ('last_update', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
+                ('created_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
+                ('updated_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
                 ('name', models.CharField(max_length=64, verbose_name='Name')),
             ],
             options={
@@ -93,8 +93,8 @@ class Migration(migrations.Migration):
             name='ProductReview',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
-                ('last_update', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
+                ('created_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
+                ('updated_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
                 ('text', models.TextField(blank=True, help_text='Review', verbose_name='Review text')),
                 ('rating', models.IntegerField(blank=True, help_text='Choose from 1 to 5', null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5)], verbose_name='Rating')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, related_name='reviews', to='catalogue.product')),
@@ -109,9 +109,9 @@ class Migration(migrations.Migration):
             name='ProductImage',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
-                ('last_update', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
-                ('image', models.ImageField(help_text='Upload a product image', upload_to=catalogue.utils.get_product_directory_path, verbose_name='Image')),
+                ('created_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Creation date')),
+                ('updated_at', models.DateTimeField(blank=True, help_text='Not required', null=True, verbose_name='Last update')),
+                ('image', models.ImageField(help_text='Upload a product image', upload_to=catalogue.utils.get_product_media_path, verbose_name='Image')),
                 ('alt_text', models.CharField(help_text='Add alternative text', max_length=255, verbose_name='Alturnative text')),
                 ('is_feature', models.BooleanField(default=False)),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='catalogue.product')),

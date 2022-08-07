@@ -12,8 +12,8 @@ class OrderAdmin(admin.ModelAdmin):
         "user",
         "address",
         "payment",
-        "last_update",
-        "creation_date",
+        "updated_at",
+        "created_at",
     )
 
 

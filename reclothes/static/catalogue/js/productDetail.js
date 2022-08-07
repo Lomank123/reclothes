@@ -98,7 +98,7 @@ function setMainInfo(data) {
     setAddToCartButton(availability);
     setTopInfo(data.product_type, data.category);
     setTagsInfo(data.tags);
-    setDatesInfo(data.last_update, data.creation_date);
+    setDatesInfo(data.updated_at, data.created_at);
 }
 
 function setTopInfo(type, categories) {
@@ -272,7 +272,7 @@ function setReviewsInfo(data) {
     data.forEach(reviewData => {
         const line = $(`<span class="grey-line"></span>`);
         const rateBar = buildRating(reviewData.rating);
-        const creationDate = formatDate(reviewData.creation_date);
+        const creationDate = formatDate(reviewData.created_at);
         const userReviewInfo = $(`
             <div class="user-review-block">
                 <div class="detail-review-user-block">

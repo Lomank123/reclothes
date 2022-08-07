@@ -35,10 +35,10 @@ class CartMiddlewareService:
             # In case user cart is gone
             user = self.session_manager.request.user
             if user.is_authenticated:
-                cart = CartRepository.get(id=new_cart.id)
-                CartRepository.attach_user_to_cart(cart, user.id)
+                cart = CartRepository.get(id=new_cart.pk)
+                CartRepository.attach_user_to_cart(cart, user.pk)
                 logger.info(consts.NEW_CART_ATTACHED_MSG)
-            cart_id = new_cart.id
+            cart_id = new_cart.pk
         return cart_id, forced
 
     def execute(self):
@@ -66,11 +66,8 @@ class CartService(APIService):
 
     @staticmethod
     def _get_cart_items(cart):
-        """
-        Return queryset with annotated product title and feature image.
+        """Return queryset with annotated product title and feature image."""
 
-        If cart is None then return empty queryset.
-        """
         if cart is None:
             return CartItemRepository.empty()
 
@@ -81,7 +78,7 @@ class CartService(APIService):
             'image': Subquery(img_subquery),
         }
         return CartItemRepository.annotate(
-            cart.all_cart_items, **annotate_data)
+            cart.cart_items, **annotate_data)
 
     def execute(self):
         cart_id = self.session_manager.get_cart_id()

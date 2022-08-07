@@ -68,8 +68,8 @@ class CartMiddlewareServiceTestCase(TestCase):
     def test_check_user_cart_in_session(self):
         user = create_user(username="test1")
         session = create_session(user)
-        cart = create_cart(user.id)
-        session["cart_id"] = cart.id
+        cart = create_cart(user.pk)
+        session["cart_id"] = cart.pk
         request = create_request(user, session)
 
         CartMiddlewareService(request).execute()
@@ -105,7 +105,7 @@ class CartServiceTestCase(TestCase):
         user = create_user()
         session = create_session(user)
         cart = create_cart()
-        session["cart_id"] = cart.id
+        session["cart_id"] = cart.pk
         request = create_request(user, session)
 
         response = CartService(request).execute()
@@ -118,9 +118,9 @@ class CartServiceTestCase(TestCase):
         session = create_session(user)
         cart = create_cart()
         product_type = self._create_product_type("test1")
-        product = self._create_product(type_id=product_type.id)
-        self._create_cart_item(cart.id, product.id)
-        session["cart_id"] = cart.id
+        product = self._create_product(type_id=product_type.pk)
+        self._create_cart_item(cart.pk, product.pk)
+        session["cart_id"] = cart.pk
         request = create_request(user, session)
 
         response = CartService(request).execute()
@@ -134,9 +134,9 @@ class CartServiceTestCase(TestCase):
         user = create_user()
         session = create_session(user)
         cart = create_cart()
-        session["cart_id"] = cart.id
+        session["cart_id"] = cart.pk
         request = create_request(user, session)
-        self._delete_cart_by_id(cart.id)
+        self._delete_cart_by_id(cart.pk)
 
         response = CartService(request).execute()
 

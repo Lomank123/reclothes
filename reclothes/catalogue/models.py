@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -6,33 +5,26 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
-from catalogue.utils import get_product_directory_path
-
-
-user_model = get_user_model()
+from catalogue.utils import get_product_media_path
 
 
 class CustomBaseModel(models.Model):
-    """Abstract model with creation and last update date fields."""
+    """
+    Abstract model with creation and update datetime fields.
 
-    creation_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name=_("Creation date"),
-        help_text=_("Not required"),
-    )
-    last_update = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name=_("Last update"),
-        help_text=_("Not required"),
-    )
+    save() method has been overriden to allow modifying dates during tests.
+    """
+
+    created_at = models.DateTimeField(
+        blank=True, null=True, verbose_name=_("Created at"))
+    updated_at = models.DateTimeField(
+        blank=True, null=True, verbose_name=_("Updated at"))
 
     def save(self, *args, **kwargs):
         date = timezone.now()
-        if self.creation_date is None:
-            self.creation_date = date
-        self.last_update = date
+        if self.created_at is None:
+            self.created_at = date
+        self.updated_at = date
         super().save(*args, **kwargs)
 
     class Meta:
@@ -58,7 +50,7 @@ class Category(MPTTModel):
     )
     slug = models.SlugField(
         max_length=255, unique=True, help_text=_("Category safe URL"))
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     class MPTTMeta:
         order_insertion_by = ["name"]
@@ -77,7 +69,7 @@ class Category(MPTTModel):
 
 class Tag(CustomBaseModel):
     """Tags to different products."""
-    name = models.CharField(max_length=64, verbose_name=_("Name"))
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
 
     class Meta:
         verbose_name = _("Tag")
@@ -93,14 +85,15 @@ class ProductType(models.Model):
     name = models.CharField(
         max_length=255,
         verbose_name=_("Type"),
-        help_text=_("Required"),
+        help_text=_("Required and unique"),
         unique=True,
     )
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     class Meta:
         verbose_name = _("Product Type")
         verbose_name_plural = _("Product Types")
+        ordering = ['-is_active']
 
     def __str__(self):
         return self.name
@@ -110,11 +103,16 @@ class ProductAttribute(models.Model):
     """Allows to add properties to certain product types (e.g. shoe size)."""
 
     product_type = models.ForeignKey(
-        ProductType, on_delete=models.RESTRICT, related_name="product_attrs")
+        ProductType,
+        on_delete=models.RESTRICT,
+        related_name="product_attrs",
+        verbose_name=_("Product Type"),
+    )
     name = models.CharField(
         max_length=255,
         verbose_name=_("Attribute name"),
-        help_text=_("Required"),
+        help_text=_("Required and unique"),
+        unique=True,
     )
 
     class Meta:
@@ -127,15 +125,21 @@ class ProductAttribute(models.Model):
 
 class Product(CustomBaseModel):
     product_type = models.ForeignKey(
-        ProductType, on_delete=models.RESTRICT, related_name="products")
+        ProductType,
+        on_delete=models.RESTRICT,
+        related_name="products",
+        verbose_name=_("Product Type"),
+    )
     category = models.ForeignKey(
         Category,
         null=True,
         blank=True,
         on_delete=models.RESTRICT,
         related_name="products",
+        verbose_name=_("Category"),
     )
-    tags = models.ManyToManyField(Tag, blank=True, related_name="tags")
+    tags = models.ManyToManyField(
+        Tag, blank=True, related_name="tags", verbose_name=_("Tags"))
     title = models.CharField(
         verbose_name=_("Title"), help_text=_("Required"), max_length=255)
     description = models.TextField(
@@ -153,24 +157,21 @@ class Product(CustomBaseModel):
         decimal_places=2,
     )
     is_active = models.BooleanField(
-        verbose_name=_("Product visibility"),
+        verbose_name=_("Active"),
         help_text=_("Change product visibility"),
         default=True,
     )
 
     class Meta:
-        ordering = ["-creation_date"]
+        ordering = ["-created_at"]
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
 
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
-        return reverse("catalogue:product_detail", kwargs={"pk": self.pk})
-
     @property
-    def all_images(self):
+    def ordered_images(self):
         """Images ordered by is_feature."""
         return self.images.order_by('-is_feature')
 
@@ -181,8 +182,8 @@ class Product(CustomBaseModel):
 
     @property
     def reviews_with_users(self):
-        """Reviews with users ordered by creation_date."""
-        return self.reviews.select_related('user').order_by('-creation_date')
+        """Reviews with users ordered by creation date."""
+        return self.reviews.select_related('user').order_by('-created_at')
 
 
 class ProductAttributeValue(models.Model):
@@ -192,12 +193,21 @@ class ProductAttributeValue(models.Model):
     Connected with product as well.
     """
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="attr_values")
-    attribute = models.ForeignKey(ProductAttribute, on_delete=models.RESTRICT)
+        Product,
+        on_delete=models.CASCADE,
+        related_name="attr_values",
+        verbose_name=_("Product"),
+    )
+    attribute = models.ForeignKey(
+        ProductAttribute,
+        on_delete=models.RESTRICT,
+        verbose_name=_("Product attribute"),
+        help_text=_("Product attribute name"),
+    )
     value = models.CharField(
-        verbose_name=_("Value"),
-        help_text=_("Product attribute value. Maximum of 255 symbols."),
         max_length=255,
+        verbose_name=_("Value"),
+        help_text=_("Product attribute value"),
     )
 
     class Meta:
@@ -216,24 +226,32 @@ class ProductAttributeValue(models.Model):
 
 
 class ProductReview(CustomBaseModel):
-    """Sort of a comment to product with its own rating."""
+    """Comment to product with its own rating."""
     user = models.ForeignKey(
-        user_model, on_delete=models.DO_NOTHING, related_name="reviews")
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        verbose_name=_("User"),
+    )
     product = models.ForeignKey(
-        Product, on_delete=models.DO_NOTHING, related_name="reviews")
+        Product,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        verbose_name=_("Product"),
+    )
     text = models.TextField(
-        verbose_name=_("Review text"), help_text=_("Review"), blank=True)
+        verbose_name=_("Review text"), blank=True)
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name=_("Rating"),
         help_text=_("Choose from 1 to 5"),
-        blank=True,
-        null=True,
+        blank=True, null=True,
     )
 
     class Meta:
         verbose_name = _("Product Review")
         verbose_name_plural = _("Product Reviews")
+        # User cannot leave more than 1 comment to each product
         constraints = [
             models.UniqueConstraint(
                 fields=['product_id', 'user_id'],
@@ -244,18 +262,23 @@ class ProductReview(CustomBaseModel):
 
 class ProductImage(CustomBaseModel):
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="images")
+        Product,
+        on_delete=models.CASCADE,
+        related_name="images",
+        verbose_name=_("Product"),
+    )
     image = models.ImageField(
         verbose_name=_("Image"),
         help_text=_("Upload a product image"),
-        upload_to=get_product_directory_path,
+        upload_to=get_product_media_path,
     )
     alt_text = models.CharField(
         max_length=255,
-        verbose_name=_("Alturnative text"),
+        verbose_name=_("Alternative text"),
         help_text=_("Add alternative text"),
     )
-    is_feature = models.BooleanField(default=False)
+    is_feature = models.BooleanField(
+        default=False, verbose_name=_("Feature image"))
 
     class Meta:
         verbose_name = _("Product Image")

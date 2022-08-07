@@ -116,4 +116,4 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProductReview
-        fields = ('id', 'user', 'text', 'rating', 'creation_date',)
+        fields = ('id', 'user', 'text', 'rating', 'created_at',)

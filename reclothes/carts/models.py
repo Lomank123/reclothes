@@ -1,36 +1,27 @@
 from catalogue.models import CustomBaseModel
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-user_model = get_user_model()
-
-
 class Cart(CustomBaseModel):
     user = models.ForeignKey(
-        user_model,
+        "accounts.CustomUser",
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+        null=True, blank=True,
         verbose_name=_("User"),
-        related_name="carts"
+        related_name="carts",
     )
     is_deleted = models.BooleanField(default=False, verbose_name=_("Deleted"))
     is_archived = models.BooleanField(
         default=False, verbose_name=_("Archived"))
 
     def __str__(self):
-        return f"Cart {self.id}"
-
-    @property
-    def all_cart_items(self):
-        return self.cart_items.all()
+        return f"Cart {self.pk}"
 
     class Meta:
         verbose_name_plural = _("Carts")
         verbose_name = _("Cart")
-        ordering = ["-creation_date"]
+        ordering = ["-created_at"]
 
 
 class CartItem(models.Model):
@@ -51,7 +42,7 @@ class CartItem(models.Model):
     class Meta:
         verbose_name_plural = _("Cart items")
         verbose_name = _("Cart item")
-        ordering = ["-id"]
+        # Cart can have only unique cart items
         constraints = [
             models.UniqueConstraint(
                 fields=['product_id', 'cart_id'],

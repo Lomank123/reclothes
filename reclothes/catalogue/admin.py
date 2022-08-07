@@ -10,7 +10,7 @@ class ProductAttributeInline(admin.TabularInline):
 
 
 class ProductImageInline(admin.TabularInline):
-    readonly_fields = ['creation_date', 'last_update']
+    readonly_fields = ['created_at', 'updated_at']
     model = models.ProductImage
 
 
@@ -28,7 +28,7 @@ class ProductTypeAdmin(admin.ModelAdmin):
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductModelForm
-    readonly_fields = ['creation_date', 'last_update']
+    readonly_fields = ['created_at', 'updated_at']
     inlines = [
         ProductAttributeValueInline,
         ProductImageInline,
@@ -42,9 +42,9 @@ class CategoryAdmin(MPTTModelAdmin):
 
 @admin.register(models.Tag)
 class TagAdmin(admin.ModelAdmin):
-    readonly_fields = ['creation_date', 'last_update']
+    readonly_fields = ['created_at', 'updated_at']
 
 
 @admin.register(models.ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
-    readonly_fields = ['creation_date', 'last_update']
+    readonly_fields = ['created_at', 'updated_at']

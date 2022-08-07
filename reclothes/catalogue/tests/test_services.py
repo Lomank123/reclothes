@@ -88,50 +88,50 @@ class CatalogueServicesTestCase(TestCase):
         user2 = self._create_user("test2")
         # Products
         product_type = create_product_type("type1")
-        attr1 = self._create_product_attr("attr1", type_id=product_type.id)
-        attr2 = self._create_product_attr("attr2", type_id=product_type.id)
-        product1 = create_product(type_id=product_type.id)
-        product2 = create_product(type_id=product_type.id)
+        attr1 = self._create_product_attr("attr1", type_id=product_type.pk)
+        attr2 = self._create_product_attr("attr2", type_id=product_type.pk)
+        product1 = create_product(type_id=product_type.pk)
+        product2 = create_product(type_id=product_type.pk)
         self._create_product_attr_value(
-            product_id=product1.id, attr_id=attr1.id)
+            product_id=product1.pk, attr_id=attr1.pk)
         self._create_product_attr_value(
-            product_id=product1.id, attr_id=attr2.id)
+            product_id=product1.pk, attr_id=attr2.pk)
         # Reviews
         self._create_product_review(
-            product_id=product1.id, user_id=user.id, rating=4)
+            product_id=product1.pk, user_id=user.pk, rating=4)
         self._create_product_review(
-            product_id=product1.id, user_id=user2.id, rating=1)
+            product_id=product1.pk, user_id=user2.pk, rating=1)
         self._create_product_review(
-            product_id=product2.id, user_id=user.id, rating=5)
+            product_id=product2.pk, user_id=user.pk, rating=5)
         self._create_product_review(
-            product_id=product2.id, user_id=user2.id, rating=2)
+            product_id=product2.pk, user_id=user2.pk, rating=2)
         # Images
-        self._create_image(product_id=product1.id, is_feature=True)
-        self._create_image(product_id=product1.id)
-        self._create_image(product_id=product2.id)
+        self._create_image(product_id=product1.pk, is_feature=True)
+        self._create_image(product_id=product1.pk)
+        self._create_image(product_id=product2.pk)
         # Carts
-        cart1 = self._create_cart(user_id=user.id)
-        cart2 = self._create_cart(user_id=user.id)
+        cart1 = self._create_cart(user_id=user.pk)
+        cart2 = self._create_cart(user_id=user.pk)
         # Cart items
         cart_item1 = self._create_cart_item(
-            product_id=product1.id, cart_id=cart1.id)
+            product_id=product1.pk, cart_id=cart1.pk)
         cart_item2 = self._create_cart_item(
-            product_id=product2.id, cart_id=cart1.id)
+            product_id=product2.pk, cart_id=cart1.pk)
         cart_item3 = self._create_cart_item(
-            product_id=product1.id, cart_id=cart2.id)
-        self._create_cart_item(product_id=product2.id, cart_id=cart2.id)
+            product_id=product1.pk, cart_id=cart2.pk)
+        self._create_cart_item(product_id=product2.pk, cart_id=cart2.pk)
         # Orders
         address = self._create_address("addr1")
         payment1 = self._create_payment()
         payment2 = self._create_payment()
         order1 = self._create_order(
-            user_id=user.id, address_id=address.id, payment_id=payment1.id)
+            user_id=user.pk, address_id=address.pk, payment_id=payment1.pk)
         order2 = self._create_order(
-            user_id=user.id, address_id=address.id, payment_id=payment2.id)
+            user_id=user.pk, address_id=address.pk, payment_id=payment2.pk)
         # Order items
-        self._create_order_item(order_id=order1.id, cart_item_id=cart_item1.id)
-        self._create_order_item(order_id=order1.id, cart_item_id=cart_item2.id)
-        self._create_order_item(order_id=order2.id, cart_item_id=cart_item3.id)
+        self._create_order_item(order_id=order1.pk, cart_item_id=cart_item1.pk)
+        self._create_order_item(order_id=order1.pk, cart_item_id=cart_item2.pk)
+        self._create_order_item(order_id=order2.pk, cart_item_id=cart_item3.pk)
 
     def test_get_products_data(self):
         self._create_data()
@@ -171,9 +171,9 @@ class ProductDetailServiceTestCase(TestCase):
 
     def test_product_detail_service(self):
         product_type = create_product_type("type1")
-        product = create_product(product_type.id)
+        product = create_product(product_type.pk)
 
-        response = ProductDetailService().execute(product.id)
+        response = ProductDetailService().execute(product.pk)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue("product" in response.data.keys())
@@ -205,14 +205,14 @@ class CategoryServiceTestCase(TestCase):
         sub_category = self._create_category(
             parent=root_category, name="s1", slug="s1")
 
-        response = CategoryService().execute(root_category.id)
+        response = CategoryService().execute(root_category.pk)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Category.objects.count(), 3)
         self.assertEqual(len(response.data["items"]), 1)
         self.assertEqual(
             response.data["items"][0]['category_tree'][0]["id"],
-            sub_category.id
+            sub_category.pk
         )
 
     def test_sub_categories_not_found(self):
@@ -245,8 +245,8 @@ class CatalogueServiceTestCase(TestCase):
     def test_get_products_with_tags(self):
         # Test data
         product_type = create_product_type(name="type1")
-        product1 = create_product(type_id=product_type.id, title="test1")
-        product2 = create_product(type_id=product_type.id, title="test2")
+        product1 = create_product(type_id=product_type.pk, title="test1")
+        product2 = create_product(type_id=product_type.pk, title="test2")
         tag1 = self._create_tag(name="tag1")
         tag2 = self._create_tag(name="tag2")
         tag3 = self._create_tag(name="tag3")
