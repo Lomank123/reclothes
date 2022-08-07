@@ -1,11 +1,11 @@
-function getHomeData() {
+function ajaxGet(url, callback) {
     $.ajax({
-        url: "/api/product/get_home_products",
+        url: url,
         method: "GET",
         dataType: "json",
         success: (result) => {
             console.log(result);
-            displayHomeData(result);
+            callback(result);
         },
         error: (error) => {
             console.log(error);
@@ -66,4 +66,4 @@ function setNewestProducts(data) {
     });
 }
 
-getHomeData();
+ajaxGet(homeProductsUrl, displayHomeData);

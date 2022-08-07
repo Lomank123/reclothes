@@ -1,13 +1,11 @@
-from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import CreateView
 
 from accounts.forms import CustomUserCreationForm
+from accounts.models import CustomUser
 from accounts.services import LoginViewService
-
-
-user_model = get_user_model()
 
 
 class AccountsLoginView(LoginView):
@@ -25,7 +23,7 @@ class AccountsLogoutView(LogoutView):
 
 
 class AccountsSignupView(CreateView):
-    model = user_model
+    model = CustomUser
     form_class = CustomUserCreationForm
     template_name = 'accounts/signup.html'
     success_url = '/'

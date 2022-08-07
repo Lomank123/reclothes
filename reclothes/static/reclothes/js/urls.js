@@ -1,19 +1,21 @@
 const baseUrl = 'http://127.0.0.1:8000';
 const apiUrl = "/api";
 
+const defaultProductUrl = `${apiUrl}/product`;
 const defaultCartUrl = `${apiUrl}/cart`;
 const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultCatalogueUrl = `${apiUrl}/catalogue`;
 const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
-const defaultCatalogueDataUrl = `${defaultCatalogueUrl}/prods-and-tags`;
+const defaultCatalogueDataUrl = `${defaultCatalogueUrl}/data`;
 
 const catalogueUrl = getUrlWithSearch(defaultCatalogueUrl);
 const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
 const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
-const cartFromSessionUrl = `${defaultCartUrl}/get_cart_from_session`;
+const cartFromSessionUrl = `${defaultCartUrl}/fetch_from_session`;
+const homeProductsUrl = `${defaultProductUrl}/fetch_home_products`;
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 
