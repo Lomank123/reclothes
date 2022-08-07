@@ -1,34 +1,41 @@
 from django.contrib import admin
 
-from orders import models
+from orders.models import Order, OrderItem, Payment, Address
 
 
-# TODO: Maybe payment shouldn't be here
-@admin.register(models.Order)
+class OrderItemInline(admin.TabularInline):
+    list_display = ('__str__', 'id', 'cart_item')
+    model = OrderItem
+
+
+class PaymentInline(admin.StackedInline):
+    model = Payment
+
+
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
-        "status",
-        "user",
-        "address",
-        "payment",
-        "updated_at",
-        "created_at",
+        '__str__',
+        'id',
+        'status',
+        'user',
+        'address',
+        'updated_at',
+        'created_at',
     )
+    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('id', )
+    inlines = (PaymentInline, OrderItemInline)
 
 
-@admin.register(models.OrderItem)
+@admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "order", "cart_item", )
+    list_display = ('__str__', 'id', 'order', 'cart_item')
+    search_fields = ('id', )
 
 
-@admin.register(models.Address)
+@admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ("name", "id", "is_available", )
-    list_filter = ("is_available", )
-
-
-@admin.register(models.Payment)
-class PaymentAdmin(admin.ModelAdmin):
-    list_display = ("id", "payment_type", "total_price", )
-    list_filter = ("payment_type", )
+    list_display = ('name', 'id', 'is_available')
+    list_filter = ('is_available', )
+    search_fields = ('id', )

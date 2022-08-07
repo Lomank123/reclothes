@@ -1,50 +1,68 @@
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 
-from catalogue import models
 from catalogue.forms import ProductModelForm
+from catalogue.models import (Category, Product, ProductAttribute,
+                              ProductAttributeValue, ProductImage,
+                              ProductReview, ProductType, Tag)
 
 
 class ProductAttributeInline(admin.TabularInline):
-    model = models.ProductAttribute
+    model = ProductAttribute
 
 
 class ProductImageInline(admin.TabularInline):
-    readonly_fields = ['created_at', 'updated_at']
-    model = models.ProductImage
+    readonly_fields = ('created_at', 'updated_at')
+    model = ProductImage
 
 
 class ProductAttributeValueInline(admin.TabularInline):
-    model = models.ProductAttributeValue
+    model = ProductAttributeValue
 
 
-@admin.register(models.ProductType)
+@admin.register(ProductType)
 class ProductTypeAdmin(admin.ModelAdmin):
-    inlines = [
-        ProductAttributeInline,
-    ]
+    list_display = ('name', 'id', 'is_active')
+    list_filter = ('is_active', )
+    search_fields = ('id', 'name')
+    inlines = (ProductAttributeInline, )
 
 
-@admin.register(models.Product)
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductModelForm
-    readonly_fields = ['created_at', 'updated_at']
-    inlines = [
-        ProductAttributeValueInline,
-        ProductImageInline,
-    ]
+    list_display = (
+        'title',
+        'id',
+        'regular_price',
+        'product_type',
+        'category',
+        'quantity',
+        'is_active',
+    )
+    list_filter = ('is_active', )
+    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('id', 'title')
+    inlines = (ProductAttributeValueInline, ProductImageInline)
 
 
-@admin.register(models.Category)
+@admin.register(Category)
 class CategoryAdmin(MPTTModelAdmin):
-    prepopulated_fields = {'slug': ('name',), }
+    list_display = ('name', 'parent', 'slug', 'is_active')
+    list_filter = ('is_active', )
+    search_fields = ('id', 'name')
+    prepopulated_fields = {'slug': ('name',)}
 
 
-@admin.register(models.Tag)
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    readonly_fields = ['created_at', 'updated_at']
+    list_display = ('name', 'id')
+    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('id', )
 
 
-@admin.register(models.ProductReview)
+@admin.register(ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
-    readonly_fields = ['created_at', 'updated_at']
+    list_display = ('__str__', 'id', 'user', 'product', 'rating')
+    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('id', 'text')

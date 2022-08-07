@@ -1,13 +1,31 @@
 from django.contrib import admin
 
-from carts import models
+from carts.models import Cart, CartItem
 
 
-@admin.register(models.Cart)
+class CartItemInline(admin.TabularInline):
+    list_display = ('__str__', 'id', 'product', 'quantity')
+    model = CartItem
+
+
+@admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'is_deleted', 'is_archived', 'updated_at', 'created_at', )
+    list_display = (
+        '__str__',
+        'id',
+        'user',
+        'is_deleted',
+        'is_archived',
+        'updated_at',
+        'created_at',
+    )
+    list_filter = ('is_deleted', 'is_archived')
+    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('id', )
+    inlines = (CartItemInline, )
 
 
-@admin.register(models.CartItem)
+@admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'cart', 'product', 'quantity', )
+    list_display = ('__str__', 'id', 'cart', 'product', 'quantity')
+    search_fields = ('id', )

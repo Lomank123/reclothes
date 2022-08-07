@@ -21,32 +21,12 @@ class Address(models.Model):
     is_available = models.BooleanField(
         default=True, verbose_name=_("Available"))
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = _("Address")
         verbose_name_plural = _("Addresses")
 
-
-# TODO: This should be created automatically with order
-# Use signals for example
-class Payment(models.Model):
-    payment_type = models.CharField(
-        max_length=10,
-        choices=PaymentTypes.choices,
-        default=PaymentTypes.CASH,
-        verbose_name=_("Payment Type"),
-    )
-    total_price = models.DecimalField(
-        max_digits=7, decimal_places=2, verbose_name=_("Total price"))
-
     def __str__(self):
-        return f"Payment ({self.pk})"
-
-    class Meta:
-        verbose_name = _("Payment")
-        verbose_name_plural = _("Payments")
+        return self.name
 
 
 class Order(CustomBaseModel):
@@ -63,8 +43,6 @@ class Order(CustomBaseModel):
         verbose_name=_("Address"),
         related_name="orders",
     )
-    payment = models.OneToOneField(
-        Payment, on_delete=models.RESTRICT, verbose_name=_("Payment"))
     status = models.CharField(
         max_length=255,
         choices=StatusTypes.choices,
@@ -100,3 +78,23 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"Order item ({self.pk})"
+
+
+class Payment(models.Model):
+    type = models.CharField(
+        max_length=10,
+        choices=PaymentTypes.choices,
+        default=PaymentTypes.CASH,
+        verbose_name=_("Payment Type"),
+    )
+    total_price = models.DecimalField(
+        max_digits=7, decimal_places=2, verbose_name=_("Total price"))
+    order = models.OneToOneField(
+        Order, on_delete=models.RESTRICT, verbose_name=_("Order"))
+
+    class Meta:
+        verbose_name = _("Payment")
+        verbose_name_plural = _("Payments")
+
+    def __str__(self):
+        return f"Payment ({self.pk}) to order ({self.order.pk})"

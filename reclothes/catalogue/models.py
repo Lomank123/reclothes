@@ -81,7 +81,6 @@ class Tag(CustomBaseModel):
 
 class ProductType(models.Model):
     """Type of product (e.g. boots, T-shirt, jacket)."""
-
     name = models.CharField(
         max_length=255,
         verbose_name=_("Type"),
@@ -259,6 +258,9 @@ class ProductReview(CustomBaseModel):
             ),
         ]
 
+    def __str__(self):
+        return f'Review ({self.pk})'
+
 
 class ProductImage(CustomBaseModel):
     product = models.ForeignKey(
@@ -283,3 +285,6 @@ class ProductImage(CustomBaseModel):
     class Meta:
         verbose_name = _("Product Image")
         verbose_name_plural = _("Product Images")
+
+    def __str__(self):
+        return f'{self.alt_text} {self.pk}'

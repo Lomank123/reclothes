@@ -15,13 +15,13 @@ class Cart(CustomBaseModel):
     is_archived = models.BooleanField(
         default=False, verbose_name=_("Archived"))
 
-    def __str__(self):
-        return f"Cart {self.pk}"
-
     class Meta:
         verbose_name_plural = _("Carts")
         verbose_name = _("Cart")
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Cart {self.pk}"
 
 
 class CartItem(models.Model):
@@ -49,3 +49,6 @@ class CartItem(models.Model):
                 name='unique_cartitem_constraint',
             ),
         ]
+
+    def __str__(self):
+        return f'Cart item ({self.pk})'

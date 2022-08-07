@@ -299,22 +299,6 @@
   }
 },
 {
-  "model": "orders.payment",
-  "pk": 1,
-  "fields": {
-    "payment_type": "CASH",
-    "total_price": "312.00"
-  }
-},
-{
-  "model": "orders.payment",
-  "pk": 2,
-  "fields": {
-    "payment_type": "CARD",
-    "total_price": "5345.00"
-  }
-},
-{
   "model": "orders.order",
   "pk": 1,
   "fields": {
@@ -322,7 +306,6 @@
     "updated_at": "2022-06-27T18:28:39.108Z",
     "user": 2,
     "address": 3,
-    "payment": 1,
     "status": "ACCEPTED"
   }
 },
@@ -334,8 +317,25 @@
     "updated_at": "2022-06-27T18:28:49.673Z",
     "user": 3,
     "address": 1,
-    "payment": 2,
     "status": "REFUNDED"
+  }
+},
+{
+  "model": "orders.payment",
+  "pk": 1,
+  "fields": {
+    "order": 1,
+    "type": "CASH",
+    "total_price": "312.00"
+  }
+},
+{
+  "model": "orders.payment",
+  "pk": 2,
+  "fields": {
+    "order": 2,
+    "type": "CARD",
+    "total_price": "5345.00"
   }
 },
 {

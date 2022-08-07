@@ -64,21 +64,19 @@ class CatalogueServicesTestCase(TestCase):
         return Address.objects.create(name=name)
 
     @staticmethod
-    def _create_payment(type=PaymentTypes.CASH, total_price=123):
+    def _create_payment(order_id, type=PaymentTypes.CASH, total_price=123):
         return Payment.objects.create(
-            payment_type=type, total_price=total_price)
+            order_id=order_id, type=type, total_price=total_price)
 
     @staticmethod
     def _create_order(
         user_id,
         address_id,
-        payment_id,
         status=StatusTypes.IN_PROGRESS,
     ):
         return Order.objects.create(
             user_id=user_id,
             address_id=address_id,
-            payment_id=payment_id,
             status=status
         )
 
@@ -127,12 +125,10 @@ class CatalogueServicesTestCase(TestCase):
         self._create_cart_item(product_id=product2.pk, cart_id=cart2.pk)
         # Orders
         address = self._create_address("addr1")
-        payment1 = self._create_payment()
-        payment2 = self._create_payment()
-        order1 = self._create_order(
-            user_id=user.pk, address_id=address.pk, payment_id=payment1.pk)
-        order2 = self._create_order(
-            user_id=user.pk, address_id=address.pk, payment_id=payment2.pk)
+        order1 = self._create_order(user_id=user.pk, address_id=address.pk)
+        order2 = self._create_order(user_id=user.pk, address_id=address.pk)
+        self._create_payment(order1.pk)
+        self._create_payment(order2.pk)
         # Order items
         self._create_order_item(order_id=order1.pk, cart_item_id=cart_item1.pk)
         self._create_order_item(order_id=order1.pk, cart_item_id=cart_item2.pk)
