@@ -7,8 +7,8 @@ from catalogue.services import (CatalogueService, CategoryService,
                                 HomeViewService, ProductDetailService)
 from catalogue.viewsets import CatalogueViewSet
 from django.test import RequestFactory, TestCase
-from orders.consts import CASH, IN_PROGRESS
-from orders.models import Address, Order, OrderItem, Payment
+from orders.models import (Address, Order, OrderItem, Payment, PaymentTypes,
+                           StatusTypes)
 from rest_framework.request import Request
 
 
@@ -64,12 +64,17 @@ class CatalogueServicesTestCase(TestCase):
         return Address.objects.create(name=name)
 
     @staticmethod
-    def _create_payment(type=CASH, total_price=123):
+    def _create_payment(type=PaymentTypes.CASH, total_price=123):
         return Payment.objects.create(
             payment_type=type, total_price=total_price)
 
     @staticmethod
-    def _create_order(user_id, address_id, payment_id, status=IN_PROGRESS):
+    def _create_order(
+        user_id,
+        address_id,
+        payment_id,
+        status=StatusTypes.IN_PROGRESS,
+    ):
         return Order.objects.create(
             user_id=user_id,
             address_id=address_id,
