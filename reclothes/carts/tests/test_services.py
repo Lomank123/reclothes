@@ -45,7 +45,7 @@ def create_request(user=None, session=None):
 
 class CartMiddlewareServiceTestCase(TestCase):
 
-    def test_create_anonymous_cart_and_set_to_session(self):
+    def test_anonymous_cart_create_and_set_to_session(self):
         user = create_user(username="test1")
         session = create_session(user)
         request = create_request(user, session)
@@ -55,7 +55,7 @@ class CartMiddlewareServiceTestCase(TestCase):
         self.assertTrue(request.session["cart_id"])
         self.assertEqual(Cart.objects.count(), 1)
 
-    def test_create_and_attach_cart_to_user_and_set_to_session(self):
+    def test_cart_create_and_attach_to_user_and_set_to_session(self):
         user = create_user(username="test1")
         session = create_session(user)
         request = create_request(user, session)
@@ -65,7 +65,7 @@ class CartMiddlewareServiceTestCase(TestCase):
         self.assertEqual(Cart.objects.count(), 1)
         self.assertEqual(Cart.objects.filter(user=user).count(), 1)
 
-    def test_check_user_cart_in_session(self):
+    def test_user_cart_check_in_session(self):
         user = create_user(username="test1")
         session = create_session(user)
         cart = create_cart(user.pk)
@@ -101,7 +101,7 @@ class CartServiceTestCase(TestCase):
     def _delete_cart_by_id(cart_id):
         Cart.objects.get(id=cart_id).delete()
 
-    def test_get_empty_cart(self):
+    def test_empty_cart_received(self):
         user = create_user()
         session = create_session(user)
         cart = create_cart()
@@ -113,7 +113,7 @@ class CartServiceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    def test_get_filled_cart(self):
+    def test_filled_cart_received(self):
         user = create_user()
         session = create_session(user)
         cart = create_cart()

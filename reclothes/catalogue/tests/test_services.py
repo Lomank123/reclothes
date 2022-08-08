@@ -134,7 +134,7 @@ class CatalogueServicesTestCase(TestCase):
         self._create_order_item(order_id=order1.pk, cart_item_id=cart_item2.pk)
         self._create_order_item(order_id=order2.pk, cart_item_id=cart_item3.pk)
 
-    def test_get_products_data(self):
+    def test_home_page_products_data_received(self):
         self._create_data()
 
         response = HomeViewService().execute()
@@ -170,7 +170,7 @@ class ProductDetailServiceTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_product_detail_service(self):
+    def test_single_detailed_product_data_received(self):
         product_type = create_product_type("type1")
         product = create_product(product_type.pk)
 
@@ -189,7 +189,7 @@ class CategoryServiceTestCase(TestCase):
     def _create_category(**kwargs):
         return Category.objects.create(**kwargs)
 
-    def test_get_root_categories(self):
+    def test_root_categories_received(self):
         root_category = self._create_category(name="root1", slug="root1")
         self._create_category(name="root2", slug="root2")
         self._create_category(parent=root_category, name="s1", slug="s1")
@@ -200,7 +200,7 @@ class CategoryServiceTestCase(TestCase):
         self.assertEqual(Category.objects.count(), 3)
         self.assertEqual(len(response.data["items"]), 2)
 
-    def test_get_sub_categories(self):
+    def test_sub_categories_received(self):
         root_category = self._create_category(name="root1", slug="root1")
         self._create_category(name="root2", slug="root2")
         sub_category = self._create_category(
@@ -243,7 +243,7 @@ class CatalogueServiceTestCase(TestCase):
     def _create_tag(**kwargs):
         return Tag.objects.create(**kwargs)
 
-    def test_get_products_with_tags(self):
+    def test_products_with_tags_received(self):
         # Test data
         product_type = create_product_type(name="type1")
         product1 = create_product(type_id=product_type.pk, title="test1")
@@ -268,7 +268,7 @@ class CatalogueServiceTestCase(TestCase):
         self.assertEqual(len(response.data['products']['results']), 2)
         self.assertEqual(len(response.data['popular_tags']), 3)
 
-    def test_data_not_found(self):
+    def test_products_with_tags_not_found(self):
         request = self._create_request()
         viewset = self._create_viewset(request)
 
