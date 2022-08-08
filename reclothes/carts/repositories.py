@@ -4,10 +4,6 @@ from carts.models import Cart, CartItem
 class CartRepository:
 
     @staticmethod
-    def get_filtered_queryset(**kwargs):
-        return Cart.objects.filter(**kwargs)
-
-    @staticmethod
     def create(*args, **kwargs):
         return Cart.objects.create(*args, **kwargs)
 
@@ -39,7 +35,7 @@ class CartRepository:
 class CartItemRepository:
 
     @staticmethod
-    def get_filtered_queryset(**kwargs):
+    def fetch_qs(**kwargs):
         return CartItem.objects.filter(**kwargs)
 
     @staticmethod

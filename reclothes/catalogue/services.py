@@ -9,7 +9,7 @@ from catalogue.repositories import ProductImageRepository, ProductRepository, \
 class HomeViewService(APIService):
 
     @staticmethod
-    def _get_response_data(best, hot, newest):
+    def _build_response_data(best, hot, newest):
         return {
             "best_products": list(best),
             "hot_products": list(hot),
@@ -19,23 +19,23 @@ class HomeViewService(APIService):
     def execute(self):
         feature_image = (
             ProductImageRepository
-            .get_feature_image_by_product_id(subquery=True)
+            .fetch_feature_image_by_product_id(subquery=True)
         )
         best_products = ProductRepository.get_best_products(feature_image)
         hot_products = ProductRepository.get_hot_products(feature_image)
         newest_products = ProductRepository.get_newest_products(feature_image)
-        data = self._get_response_data(
+        data = self._build_response_data(
             best_products[:consts.BEST_PRODUCT_IN_PAGE_LIMIT],
             hot_products[:consts.HOT_PRODUCT_IN_PAGE_LIMIT],
             newest_products[:consts.NEWEST_PRODUCT_IN_PAGE_LIMIT]
         )
-        return self._get_response(data)
+        return self._build_response(data)
 
 
 class ProductDetailService(APIService):
 
     @staticmethod
-    def _get_response_data(product):
+    def _build_response_data(product):
         data = {}
         if product is not None:
             product_serializer = serializers.ProductSerializer(product)
@@ -64,8 +64,8 @@ class ProductDetailService(APIService):
 
     def execute(self, product_id):
         product = ProductRepository.get_detail(id=product_id)
-        data = self._get_response_data(product)
-        return self._get_response(data)
+        data = self._build_response_data(product)
+        return self._build_response(data)
 
 
 class CategoryService(APIService):
@@ -83,9 +83,9 @@ class CategoryService(APIService):
             filters["parent__isnull"] = True
         else:
             filters["id"] = id
-        return CategoryRepository.get_filtered_queryset(**filters)
+        return CategoryRepository.fetch_qs(**filters)
 
-    def _get_response_data(self, queryset, is_root=False):
+    def _build_response_data(self, queryset, is_root=False):
         data = {}
         if queryset.exists():
             serializer_class = self._get_serializer_class(is_root)
@@ -97,8 +97,8 @@ class CategoryService(APIService):
     def execute(self, id=None):
         """Return root categories if id is None otherwise sub categories."""
         queryset = self._get_queryset(id)
-        data = self._get_response_data(queryset, id is None)
-        return self._get_response(data)
+        data = self._build_response_data(queryset, id is None)
+        return self._build_response(data)
 
 
 class CatalogueService(APIService):
@@ -117,7 +117,7 @@ class CatalogueService(APIService):
         most_popular_tags = TagRepository().get_by_ids(most_popular_tags_id)
         return most_popular_tags
 
-    def _get_response_data(self, tags, products):
+    def _build_response_data(self, tags, products):
         data = {}
         if tags.exists():
             serializer = serializers.TagSerializer(tags, many=True)
@@ -134,14 +134,14 @@ class CatalogueService(APIService):
         initial_qs = self.viewset.get_queryset()
         products = self.viewset.filter_queryset(initial_qs)
         popular_tags = self._get_popular_tags(products)
-        data = self._get_response_data(popular_tags, products)
-        return self._get_response(data)
+        data = self._build_response_data(popular_tags, products)
+        return self._build_response(data)
 
 
 class ProductViewSetService:
 
     def execute(self):
-        return ProductRepository.get_filtered_queryset(is_active=True)
+        return ProductRepository.fetch_qs(is_active=True)
 
 
 class CatalogueViewSetService:
@@ -153,7 +153,7 @@ class CatalogueViewSetService:
 class CategoryViewSetService:
 
     def execute(self):
-        return CategoryRepository.get_filtered_queryset(is_active=True)
+        return CategoryRepository.fetch_qs(is_active=True)
 
 
 class TagViewSetService:

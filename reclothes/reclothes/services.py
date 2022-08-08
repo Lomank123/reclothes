@@ -4,17 +4,17 @@ from rest_framework.response import Response
 
 class AbstractAPIService:
 
-    def _get_response_data(self):
+    def _build_response_data(self):
         pass
 
-    def _get_response(self):
+    def _build_response(self):
         pass
 
 
 class APIService(AbstractAPIService):
 
     @staticmethod
-    def _get_response(data: dict) -> Response:
+    def _build_response(data: dict) -> Response:
         response = Response(data=data, status=status.HTTP_200_OK)
         if len(data) == 0:
             response.status_code = status.HTTP_404_NOT_FOUND

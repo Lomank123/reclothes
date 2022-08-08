@@ -4,7 +4,7 @@ from django.db.models import Subquery, F
 
 from catalogue.repositories import ProductImageRepository
 from reclothes.services import APIService
-from carts import consts
+from carts.consts import NEW_CART_CREATED_MSG, NEW_CART_ATTACHED_MSG
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
@@ -20,30 +20,35 @@ class CartMiddlewareService:
     def __init__(self, request):
         self.session_manager = CartSessionManager(request)
 
-    def _get_or_create_cart_id(self):
-        """
-        Return cart id if it's in current session. Otherwise create new cart
-        and return it's id. Also return flag whether to update session value.
-        """
+    def _fetch_session_cart(self):
         cart_id = self.session_manager.get_cart_id()
+        return CartRepository.fetch_active(id=cart_id)
+
+    def _check_or_create_cart(self, session_cart):
         forced = False
-        exists = CartRepository.get_filtered_queryset(id=cart_id).exists()
-        if not exists:
+        if session_cart is None:
             forced = True
-            new_cart = CartRepository.create()
-            logger.info(consts.NEW_CART_CREATED_MSG)
-            # In case user cart is gone
             user = self.session_manager.request.user
             if user.is_authenticated:
-                cart = CartRepository.fetch_active(id=new_cart.pk)
-                CartRepository.attach_user_to_cart(cart, user.pk)
-                logger.info(consts.NEW_CART_ATTACHED_MSG)
-            cart_id = new_cart.pk
-        return cart_id, forced
+                user_cart = CartRepository.fetch_active(user_id=user.pk)
+                if user_cart is None:
+                    new_user_cart = CartRepository.create(user_id=user.pk)
+                    cart = new_user_cart
+                    logger.info(NEW_CART_ATTACHED_MSG)
+                else:
+                    cart = user_cart
+            else:
+                new_cart = CartRepository.create()
+                cart = new_cart
+                logger.info(NEW_CART_CREATED_MSG)
+        else:
+            cart = session_cart
+        return cart, forced
 
     def execute(self):
-        cart_id, forced = self._get_or_create_cart_id()
-        self.session_manager.set_cart_id_if_not_exists(cart_id, forced=forced)
+        session_cart = self._fetch_session_cart()
+        cart, forced = self._check_or_create_cart(session_cart)
+        self.session_manager.set_cart_id_if_not_exists(cart.pk, forced=forced)
 
 
 class CartService(APIService):
@@ -54,7 +59,7 @@ class CartService(APIService):
         self.session_manager = CartSessionManager(request)
 
     @staticmethod
-    def _get_response_data(cart, cart_items):
+    def _build_response_data(cart, cart_items):
         data = {}
         if cart is not None:
             serializer = CartSerializer(cart)
@@ -65,14 +70,19 @@ class CartService(APIService):
         return data
 
     @staticmethod
-    def _get_cart_items(cart):
+    def _fetch_annotated_cart_items_or_none(cart):
         """Return queryset with annotated product title and feature image."""
 
         if cart is None:
             return CartItemRepository.empty()
 
-        img_subquery = ProductImageRepository.get_feature_image_by_product_id(
-            subquery=True, outer_ref_value="product_id")
+        img_subquery = (
+            ProductImageRepository
+            .fetch_feature_image_by_product_id(
+                subquery=True,
+                outer_ref_value="product_id",
+            )
+        )
         annotate_data = {
             'product_title': F('product__title'),
             'image': Subquery(img_subquery),
@@ -83,19 +93,18 @@ class CartService(APIService):
     def execute(self):
         cart_id = self.session_manager.get_cart_id()
         cart = CartRepository.fetch_active(id=cart_id)
-        cart_items = self._get_cart_items(cart)
-        data = self._get_response_data(cart, cart_items)
-        return self._get_response(data)
+        cart_items = self._fetch_annotated_cart_items_or_none(cart)
+        data = self._build_response_data(cart, cart_items)
+        return self._build_response(data)
 
 
 class CartViewSetService:
 
     def execute(self):
-        return CartRepository.get_filtered_queryset(
-            is_archived=False, is_deleted=False)
+        return CartRepository.fetch_active()
 
 
 class CartItemViewSetService:
 
     def execute(self):
-        return CartItemRepository.get_filtered_queryset()
+        return CartItemRepository.fetch_qs()

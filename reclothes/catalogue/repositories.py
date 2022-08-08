@@ -6,7 +6,7 @@ from catalogue.models import Product, ProductImage, Category, Tag
 class ProductRepository:
 
     @staticmethod
-    def get_filtered_queryset(**kwargs):
+    def fetch_qs(**kwargs):
         return Product.objects.filter(**kwargs)
 
     @staticmethod
@@ -129,7 +129,7 @@ class ProductRepository:
 class CategoryRepository:
 
     @staticmethod
-    def get_filtered_queryset(**kwargs):
+    def fetch_qs(**kwargs):
         return Category.objects.filter(**kwargs)
 
 
@@ -147,7 +147,7 @@ class TagRepository:
 class ProductImageRepository:
 
     @staticmethod
-    def get_feature_image_by_product_id(
+    def fetch_feature_image_by_product_id(
         product_id=None,
         subquery=False,
         outer_ref_value="id"
