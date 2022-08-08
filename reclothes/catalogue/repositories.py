@@ -19,43 +19,43 @@ class ProductRepository:
 
     @staticmethod
     def fetch_single_detailed(**kwargs):
-        """Return product with average rating."""
+        '''Return product with average rating and related category and type.'''
         return (
             Product.objects
             .select_related('category', 'product_type')
             .filter(**kwargs)
-            .annotate(avg_rate=Avg("reviews__rating"))
+            .annotate(avg_rate=Avg('reviews__rating'))
             .first()
         )
 
     @staticmethod
-    def fetch_values_list(products, field_name, flat=True):
-        """Return values list without nulls based on field name."""
+    def fetch_tags_ids(products):
+        '''Return list of tags ids without nulls.'''
         return products.filter(tags__isnull=False).values_list(
-            field_name, flat=flat)
+            'tags__id', flat=True)
 
     @staticmethod
-    def fetch_newest_products(image, limit=None):
-        """
+    def fetch_newest_products(img_subquery, limit=None):
+        '''
         Return newest active products.
 
         Limit by specifying `limit` param.
-        """
+        '''
         qs = (
             Product.objects
             .filter(is_active=True)
             .annotate(
-                type=F("product_type__name"), feature_image=Subquery(image))
+                type=F('product_type__name'), feature_image=img_subquery)
             .values(
-                "id",
-                "title",
-                "description",
-                "type",
-                "regular_price",
-                "product_type",
-                "feature_image",
+                'id',
+                'title',
+                'description',
+                'type',
+                'regular_price',
+                'product_type',
+                'feature_image',
             )
-            .order_by("-created_at")
+            .order_by('-created_at')
         )
         products = qs
         if limit:
@@ -63,31 +63,31 @@ class ProductRepository:
         return products
 
     @staticmethod
-    def fetch_hot_products(image, limit=None):
-        """
+    def fetch_hot_products(img_subquery, limit=None):
+        '''
         Get active products with most number of purchases.
 
         Limit by specifying `limit` param.
         Number of purchases means count of order items.
-        """
+        '''
         qs = (
             Product.objects
             .filter(is_active=True)
             .annotate(
-                purchases=Count("cart_items__orderitem"),
-                type=F("product_type__name"),
-                feature_image=Subquery(image),
+                purchases=Count('cart_items__orderitem'),
+                type=F('product_type__name'),
+                feature_image=img_subquery,
             )
             .values(
-                "id",
-                "title",
-                "description",
-                "regular_price",
-                "type",
-                "purchases",
-                "feature_image",
+                'id',
+                'title',
+                'description',
+                'regular_price',
+                'type',
+                'purchases',
+                'feature_image',
             )
-            .order_by("-purchases")
+            .order_by('-purchases')
         )
         products = qs
         if limit:
@@ -95,30 +95,30 @@ class ProductRepository:
         return products
 
     @staticmethod
-    def fetch_best_products(image, limit=None):
-        """
+    def fetch_best_products(img_subquery, limit=None):
+        '''
         Get active products with best reviews rating ratio.
 
         Limit by specifying `limit` param.
-        """
+        '''
         qs = (
             Product.objects
             .filter(is_active=True)
             .annotate(
-                avg_rate=Avg("reviews__rating"),
-                type=F("product_type__name"),
-                feature_image=Subquery(image),
+                avg_rate=Avg('reviews__rating'),
+                type=F('product_type__name'),
+                feature_image=img_subquery,
             )
             .values(
-                "id",
-                "title",
-                "description",
-                "regular_price",
-                "type",
-                "avg_rate",
-                "feature_image",
+                'id',
+                'title',
+                'description',
+                'regular_price',
+                'type',
+                'avg_rate',
+                'feature_image',
             )
-            .order_by("-avg_rate")
+            .order_by('-avg_rate')
         )
         products = qs
         if limit:
@@ -143,21 +143,10 @@ class TagRepository:
 class ProductImageRepository:
 
     @staticmethod
-    def fetch_feature_image_by_product_id(
-        product_id=None,
-        subquery=False,
-        outer_ref_value="id"
-    ):
-        """
-        Return first feature image.
-
-        Set subquery=True to return subquery.
-        """
-        ref_id = product_id
-        if subquery:
-            ref_id = OuterRef(outer_ref_value)
-        elif product_id is None:
-            raise AttributeError(
-                "If subquery is False product_id must not be None.")
-        return ProductImage.objects.filter(
-            product_id=ref_id, is_feature=True).values('image')[:1]
+    def prepare_feature_image_subquery(outer_ref_value='id'):
+        '''Return first feature image subquery.'''
+        return Subquery(
+            ProductImage.objects
+            .filter(product_id=OuterRef(outer_ref_value), is_feature=True)
+            .values('image')[:1]
+        )

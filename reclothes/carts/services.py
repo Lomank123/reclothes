@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Subquery, F
+from django.db.models import F
 
 from catalogue.repositories import ProductImageRepository
 from reclothes.services import APIService
@@ -62,11 +62,13 @@ class CartService(APIService):
     def _build_response_data(cart, cart_items):
         data = {}
         if cart is not None:
-            serializer = CartSerializer(cart)
-            data["cart"] = serializer.data
-        if cart_items.exists():
-            serializer = CartItemSerializer(cart_items, many=True)
-            data["cart_items"] = serializer.data
+            cart_serializer = CartSerializer(cart)
+            cart_item_serializer = CartItemSerializer(cart_items, many=True)
+            complete_data = {
+                'cart': cart_serializer.data,
+                'cart_items': cart_item_serializer.data,
+            }
+            data.update(complete_data)
         return data
 
     @staticmethod
@@ -78,14 +80,11 @@ class CartService(APIService):
 
         img_subquery = (
             ProductImageRepository
-            .fetch_feature_image_by_product_id(
-                subquery=True,
-                outer_ref_value="product_id",
-            )
+            .prepare_feature_image_subquery(outer_ref_value="product_id")
         )
         annotate_data = {
             'product_title': F('product__title'),
-            'image': Subquery(img_subquery),
+            'image': img_subquery,
         }
         return CartItemRepository.annotate(
             cart.cart_items, **annotate_data)

@@ -111,7 +111,8 @@ class CartServiceTestCase(TestCase):
         response = CartService(request).execute()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data["cart_items"]), 0)
 
     def test_filled_cart_received(self):
         user = create_user()

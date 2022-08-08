@@ -213,20 +213,8 @@ class CategoryServiceTestCase(TestCase):
         self.assertEqual(len(response.data["items"]), 1)
         self.assertEqual(
             response.data["items"][0]['category_tree'][0]["id"],
-            sub_category.pk
+            sub_category.pk,
         )
-
-    def test_sub_categories_not_found(self):
-        category_id = 123123
-
-        response = CategoryService().execute(category_id)
-
-        self.assertEqual(response.status_code, 404)
-
-    def test_root_categories_not_found(self):
-        response = CategoryService().execute()
-
-        self.assertEqual(response.status_code, 404)
 
 
 class CatalogueServiceTestCase(TestCase):
@@ -267,11 +255,3 @@ class CatalogueServiceTestCase(TestCase):
         self.assertTrue(response.data['products'].get('results', False))
         self.assertEqual(len(response.data['products']['results']), 2)
         self.assertEqual(len(response.data['popular_tags']), 3)
-
-    def test_products_with_tags_not_found(self):
-        request = self._create_request()
-        viewset = self._create_viewset(request)
-
-        response = CatalogueService(viewset).execute()
-
-        self.assertEqual(response.status_code, 404)
