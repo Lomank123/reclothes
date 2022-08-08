@@ -17,29 +17,33 @@ class LoginViewService:
     def __init__(self, request):
         self.session_manager = CartSessionManager(request)
 
-    def _get_user_cart_id(self):
-        '''
-        Get user cart which is not deleted or archived.
-        If there's none, attach current cart to them.
-        Otherwise return user cart id and delete recently created one.
-        '''
-        user_id = self.session_manager.request.user.pk
-        user_cart = CartRepository.get(user_id=user_id)
-        # We always have cart id because of middleware
+    def _fetch_session_cart(self):
+        # We always have session cart id because of middleware
         cart_id = self.session_manager.get_cart_id()
-        cart = CartRepository.get(id=cart_id)
+        return CartRepository.fetch_active(id=cart_id)
+
+    def _fetch_user_cart(self):
+        user_id = self.session_manager.request.user.pk
+        return CartRepository.fetch_active(user_id=user_id)
+
+    def _attach_or_delete_session_cart(self, session_cart, user_cart):
+        '''Return id of existing user cart or newly attached session one.'''
+        cart_id = session_cart.pk
         if user_cart is None:
-            CartRepository.attach_user_to_cart(cart, user_id)
+            CartRepository.attach_user_to_cart(
+                session_cart, self.session_manager.request.user.pk)
             logger.info(USER_CART_NOT_FOUND_MSG)
         else:
             # Delete old cart
-            CartRepository.delete(cart)
+            CartRepository.delete(session_cart)
             logger.info(DELETE_OLD_CART_MSG)
             cart_id = user_cart.pk
         return cart_id
 
     def execute(self):
-        cart_id = self._get_user_cart_id()
+        session_cart = self._fetch_session_cart()
+        user_cart = self._fetch_user_cart()
+        cart_id = self._attach_or_delete_session_cart(session_cart, user_cart)
         self.session_manager.set_cart_id_if_not_exists(cart_id, forced=True)
 
 

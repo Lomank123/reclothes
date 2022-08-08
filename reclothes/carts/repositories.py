@@ -12,7 +12,7 @@ class CartRepository:
         return Cart.objects.create(*args, **kwargs)
 
     @staticmethod
-    def get(**kwargs):
+    def fetch_active(**kwargs):
         """Return non-deleted and non-archived cart."""
         return Cart.objects.filter(
             is_archived=False, is_deleted=False, **kwargs).first()

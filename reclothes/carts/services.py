@@ -35,7 +35,7 @@ class CartMiddlewareService:
             # In case user cart is gone
             user = self.session_manager.request.user
             if user.is_authenticated:
-                cart = CartRepository.get(id=new_cart.pk)
+                cart = CartRepository.fetch_active(id=new_cart.pk)
                 CartRepository.attach_user_to_cart(cart, user.pk)
                 logger.info(consts.NEW_CART_ATTACHED_MSG)
             cart_id = new_cart.pk
@@ -82,7 +82,7 @@ class CartService(APIService):
 
     def execute(self):
         cart_id = self.session_manager.get_cart_id()
-        cart = CartRepository.get(id=cart_id)
+        cart = CartRepository.fetch_active(id=cart_id)
         cart_items = self._get_cart_items(cart)
         data = self._get_response_data(cart, cart_items)
         return self._get_response(data)
