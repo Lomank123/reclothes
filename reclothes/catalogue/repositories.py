@@ -6,11 +6,11 @@ from catalogue.models import Product, ProductImage, Category, Tag
 class ProductRepository:
 
     @staticmethod
-    def fetch_qs(**kwargs):
+    def fetch(**kwargs):
         return Product.objects.filter(**kwargs)
 
     @staticmethod
-    def get_active_with_category():
+    def fetch_active_with_category():
         return (
             Product.objects
             .select_related('category')
@@ -18,7 +18,7 @@ class ProductRepository:
         )
 
     @staticmethod
-    def get_detail(**kwargs):
+    def fetch_single_detailed(**kwargs):
         """Return product with average rating."""
         return (
             Product.objects
@@ -29,13 +29,13 @@ class ProductRepository:
         )
 
     @staticmethod
-    def get_values_list(products, field_name, flat=True):
+    def fetch_values_list(products, field_name, flat=True):
         """Return values list without nulls based on field name."""
         return products.filter(tags__isnull=False).values_list(
             field_name, flat=flat)
 
     @staticmethod
-    def get_newest_products(image, limit=None):
+    def fetch_newest_products(image, limit=None):
         """
         Return newest active products.
 
@@ -63,7 +63,7 @@ class ProductRepository:
         return products
 
     @staticmethod
-    def get_hot_products(image, limit=None):
+    def fetch_hot_products(image, limit=None):
         """
         Get active products with most number of purchases.
 
@@ -95,7 +95,7 @@ class ProductRepository:
         return products
 
     @staticmethod
-    def get_best_products(image, limit=None):
+    def fetch_best_products(image, limit=None):
         """
         Get active products with best reviews rating ratio.
 
@@ -129,19 +129,15 @@ class ProductRepository:
 class CategoryRepository:
 
     @staticmethod
-    def fetch_qs(**kwargs):
+    def fetch(**kwargs):
         return Category.objects.filter(**kwargs)
 
 
 class TagRepository:
 
     @staticmethod
-    def get_by_ids(ids):
-        return Tag.objects.filter(id__in=ids)
-
-    @staticmethod
-    def get_all():
-        return Tag.objects.all()
+    def fetch(**kwargs):
+        return Tag.objects.filter(**kwargs)
 
 
 class ProductImageRepository:

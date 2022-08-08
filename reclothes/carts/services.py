@@ -22,7 +22,7 @@ class CartMiddlewareService:
 
     def _fetch_session_cart(self):
         cart_id = self.session_manager.get_cart_id()
-        return CartRepository.fetch_active(id=cart_id)
+        return CartRepository.fetch_single_active(id=cart_id)
 
     def _check_or_create_cart(self, session_cart):
         forced = False
@@ -30,7 +30,7 @@ class CartMiddlewareService:
             forced = True
             user = self.session_manager.request.user
             if user.is_authenticated:
-                user_cart = CartRepository.fetch_active(user_id=user.pk)
+                user_cart = CartRepository.fetch_single_active(user_id=user.pk)
                 if user_cart is None:
                     new_user_cart = CartRepository.create(user_id=user.pk)
                     cart = new_user_cart
@@ -92,7 +92,7 @@ class CartService(APIService):
 
     def execute(self):
         cart_id = self.session_manager.get_cart_id()
-        cart = CartRepository.fetch_active(id=cart_id)
+        cart = CartRepository.fetch_single_active(id=cart_id)
         cart_items = self._fetch_annotated_cart_items_or_none(cart)
         data = self._build_response_data(cart, cart_items)
         return self._build_response(data)
@@ -101,10 +101,10 @@ class CartService(APIService):
 class CartViewSetService:
 
     def execute(self):
-        return CartRepository.fetch_active()
+        return CartRepository.fetch_single_active()
 
 
 class CartItemViewSetService:
 
     def execute(self):
-        return CartItemRepository.fetch_qs()
+        return CartItemRepository.fetch()

@@ -8,7 +8,7 @@ class CartRepository:
         return Cart.objects.create(*args, **kwargs)
 
     @staticmethod
-    def fetch_active(**kwargs):
+    def fetch_single_active(**kwargs):
         """Return non-deleted and non-archived cart."""
         return Cart.objects.filter(
             is_archived=False, is_deleted=False, **kwargs).first()
@@ -35,7 +35,7 @@ class CartRepository:
 class CartItemRepository:
 
     @staticmethod
-    def fetch_qs(**kwargs):
+    def fetch(**kwargs):
         return CartItem.objects.filter(**kwargs)
 
     @staticmethod
