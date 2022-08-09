@@ -36,14 +36,10 @@ class ProductRepository:
 
     @staticmethod
     def fetch_newest_products(img_subquery, limit=None):
-        '''
-        Return newest active products.
-
-        Limit by specifying `limit` param.
-        '''
+        '''Return newest active products.'''
         qs = (
             Product.objects
-            .filter(is_active=True)
+            .filter(is_active=True, quantity__gte=0)
             .annotate(
                 type=F('product_type__name'), feature_image=img_subquery)
             .values(
@@ -67,12 +63,11 @@ class ProductRepository:
         '''
         Get active products with most number of purchases.
 
-        Limit by specifying `limit` param.
         Number of purchases means count of order items.
         '''
         qs = (
             Product.objects
-            .filter(is_active=True)
+            .filter(is_active=True, quantity__gte=0)
             .annotate(
                 purchases=Count('cart_items__orderitem'),
                 type=F('product_type__name'),
@@ -96,14 +91,10 @@ class ProductRepository:
 
     @staticmethod
     def fetch_best_products(img_subquery, limit=None):
-        '''
-        Get active products with best reviews rating ratio.
-
-        Limit by specifying `limit` param.
-        '''
+        '''Get active products with best reviews rating ratio.'''
         qs = (
             Product.objects
-            .filter(is_active=True)
+            .filter(is_active=True, quantity__gte=0)
             .annotate(
                 avg_rate=Avg('reviews__rating'),
                 type=F('product_type__name'),

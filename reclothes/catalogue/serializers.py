@@ -55,6 +55,12 @@ class ProductTypeSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+class ProductDetailSerializer(serializers.ModelSerializer):
     category = CategoryDetailSerializer()
     product_type = ProductTypeSerializer()
     tags = TagSerializer(many=True)
@@ -62,7 +68,20 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = (
+            'id',
+            'category',
+            'product_type',
+            'tags',
+            'avg_rate',
+            'in_stock',
+            'title',
+            'description',
+            'regular_price',
+            'is_active',
+            'created_at',
+            'updated_at',
+        )
 
 
 class ProductCatalogueSerializer(serializers.ModelSerializer):

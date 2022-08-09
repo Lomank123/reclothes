@@ -170,6 +170,10 @@ class Product(CustomBaseModel):
         return self.title
 
     @property
+    def in_stock(self):
+        return self.quantity > 0
+
+    @property
     def ordered_images(self):
         """Images ordered by is_feature."""
         return self.images.order_by('-is_feature')

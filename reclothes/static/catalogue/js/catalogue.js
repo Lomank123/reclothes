@@ -1,6 +1,7 @@
 const productsBlock = $('#products-block');
 const tagsBlock = $('#tags-block');
 const mainLabel = $('#catalogue-main-label');
+const paginationBlock = $('#pagination-block');
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -58,6 +59,12 @@ function setData(data) {
 function setCatalogue(data) {
     // Cleaning block
     productsBlock.empty();
+    if (data.length == 0) {
+        // Add message
+        const emptyMsg = $(`<span id="empty-msg" class="default-block">No products found.</span>`);
+        productsBlock.append(emptyMsg);
+        return;
+    }
     // Adding items
     data.forEach(product => {
         const productBlock = $(`
@@ -85,10 +92,13 @@ function setTags(data) {
 }
 
 
-function setPagination(paginationData) {
+function setPagination(data) {
+    if (data.results.length == 0) {
+        paginationBlock.hide();
+    }
     // Set pagination text
     const pageText = $('#pagination-text');
-    pageText.text(`${paginationData.number} of ${paginationData.num_pages}`);
+    pageText.text(`${data.number} of ${data.num_pages}`);
 
     // Set buttons
     const firstButton = $('#first-btn');
@@ -96,16 +106,16 @@ function setPagination(paginationData) {
     const nextButton = $('#next-btn');
     const lastButton = $('#last-btn');
 
-    firstButton.prop('disabled', paginationData.first === null);
-    previousButton.prop('disabled', paginationData.previous === null);
-    nextButton.prop('disabled', paginationData.next === null);
-    lastButton.prop('disabled', paginationData.last === null);
+    firstButton.prop('disabled', data.first === null);
+    previousButton.prop('disabled', data.previous === null);
+    nextButton.prop('disabled', data.next === null);
+    lastButton.prop('disabled', data.last === null);
 
     // .unbind() to prevent multiple click events
-    firstButton.unbind().click(() => { handleFilterClick(paginationData.first); });
-    previousButton.unbind().click(() => { handleFilterClick(paginationData.previous); });
-    nextButton.unbind().click(() => { handleFilterClick(paginationData.next); });
-    lastButton.unbind().click(() => { handleFilterClick(paginationData.last); });
+    firstButton.unbind().click(() => { handleFilterClick(data.first); });
+    previousButton.unbind().click(() => { handleFilterClick(data.previous); });
+    nextButton.unbind().click(() => { handleFilterClick(data.next); });
+    lastButton.unbind().click(() => { handleFilterClick(data.last); });
 }
 
 

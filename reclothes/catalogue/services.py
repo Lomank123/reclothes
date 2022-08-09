@@ -10,8 +10,9 @@ from catalogue.repositories import (CategoryRepository, ProductImageRepository,
                                     ProductRepository, TagRepository)
 from catalogue.serializers import (CategorySerializer,
                                    ProductAttributeValueSerializer,
+                                   ProductDetailSerializer,
                                    ProductImageSerializer,
-                                   ProductReviewSerializer, ProductSerializer,
+                                   ProductReviewSerializer,
                                    SubCategorySerializer, TagSerializer)
 
 
@@ -41,7 +42,7 @@ class ProductDetailService(APIService):
     def _build_response_data(product):
         data = {}
         if product is not None:
-            product_serializer = ProductSerializer(product)
+            product_serializer = ProductDetailSerializer(product)
             images_serializer = ProductImageSerializer(
                 product.ordered_images, many=True)
             attrs_serializer = ProductAttributeValueSerializer(

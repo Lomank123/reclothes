@@ -35,7 +35,7 @@ function displayProductInfo(result) {
     setReviewsInfo(result.reviews);
 }
 
-function getAvailability(isActive, quantity) {
+function getAvailability(isActive, inStock) {
     // 1 - OK
     // 2 - Out of stock
     // 3 - Unavailable
@@ -43,7 +43,7 @@ function getAvailability(isActive, quantity) {
     let active = 1;
     let text = "Add to cart";
     if (isActive) {
-        if (quantity <= 0) {
+        if (!inStock) {
             active = 2;
             text = "Out of stock";
         }
@@ -94,7 +94,7 @@ function setMainInfo(data) {
         rateBlock.append(rateBar);
     }
 
-    const availability = getAvailability(data.is_active, data.quantity);
+    const availability = getAvailability(data.is_active, data.in_stock);
     setAddToCartButton(availability);
     setTopInfo(data.product_type, data.category);
     setTagsInfo(data.tags);
