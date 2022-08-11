@@ -20,11 +20,11 @@ class LoginViewService:
     def _fetch_session_cart(self):
         # We always have session cart id because of middleware
         cart_id = self.session_manager.get_cart_id()
-        return CartRepository.fetch_single_active(id=cart_id)
+        return CartRepository.fetch_active(single=True, id=cart_id)
 
     def _fetch_user_cart(self):
         user_id = self.session_manager.request.user.pk
-        return CartRepository.fetch_single_active(user_id=user_id)
+        return CartRepository.fetch_active(single=True, user_id=user_id)
 
     def _attach_or_delete_session_cart(self, session_cart, user_cart):
         '''Return id of existing user cart or newly attached session one.'''

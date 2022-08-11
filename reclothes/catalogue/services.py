@@ -124,7 +124,7 @@ class CatalogueService(APIService):
         }
 
     def execute(self):
-        """Return popular tags with filtered products queryset."""
+        """Return popular tags with filtered and paginated products."""
         products = self.viewset.get_queryset()
         filtered_products = self.viewset.filter_queryset(products)
         popular_tags = self._fetch_popular_tags(filtered_products)

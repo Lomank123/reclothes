@@ -3,6 +3,7 @@ const apiUrl = "/api";
 
 const defaultProductUrl = `${apiUrl}/product`;
 const defaultCartUrl = `${apiUrl}/cart`;
+const defaultCartItemUrl = `${apiUrl}/cart_item`;
 const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultCatalogueUrl = `${apiUrl}/catalogue`;
@@ -16,6 +17,7 @@ const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
 const cartFromSessionUrl = `${defaultCartUrl}/fetch_from_session`;
 const homeProductsUrl = `${defaultProductUrl}/fetch_home_products`;
+const headerCartUrl = `${defaultCartUrl}/header`;
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 

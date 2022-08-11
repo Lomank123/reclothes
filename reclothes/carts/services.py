@@ -1,10 +1,10 @@
 import logging
 
-from django.db.models import F
-
 from catalogue.repositories import ProductImageRepository
+from django.db.models import F
 from reclothes.services import APIService
-from carts.consts import NEW_CART_CREATED_MSG, NEW_CART_ATTACHED_MSG
+
+from carts.consts import NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
@@ -22,7 +22,7 @@ class CartMiddlewareService:
 
     def _fetch_session_cart(self):
         cart_id = self.session_manager.get_cart_id()
-        return CartRepository.fetch_single_active(id=cart_id)
+        return CartRepository.fetch_active(single=True, id=cart_id)
 
     def _check_or_create_cart(self, session_cart):
         forced = False
@@ -30,7 +30,8 @@ class CartMiddlewareService:
             forced = True
             user = self.session_manager.request.user
             if user.is_authenticated:
-                user_cart = CartRepository.fetch_single_active(user_id=user.pk)
+                user_cart = CartRepository.fetch_active(
+                    single=True, user_id=user.pk)
                 if user_cart is None:
                     new_user_cart = CartRepository.create(user_id=user.pk)
                     cart = new_user_cart
@@ -72,11 +73,11 @@ class CartService(APIService):
         return data
 
     @staticmethod
-    def _fetch_annotated_cart_items_or_none(cart):
+    def _annotate_product_with_image(qs):
         """Return queryset with annotated product title and feature image."""
 
-        if cart is None:
-            return CartItemRepository.empty()
+        if len(qs) == 0:
+            return qs
 
         img_subquery = (
             ProductImageRepository
@@ -86,21 +87,21 @@ class CartService(APIService):
             'product_title': F('product__title'),
             'image': img_subquery,
         }
-        return CartItemRepository.annotate(
-            cart.cart_items, **annotate_data)
+        return CartItemRepository.annotate(qs, **annotate_data)
 
-    def execute(self):
+    def execute(self, limit=None):
         cart_id = self.session_manager.get_cart_id()
-        cart = CartRepository.fetch_single_active(id=cart_id)
-        cart_items = self._fetch_annotated_cart_items_or_none(cart)
-        data = self._build_response_data(cart, cart_items)
+        cart = CartRepository.fetch_active(single=True, id=cart_id)
+        cart_items = CartItemRepository.fetch(limit=limit, cart_id=cart_id)
+        annotated_qs = self._annotate_product_with_image(qs=cart_items)
+        data = self._build_response_data(cart, annotated_qs)
         return self._build_response(data)
 
 
 class CartViewSetService:
 
     def execute(self):
-        return CartRepository.fetch_single_active()
+        return CartRepository.fetch_active()
 
 
 class CartItemViewSetService:
