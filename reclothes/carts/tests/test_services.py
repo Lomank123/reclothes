@@ -1,4 +1,5 @@
 from accounts.models import CustomUser
+from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.models import Cart, CartItem
 from carts.services import CartMiddlewareService, CartService
 from catalogue.models import Product, ProductType
@@ -130,6 +131,30 @@ class CartServiceTestCase(TestCase):
         self.assertEqual(len(response.data["cart_items"]), 1)
         self.assertTrue("image" in response.data["cart_items"][0])
         self.assertTrue("product_title" in response.data["cart_items"][0])
+
+    def test_limited_cart_items_received(self):
+        user = create_user()
+        session = create_session(user)
+        cart = create_cart()
+        product_type = self._create_product_type("test1")
+        product = self._create_product(type_id=product_type.pk)
+        product2 = self._create_product(type_id=product_type.pk)
+        product3 = self._create_product(type_id=product_type.pk)
+        product4 = self._create_product(type_id=product_type.pk)
+        product5 = self._create_product(type_id=product_type.pk)
+        self._create_cart_item(cart.pk, product.pk)
+        self._create_cart_item(cart.pk, product2.pk)
+        self._create_cart_item(cart.pk, product3.pk)
+        self._create_cart_item(cart.pk, product4.pk)
+        self._create_cart_item(cart.pk, product5.pk)
+        session["cart_id"] = cart.pk
+        request = create_request(user, session)
+
+        response = CartService(request).execute(limit=RECENT_CART_ITEMS_LIMIT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            len(response.data["cart_items"]), RECENT_CART_ITEMS_LIMIT)
 
     def test_cart_not_found(self):
         user = create_user()

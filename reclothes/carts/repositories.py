@@ -60,7 +60,3 @@ class CartItemRepository:
     @staticmethod
     def annotate(qs, **kwargs):
         return qs.annotate(**kwargs)
-
-    @staticmethod
-    def calculate_count(**kwargs):
-        return CartItem.objects.filter(**kwargs).count()
