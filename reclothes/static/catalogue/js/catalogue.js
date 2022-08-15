@@ -33,22 +33,6 @@ function setCurrentCategory(data) {
 }
 
 
-function ajaxGet(url, callback) {
-    $.ajax({
-        url: url,
-        method: "GET",
-        dataType: "json",
-        success: (result) => {
-            console.log(result);
-            callback(result);
-        },
-        error: (error) => {
-            console.log(error);
-        },
-    });
-}
-
-
 function setData(data) {
     setTags(data.popular_tags);
     setCatalogue(data.products.results);

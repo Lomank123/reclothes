@@ -1,18 +1,3 @@
-function ajaxGet(url, callback) {
-    $.ajax({
-        url: url,
-        method: "GET",
-        dataType: "json",
-        success: (result) => {
-            console.log(result);
-            callback(result);
-        },
-        error: (error) => {
-            console.log(error);
-        },
-    });
-}
-
 function displayHomeData(result) {
     setBestProducts(result.best_products);
     setHotProducts(result.hot_products);

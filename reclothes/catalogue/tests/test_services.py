@@ -225,7 +225,9 @@ class CatalogueServiceTestCase(TestCase):
 
     @staticmethod
     def _create_viewset(request):
-        return CatalogueViewSet(request=request)
+        viewset = CatalogueViewSet(request=request)
+        viewset.format_kwarg = None
+        return viewset
 
     @staticmethod
     def _create_tag(**kwargs):
@@ -245,7 +247,6 @@ class CatalogueServiceTestCase(TestCase):
         # Viewset
         request = self._create_request()
         viewset = self._create_viewset(request)
-        viewset.format_kwarg = None
 
         response = CatalogueService(viewset).execute()
 

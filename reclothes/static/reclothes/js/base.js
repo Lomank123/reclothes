@@ -19,3 +19,21 @@ function formatDate(date) {
     const result = new Date(date);
     return result.toLocaleDateString();
 }
+
+function ajaxGet(url, callback, data=null) {
+    const csrftoken = getCookie('csrftoken');
+    $.ajax({
+        url: url,
+        headers: {"X-CSRFToken": csrftoken},
+        data: data,
+        method: 'GET',
+        dataType: 'json',
+        success: (result) => {
+            console.log(result);
+            callback(result);
+        },
+        error: (error) => {
+            console.log(error);
+        }
+    });
+}

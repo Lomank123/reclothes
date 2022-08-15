@@ -17,7 +17,10 @@ const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
 const cartFromSessionUrl = `${defaultCartUrl}/fetch_from_session`;
 const homeProductsUrl = `${defaultProductUrl}/fetch_home_products`;
-const headerCartUrl = `${defaultCartUrl}/header`;
+// Cart and cart items
+const sessionCartUrl = `${defaultCartUrl}/session_cart`;
+const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
+const paginatedCartItemsUrl = `${defaultCartItemUrl}/all_by_cart`;
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 

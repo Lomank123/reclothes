@@ -1,6 +1,9 @@
-function setCart(data) {
-    console.log(data);
+function setPaginatedCartItems(data) {
+    console.log("Paginated cart items done!");
 }
 
+function getPaginatedCartItems(data) {
+    ajaxGet(paginatedCartItemsUrl, setPaginatedCartItems, data={cart_id: data.cart.id});
+}
 
-getCartData(cartFromSessionUrl, setCart);
+ajaxGet(sessionCartUrl, getPaginatedCartItems)

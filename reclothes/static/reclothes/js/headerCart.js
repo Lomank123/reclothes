@@ -1,26 +1,8 @@
 const cartBlock = $('#cart-header-block');
 
-// Get cart from session cookies
-function ajaxGet(url, callback) {
-    const csrftoken = getCookie('csrftoken');
-    $.ajax({
-        url: url,
-        headers: {"X-CSRFToken": csrftoken},
-        method: 'GET',
-        dataType: 'json',
-        success: (result) => {
-            console.log(result);
-            callback(result);
-        },
-        error: (error) => {
-            console.log(error);
-        }
-    });
-}
-
 function setCartHeaderData(data) {
     setCartData(data);
-    setCartItemsData(data);
+    ajaxGet(headerCartItemsUrl, setCartItemsData, data={cart_id: data.cart.id});
 }
 
 function calculateItemsCount(count) {
@@ -46,4 +28,4 @@ function setCartItemsData(data) {
     console.log("Cart items data set!");
 }
 
-ajaxGet(headerCartUrl, setCartHeaderData);
+ajaxGet(sessionCartUrl, setCartHeaderData);

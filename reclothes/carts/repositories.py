@@ -48,7 +48,7 @@ class CartItemRepository:
 
     @staticmethod
     def fetch(limit=None, **kwargs):
-        qs = CartItem.objects.filter(**kwargs)
+        qs = CartItem.objects.filter(**kwargs).order_by('-id')
         if limit:
             return qs[:limit]
         return qs

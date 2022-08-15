@@ -4,9 +4,10 @@ from catalogue.repositories import ProductImageRepository
 from django.db.models import F
 from reclothes.services import APIService
 
-from carts.consts import NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG
+from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG,
+                          RECENT_CART_ITEMS_LIMIT)
 from carts.repositories import CartItemRepository, CartRepository
-from carts.serializers import CartItemSerializer, CartSerializer
+from carts.serializers import CartSerializer
 from carts.utils import CartSessionManager
 
 
@@ -60,17 +61,44 @@ class CartService(APIService):
         self.session_manager = CartSessionManager(request)
 
     @staticmethod
-    def _build_response_data(cart, cart_items):
+    def _build_response_data(cart):
         data = {}
         if cart is not None:
             cart_serializer = CartSerializer(cart)
-            cart_item_serializer = CartItemSerializer(cart_items, many=True)
             complete_data = {
                 'cart': cart_serializer.data,
-                'cart_items': cart_item_serializer.data,
             }
             data.update(complete_data)
         return data
+
+    def execute(self, limit=None):
+        cart_id = self.session_manager.get_cart_id()
+        cart = CartRepository.fetch_active(single=True, id=cart_id)
+        data = self._build_response_data(cart)
+        return self._build_response(data)
+
+
+class CartItemService(APIService):
+
+    __slots__ = 'viewset'
+
+    def __init__(self, viewset):
+        self.viewset = viewset
+
+    def _build_response_data(self, items):
+        return {
+            'cart_items': items,
+        }
+
+    def _serialize_data(self, items, paginate=False):
+        if paginate:
+            page = self.viewset.paginate_queryset(items)
+            if page is not None:
+                serializer = self.viewset.get_serializer(page, many=True)
+                return self.viewset.get_paginated_response(
+                    serializer.data).data
+        serializer = self.viewset.get_serializer(items, many=True)
+        return serializer.data
 
     @staticmethod
     def _annotate_product_with_image(qs):
@@ -89,12 +117,12 @@ class CartService(APIService):
         }
         return CartItemRepository.annotate(qs, **annotate_data)
 
-    def execute(self, limit=None):
-        cart_id = self.session_manager.get_cart_id()
-        cart = CartRepository.fetch_active(single=True, id=cart_id)
-        cart_items = CartItemRepository.fetch(limit=limit, cart_id=cart_id)
-        annotated_qs = self._annotate_product_with_image(qs=cart_items)
-        data = self._build_response_data(cart, annotated_qs)
+    def execute(self, cart_id=None, paginate=False):
+        qs = CartItemRepository.fetch(
+            limit=RECENT_CART_ITEMS_LIMIT, cart_id=cart_id)
+        annotated_qs = self._annotate_product_with_image(qs=qs)
+        serialized_data = self._serialize_data(annotated_qs, paginate=paginate)
+        data = self._build_response_data(items=serialized_data)
         return self._build_response(data)
 
 
