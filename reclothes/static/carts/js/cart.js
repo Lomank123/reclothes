@@ -28,9 +28,4 @@ function setCartItemsData(data) {
 }
 
 
-function getCartItems(data) {
-    ajaxGet(paginatedCartItemsUrl, setCartItemsData, data={cart_id: data.cart.id});
-}
-
-
-ajaxGet(sessionCartUrl, getCartItems)
+ajaxGet(paginatedCartItemsUrl, setCartItemsData);

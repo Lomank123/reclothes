@@ -25,6 +25,7 @@ const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
 
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
+const cartPageUrl = `${baseUrl}/cart`;
 
 function getUrlWithSearch(defaultUrl) {
     let url = new URL(defaultUrl, baseUrl);

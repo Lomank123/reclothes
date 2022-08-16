@@ -16,16 +16,25 @@ function calculateItemsCount(count) {
 function setCartData(data) {
     const count = calculateItemsCount(data.cart.items_count);
     const cartButton = $(`
-        <a href="/cart" class="btn btn-lg" id="cart-btn">
+        <button type="button" class="btn btn-lg" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
             ${count}
-        </a>
+        </button>
     `);
+    cartButton.click(() => {handleCartBtnClick(data.cart.id)});
     cartBlock.append(cartButton);
 }
 
 function setCartItemsData(data) {
     console.log("Cart items data set!");
 }
+
+
+function handleCartBtnClick(id) {
+    const pageUrl = new URL(cartPageUrl);
+    pageUrl.searchParams.set('cart_id', id);
+    window.location.replace(`${pageUrl.href}`);
+}
+
 
 ajaxGet(sessionCartUrl, setCartHeaderData);
