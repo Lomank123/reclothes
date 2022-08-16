@@ -9,18 +9,20 @@ const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultCatalogueUrl = `${apiUrl}/catalogue`;
 const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
 const defaultCatalogueDataUrl = `${defaultCatalogueUrl}/data`;
+const defaultPaginatedCartItemsUrl = `${defaultCartItemUrl}/all_by_cart`;
 
 const catalogueUrl = getUrlWithSearch(defaultCatalogueUrl);
 const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
 const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
+const paginatedCartItemsUrl = getUrlWithSearch(defaultPaginatedCartItemsUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
 const cartFromSessionUrl = `${defaultCartUrl}/fetch_from_session`;
 const homeProductsUrl = `${defaultProductUrl}/fetch_home_products`;
 // Cart and cart items
 const sessionCartUrl = `${defaultCartUrl}/session_cart`;
 const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
-const paginatedCartItemsUrl = `${defaultCartItemUrl}/all_by_cart`;
+
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 

@@ -1,0 +1,10 @@
+#cart-block {
+  display: flex;
+  flex-direction: column;
+}
+
+#order-create-btn {
+  margin-top: 20px;
+  width: 50%;
+  align-self: center;
+}

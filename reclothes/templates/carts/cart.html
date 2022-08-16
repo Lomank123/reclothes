@@ -2,6 +2,7 @@
 {% load i18n static %}
 
 {% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'utils/css/pagination.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'carts/css/cart.css' %}">
 {% endblock styles %}
 
@@ -13,11 +14,15 @@
 <hr />
 
 <div id="cart-block">
-  <p>Cart block</p>
+  <div id="cart-items-block"></div>
+  {% include 'utils/pagination.html' %}
+  <button id="order-create-btn" type="button" class="btn btn-primary">Create order</button>
 </div>
+
 
 {% endblock content %}
 
 {% block scripts %}
+<script src="{% static 'utils/js/pagination.js' %}"></script>
 <script src="{% static 'carts/js/cart.js' %}"></script>
 {% endblock scripts %}

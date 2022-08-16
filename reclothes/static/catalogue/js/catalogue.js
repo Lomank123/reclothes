@@ -36,6 +36,7 @@ function setCurrentCategory(data) {
 function setData(data) {
     setTags(data.popular_tags);
     setCatalogue(data.products.results);
+    // from pagination.js
     setPagination(data.products);
 }
 
@@ -73,33 +74,6 @@ function setTags(data) {
         tagBlock.append(tagButton);
         tagsBlock.append(tagBlock);
     });
-}
-
-
-function setPagination(data) {
-    if (data.results.length == 0) {
-        paginationBlock.hide();
-    }
-    // Set pagination text
-    const pageText = $('#pagination-text');
-    pageText.text(`${data.number} of ${data.num_pages}`);
-
-    // Set buttons
-    const firstButton = $('#first-btn');
-    const previousButton = $('#previous-btn');
-    const nextButton = $('#next-btn');
-    const lastButton = $('#last-btn');
-
-    firstButton.prop('disabled', data.first === null);
-    previousButton.prop('disabled', data.previous === null);
-    nextButton.prop('disabled', data.next === null);
-    lastButton.prop('disabled', data.last === null);
-
-    // .unbind() to prevent multiple click events
-    firstButton.unbind().click(() => { handleFilterClick(data.first); });
-    previousButton.unbind().click(() => { handleFilterClick(data.previous); });
-    nextButton.unbind().click(() => { handleFilterClick(data.next); });
-    lastButton.unbind().click(() => { handleFilterClick(data.last); });
 }
 
 

@@ -1,9 +1,36 @@
-function setPaginatedCartItems(data) {
-    console.log("Paginated cart items done!");
+const cartItemsBlock = $('#cart-items-block');
+const orderBtn = $('#order-create-btn');
+const paginationBlock = $('#pagination-block');
+
+
+function setPaginatedCartItems(cartItems) {
+    if (cartItems.length == 0) {
+        const emptyMsg = $(`<span>Cart is empty.</span>`);
+        cartItemsBlock.append(emptyMsg);
+        orderBtn.hide();
+        return;
+    }
+    cartItems.forEach(item => {
+        const newItem = $(`
+            <div class="default-block single-cart-item">
+                <span>${item.product_title}</span>
+                <span>${item.quantity}</span>
+            </div>
+        `);
+        cartItemsBlock.append(newItem);
+    });
 }
 
-function getPaginatedCartItems(data) {
-    ajaxGet(paginatedCartItemsUrl, setPaginatedCartItems, data={cart_id: data.cart.id});
+
+function setCartItemsData(data) {
+    setPaginatedCartItems(data.cart_items.results);
+    setPagination(data.cart_items);
 }
 
-ajaxGet(sessionCartUrl, getPaginatedCartItems)
+
+function getCartItems(data) {
+    ajaxGet(paginatedCartItemsUrl, setCartItemsData, data={cart_id: data.cart.id});
+}
+
+
+ajaxGet(sessionCartUrl, getCartItems)

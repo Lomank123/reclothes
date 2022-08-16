@@ -2,6 +2,7 @@
 {% load i18n static %}
 
 {% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'utils/css/pagination.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'catalogue/css/catalogue.css' %}">
 {% endblock styles %}
 
@@ -78,13 +79,7 @@
   <div id="catalogue-block">
     <div id="tags-block" class="default-block"></div>
     <div id="products-block"></div>
-    <div id="pagination-block" class="default-block">
-      <button id="first-btn" class="btn btn-primary pagination-btn">First</button>
-      <button id="previous-btn" class="btn btn-primary pagination-btn">Previous</button>
-      <span id="pagination-text">Page</span>
-      <button id="next-btn" class="btn btn-primary pagination-btn">Next</button>
-      <button id="last-btn" class="btn btn-primary pagination-btn">Last</button>
-    </div>
+    {% include 'utils/pagination.html' %}
   </div>
 
 </div>
@@ -92,5 +87,6 @@
 {% endblock content %}
 
 {% block scripts %}
+<script src="{% static 'utils/js/pagination.js' %}"></script>
 <script src="{% static 'catalogue/js/catalogue.js' %}"></script>
 {% endblock scripts %}
