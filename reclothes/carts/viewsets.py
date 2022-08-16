@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
+from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.services import (CartItemService, CartItemViewSetService,
                             CartService, CartViewSetService)
@@ -33,7 +34,7 @@ class CartItemViewSet(ModelViewSet):
     @action(methods=['get'], detail=False, url_path='header')
     def load_header_items(self, request):
         return CartItemService(self).execute(
-            cart_id=request.GET.get('cart_id'))
+            cart_id=request.GET.get('cart_id'), limit=RECENT_CART_ITEMS_LIMIT)
 
     def get_queryset(self):
         return CartItemViewSetService().execute()

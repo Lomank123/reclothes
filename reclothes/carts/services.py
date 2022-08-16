@@ -4,8 +4,7 @@ from catalogue.repositories import ProductImageRepository
 from django.db.models import F
 from reclothes.services import APIService
 
-from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG,
-                          RECENT_CART_ITEMS_LIMIT)
+from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG)
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartSerializer
 from carts.utils import CartSessionManager
@@ -117,9 +116,8 @@ class CartItemService(APIService):
         }
         return CartItemRepository.annotate(qs, **annotate_data)
 
-    def execute(self, cart_id=None, paginate=False):
-        qs = CartItemRepository.fetch(
-            limit=RECENT_CART_ITEMS_LIMIT, cart_id=cart_id)
+    def execute(self, cart_id=None, paginate=False, limit=None):
+        qs = CartItemRepository.fetch(limit=limit, cart_id=cart_id)
         annotated_qs = self._annotate_product_with_image(qs=qs)
         serialized_data = self._serialize_data(annotated_qs, paginate=paginate)
         data = self._build_response_data(items=serialized_data)
