@@ -6,8 +6,11 @@ from catalogue.models import Product, ProductImage, Category, Tag
 class ProductRepository:
 
     @staticmethod
-    def fetch(**kwargs):
-        return Product.objects.filter(**kwargs)
+    def fetch(single=False, **kwargs):
+        qs = Product.objects.filter(**kwargs)
+        if single:
+            return qs.first()
+        return qs
 
     @staticmethod
     def fetch_active_with_category():

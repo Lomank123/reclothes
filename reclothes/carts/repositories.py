@@ -47,10 +47,12 @@ class CartRepository:
 class CartItemRepository:
 
     @staticmethod
-    def fetch(limit=None, **kwargs):
+    def fetch(single=False, limit=None, **kwargs):
         qs = CartItem.objects.filter(**kwargs).order_by('-id')
         if limit:
             return qs[:limit]
+        elif single:
+            return qs.first()
         return qs
 
     @staticmethod
@@ -60,3 +62,8 @@ class CartItemRepository:
     @staticmethod
     def annotate(qs, **kwargs):
         return qs.annotate(**kwargs)
+
+    @staticmethod
+    def change_quantity(item, value):
+        item.quantity = value
+        item.save()

@@ -22,6 +22,7 @@ const homeProductsUrl = `${defaultProductUrl}/fetch_home_products`;
 // Cart and cart items
 const sessionCartUrl = `${defaultCartUrl}/session_cart`;
 const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
+const changeCartItemQuantityUrl = `${defaultCartItemUrl}/change_quantity`;
 
 
 const cataloguePageUrl = `${baseUrl}/catalogue`;

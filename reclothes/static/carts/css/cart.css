@@ -8,3 +8,33 @@
   width: 50%;
   align-self: center;
 }
+
+
+/* Cart item block */
+
+.single-cart-item {
+  flex-direction: row !important;
+  justify-content: space-between;
+}
+
+.item-info-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.quantity-block {
+  display: flex;
+  flex-direction: row;
+  align-self: center;
+}
+
+.quantity-field {
+  margin-right: 10px;
+  margin-left: 10px;
+  align-self: center;
+}
+
+.quantity-btn {
+  width: 38px;
+  height: 38px;
+}

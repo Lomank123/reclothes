@@ -6,7 +6,8 @@ from rest_framework.viewsets import ModelViewSet
 from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.services import (CartItemService, CartItemViewSetService,
-                            CartService, CartViewSetService)
+                            CartService, CartViewSetService,
+                            ChangeQuantityService)
 
 
 class CartViewSet(ModelViewSet):
@@ -35,6 +36,10 @@ class CartItemViewSet(ModelViewSet):
     def load_header_items(self, request):
         return CartItemService(self).execute(
             cart_id=request.GET.get('cart_id'), limit=RECENT_CART_ITEMS_LIMIT)
+
+    @action(methods=['post'], detail=False)
+    def change_quantity(self, request):
+        return ChangeQuantityService(request).execute()
 
     def get_queryset(self):
         return CartItemViewSetService().execute()

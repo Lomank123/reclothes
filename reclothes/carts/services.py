@@ -1,14 +1,16 @@
 import logging
 
-from catalogue.repositories import ProductImageRepository
+from catalogue.repositories import ProductImageRepository, ProductRepository
 from django.db.models import F
 from reclothes.services import APIService
+from rest_framework import status
+from rest_framework.response import Response
 
-from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG)
+from carts.consts import (INVALID_QUANTITY_ERROR_MSG, NEW_CART_ATTACHED_MSG,
+                          NEW_CART_CREATED_MSG)
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartSerializer
 from carts.utils import CartSessionManager
-
 
 logger = logging.getLogger('django')
 
@@ -121,6 +123,42 @@ class CartItemService(APIService):
         annotated_qs = self._annotate_product_with_image(qs=qs)
         serialized_data = self._serialize_data(annotated_qs, paginate=paginate)
         data = self._build_response_data(items=serialized_data)
+        return self._build_response(data)
+
+
+class ChangeQuantityService(APIService):
+
+    __slots__ = 'request'
+
+    def __init__(self, request):
+        self.request = request
+
+    def _change_quantity(self, cart_item, product_quantity):
+        new_quantity = int(self.request.POST['value'])
+        if 0 < new_quantity <= product_quantity:
+            CartItemRepository.change_quantity(cart_item, new_quantity)
+            return new_quantity
+        else:
+            return -1
+
+    def _build_response_data(self, quantity):
+        return {'value': quantity}
+
+    @staticmethod
+    def _build_response(data):
+        response = Response(data=data, status=status.HTTP_200_OK)
+        if data['value'] < 0:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            response.data = {'msg': INVALID_QUANTITY_ERROR_MSG}
+        return response
+
+    def execute(self):
+        product_id = self.request.POST['product_id']
+        product = ProductRepository.fetch(single=True, id=product_id)
+        cart_item_id = self.request.POST['cart_item_id']
+        cart_item = CartItemRepository.fetch(single=True, id=cart_item_id)
+        result = self._change_quantity(cart_item, product.quantity)
+        data = self._build_response_data(result)
         return self._build_response(data)
 
 

@@ -11,13 +11,55 @@ function setPaginatedCartItems(cartItems) {
         return;
     }
     cartItems.forEach(item => {
-        const newItem = $(`
-            <div class="default-block single-cart-item">
-                <span>${item.product_title}</span>
-                <span>${item.quantity}</span>
+        const newItem = $(`<div class="default-block single-cart-item"></div>`);
+        const infoBlock = $(`
+            <div class="item-info-block">
+                <a href="/product/${item.product_id}">${item.product_title}</a>
             </div>
         `);
+        const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
+        newItem.append(infoBlock);
+        newItem.append(quantityBlock);
         cartItemsBlock.append(newItem);
+    });
+}
+
+
+function buildQuantityBlock(quantity, id, productId) {
+    const addBtn = $(`<button type="button" class="btn btn-primary quantity-btn">+</button>`);
+    const subBtn = $(`<button type="button" class="btn btn-primary quantity-btn">-</button>`);
+    const quantityField = $(`<span class="quantity-field">${quantity}</span>`);
+    const quantityBlock = $(`<div class="quantity-block"></div>`);
+    const currentQuantity = parseInt(quantity);
+
+    addBtn.click(() => {changeQuantity(currentQuantity + 1, id, productId)});
+    subBtn.click(() => {changeQuantity(currentQuantity - 1, id, productId)});
+
+    quantityBlock.append(addBtn);
+    quantityBlock.append(quantityField);
+    quantityBlock.append(subBtn);
+    return quantityBlock;
+}
+
+
+function changeQuantity(newQuantity, id, productId) {
+    const data = {
+        value: newQuantity,
+        cart_item_id: id,
+        product_id: productId,
+    }
+    $.ajax({
+        url: `${changeCartItemQuantityUrl}/`,
+        headers: {"X-CSRFToken": csrftoken},
+        data: data,
+        method: 'POST',
+        dataType: 'json',
+        success: () => {
+            window.location.reload();
+        },
+        error: (error) => {
+            console.log(error.responseText);
+        }
     });
 }
 

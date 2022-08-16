@@ -14,6 +14,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+const csrftoken = getCookie('csrftoken');
 
 function formatDate(date) {
     const result = new Date(date);
@@ -21,7 +22,6 @@ function formatDate(date) {
 }
 
 function ajaxGet(url, callback, data=null) {
-    const csrftoken = getCookie('csrftoken');
     $.ajax({
         url: url,
         headers: {"X-CSRFToken": csrftoken},
