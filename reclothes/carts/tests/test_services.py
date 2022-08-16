@@ -186,7 +186,8 @@ class CartItemServiceTestCase(TestCase):
         create_cart_item(cart.pk, product4.pk)
         create_cart_item(cart.pk, product5.pk)
 
-        response = CartItemService(viewset).execute(cart_id=cart.pk)
+        response = CartItemService(viewset).execute(
+            cart_id=cart.pk, limit=RECENT_CART_ITEMS_LIMIT)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
