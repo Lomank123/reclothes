@@ -8,6 +8,7 @@ function setBestProducts(data) {
     const bestProductsBlock = $("#best-products-block");
     bestProductsBlock.empty();
     data.forEach((product) => {
+        const singleProductBlock = $(`<div class="single-product-block"></div>`);
         const info = $(`
             <div class="flex-block">
                 <a href="/product/${product.id}">Title: ${product.title}</a>
@@ -16,14 +17,19 @@ function setBestProducts(data) {
                 <span>Rating: ${product.avg_rate}</span>
             </div>
         `);
-        bestProductsBlock.append(info);
+        const cartBtn = buildCartButton();
+        singleProductBlock.append(info);
+        singleProductBlock.append(cartBtn);
+        bestProductsBlock.append(singleProductBlock);
     });
 }
+
 
 function setHotProducts(data) {
     const hotProductsBlock = $("#hot-products-block");
     hotProductsBlock.empty();
     data.forEach((product) => {
+        const singleProductBlock = $(`<div class="single-product-block"></div>`);
         const info = $(`
             <div class="flex-block">
                 <a href="/product/${product.id}">Title: ${product.title}</a>
@@ -32,7 +38,10 @@ function setHotProducts(data) {
                 <span>Purchases: ${product.purchases}</span>
             </div>
         `);
-        hotProductsBlock.append(info);
+        const cartBtn = buildCartButton();
+        singleProductBlock.append(info);
+        singleProductBlock.append(cartBtn);
+        hotProductsBlock.append(singleProductBlock);
     });
 }
 
@@ -40,6 +49,7 @@ function setNewestProducts(data) {
     const newestProductsBlock = $("#newest-products-block");
     newestProductsBlock.empty();
     data.forEach((product) => {
+        const singleProductBlock = $(`<div class="single-product-block"></div>`);
         const info = $(`
             <div class="flex-block">
             <a href="/product/${product.id}">Title: ${product.title}</a>
@@ -47,8 +57,12 @@ function setNewestProducts(data) {
             <span>Price: ${product.regular_price}</span>
             </div>
         `);
-        newestProductsBlock.append(info);
+        const cartBtn = buildCartButton();
+        singleProductBlock.append(info);
+        singleProductBlock.append(cartBtn);
+        newestProductsBlock.append(singleProductBlock);
     });
 }
+
 
 ajaxGet(homeProductsUrl, displayHomeData);

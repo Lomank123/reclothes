@@ -1,3 +1,9 @@
 .products-label {
   margin-top: 20px;
 }
+
+.single-product-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

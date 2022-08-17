@@ -17,6 +17,20 @@
   text-align: center;
 }
 
+/* catalogue product card */
+
+.catalogue-product-block {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: space-between;
+}
+
+.catalogue-product-info-block {
+  display: flex;
+  flex-direction: column;
+}
+
+
 
 /* Default filters */
 #default-filters-block {

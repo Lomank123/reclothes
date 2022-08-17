@@ -57,12 +57,13 @@ function getAvailability(isActive, inStock) {
     };
 }
 
-function setAddToCartButton(availability) {
+function setAddToCartButton(availability, id) {
     const button = $(`
         <button id="add-to-cart-btn" type="button" class="btn btn-primary">
             ${availability.text}
         </button>
     `);
+    button.click(() => {addToCart(id)});
     if (availability.active !== 1) {
         button.prop('disabled', true);
     }
@@ -95,7 +96,7 @@ function setMainInfo(data) {
     }
 
     const availability = getAvailability(data.is_active, data.in_stock);
-    setAddToCartButton(availability);
+    setAddToCartButton(availability, data.id);
     setTopInfo(data.product_type, data.category);
     setTagsInfo(data.tags);
     setDatesInfo(data.updated_at, data.created_at);

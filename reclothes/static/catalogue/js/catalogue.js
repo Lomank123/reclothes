@@ -52,12 +52,16 @@ function setCatalogue(data) {
     }
     // Adding items
     data.forEach(product => {
-        const productBlock = $(`
-            <div class="default-block">
+        const productBlock = $(`<div class="default-block catalogue-product-block"></div>`);
+        const infoBlock = $(`
+            <div class="catalogue-product-info-block">
                 <a href="/product/${product.id}">${product.title}</a>
                 <span>Price: ${product.regular_price}</span>
             </div>
         `);
+        const cartBtn = buildCartButton();
+        productBlock.append(infoBlock);
+        productBlock.append(cartBtn);
         productsBlock.append(productBlock);
     });
 }

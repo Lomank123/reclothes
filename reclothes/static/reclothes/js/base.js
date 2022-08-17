@@ -37,3 +37,19 @@ function ajaxGet(url, callback, data=null) {
         }
     });
 }
+
+
+function buildCartButton() {
+    const addToCartButton = $(`
+        <button class="btn btn-primary">
+            <i class="d-flex justify-content-center align-items-center bi bi-cart cart-btn"></i>
+        </button>
+    `);
+    addToCartButton.click(() => {addToCart(product.id)});
+    return addToCartButton;
+}
+
+
+function addToCart(id) {
+
+}
