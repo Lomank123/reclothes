@@ -1,7 +1,8 @@
 from accounts.models import CustomUser
 from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.models import Cart, CartItem
-from carts.services import CartItemService, CartMiddlewareService, CartService
+from carts.services import (CartItemService, CartMiddlewareService,
+                            CartService, ChangeQuantityService)
 from carts.viewsets import CartItemViewSet
 from catalogue.models import Product, ProductType
 from django.contrib import auth
@@ -12,9 +13,6 @@ from rest_framework.request import Request
 
 
 def create_user(username=None, password='123123123Aa'):
-    '''
-    Create and return user. If username is none then return AnonymousUser.
-    '''
     if username is None:
         return AnonymousUser()
     return CustomUser.objects.create(username=username, password=password)
@@ -43,14 +41,17 @@ def create_product(type_id, title='test', quantity=10, regular_price=100.00):
 
 def create_session(user):
     '''
-    Create and return new session. User must be either User or AnonymousUser object.
+    Create and return new session.
+
+    User must be either User or AnonymousUser object.
     '''
     session = SessionStore(None)
     session.clear()
     session.cycle_key()
     if user.is_authenticated:
         session[auth.SESSION_KEY] = user._meta.pk.value_to_string(user)
-        session[auth.BACKEND_SESSION_KEY] = 'django.contrib.auth.backends.ModelBackend'
+        session[auth.BACKEND_SESSION_KEY] = (
+            'django.contrib.auth.backends.ModelBackend')
         session[auth.HASH_SESSION_KEY] = user.get_session_auth_hash()
     session.save()
     return session
@@ -61,6 +62,10 @@ def create_request(user=None, session=None):
     request.user = user
     request.session = session
     return request
+
+
+def create_post_request(path='/', data=dict()):
+    return RequestFactory().post(path=path, data=data)
 
 
 class CartMiddlewareServiceTestCase(TestCase):
@@ -192,3 +197,73 @@ class CartItemServiceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             len(response.data['cart_items']), RECENT_CART_ITEMS_LIMIT)
+
+
+class ChangeQuantityServiceTestCase(TestCase):
+
+    def test_cart_item_quantity_changed(self):
+        # Arrange
+        product_type = create_product_type(name="type1")
+        product = create_product(product_type.pk)
+        cart = create_cart()
+        cart_item = create_cart_item(cart.pk, product.pk)
+
+        post_data = {
+            'value': cart_item.quantity + 1,
+            'cart_item_id': cart_item.pk,
+            'product_id': product.pk,
+        }
+        request = create_post_request(data=post_data)
+
+        # Act
+        response = ChangeQuantityService(request).execute()
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data.get('value', False))
+        self.assertEqual(response.data['value'], 2)
+        self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 2)
+
+    def test_new_quantity_too_little(self):
+        # Arrange
+        product_type = create_product_type(name="type1")
+        product = create_product(product_type.pk)
+        cart = create_cart()
+        cart_item = create_cart_item(cart.pk, product.pk)
+
+        post_data = {
+            'value': cart_item.quantity - 1,
+            'cart_item_id': cart_item.pk,
+            'product_id': product.pk,
+        }
+        request = create_post_request(data=post_data)
+
+        # Act
+        response = ChangeQuantityService(request).execute()
+
+        # Assert
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.data.get('msg', False))
+        self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)
+
+    def test_new_quantity_more_than_max_possible(self):
+        # Arrange
+        product_type = create_product_type(name="type1")
+        product = create_product(type_id=product_type.pk, quantity=1)
+        cart = create_cart()
+        cart_item = create_cart_item(cart.pk, product.pk)
+
+        post_data = {
+            'value': cart_item.quantity + 1,
+            'cart_item_id': cart_item.pk,
+            'product_id': product.pk,
+        }
+        request = create_post_request(data=post_data)
+
+        # Act
+        response = ChangeQuantityService(request).execute()
+
+        # Assert
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.data.get('msg', False))
+        self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)
