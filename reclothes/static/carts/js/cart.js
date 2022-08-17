@@ -18,8 +18,16 @@ function setPaginatedCartItems(cartItems) {
             </div>
         `);
         const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
+        const deleteItemButton = $(`
+            <button type="button" class="btn btn-primary delete-cart-item-btn">
+                <i class="bi bi-trash d-flex justify-content-center align-items-center"></i>
+            </button>
+        `);
+        deleteItemButton.click(() => {deleteCartItem(item.id)});
+
         newItem.append(infoBlock);
         newItem.append(quantityBlock);
+        newItem.append(deleteItemButton);
         cartItemsBlock.append(newItem);
     });
 }
@@ -60,6 +68,22 @@ function changeQuantity(newQuantity, id, productId) {
         error: (error) => {
             console.log(error.responseText);
         }
+    });
+}
+
+
+function deleteCartItem(id) {
+    $.ajax({
+        url: `${defaultCartItemUrl}/${id}`,
+        headers: {"X-CSRFToken": csrftoken},
+        method: 'DELETE',
+        dataType: 'json',
+        success: () => {
+            window.location.reload();
+        },
+        error: (error) => {
+            console.log(error.responseText);
+        },
     });
 }
 

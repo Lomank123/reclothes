@@ -16,7 +16,7 @@ function calculateItemsCount(count) {
 function setCartData(data) {
     const count = calculateItemsCount(data.cart.items_count);
     const cartButton = $(`
-        <button type="button" class="btn btn-lg" id="cart-btn">
+        <button type="button" class="btn btn-lg transparent-btn" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
             ${count}
         </button>

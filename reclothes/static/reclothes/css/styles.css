@@ -94,15 +94,18 @@ a.logo, a.logo:hover, a.logo:active, a.logo:visited, a.logo:focus {
   height: 100%;
 }
 
+.transparent-btn {
+  background-color: transparent;
+  overflow: hidden;
+  font-size: larger;
+  outline: none !important;
+}
+
 #cart-btn {
   height: 100%;
   display: flex;
   align-items: center;
   margin-right: 10px;
-  background-color: transparent;
-  overflow: hidden;
-  font-size: larger;
-  outline: none !important;
   box-shadow: none;
   color: black;
 }
