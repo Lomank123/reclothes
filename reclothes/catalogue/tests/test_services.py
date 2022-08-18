@@ -5,7 +5,7 @@ from catalogue.models import (Category, Product, ProductAttribute,
                               ProductReview, ProductType, Tag)
 from catalogue.services import (CatalogueService, CategoryService,
                                 HomeViewService, ProductDetailService)
-from catalogue.viewsets import CatalogueViewSet
+from catalogue.viewsets import ProductViewSet
 from django.test import RequestFactory, TestCase
 from orders.models import (Address, Order, OrderItem, Payment, PaymentTypes,
                            StatusTypes)
@@ -225,7 +225,7 @@ class CatalogueServiceTestCase(TestCase):
 
     @staticmethod
     def _create_viewset(request):
-        viewset = CatalogueViewSet(request=request)
+        viewset = ProductViewSet(request=request)
         viewset.format_kwarg = None
         return viewset
 
@@ -248,7 +248,7 @@ class CatalogueServiceTestCase(TestCase):
         request = self._create_request()
         viewset = self._create_viewset(request)
 
-        response = CatalogueService(viewset).execute()
+        response = CatalogueService(viewset).execute(paginate=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.data.get('products', False))

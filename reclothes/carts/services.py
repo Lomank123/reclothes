@@ -1,5 +1,6 @@
 import logging
 
+from catalogue.pagination import DefaultCustomPagination
 from catalogue.repositories import ProductImageRepository, ProductRepository
 from django.db.models import F
 from reclothes.services import APIService
@@ -9,8 +10,9 @@ from rest_framework.response import Response
 from carts.consts import (INVALID_QUANTITY_ERROR_MSG, NEW_CART_ATTACHED_MSG,
                           NEW_CART_CREATED_MSG)
 from carts.repositories import CartItemRepository, CartRepository
-from carts.serializers import CartSerializer
+from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
+
 
 logger = logging.getLogger('django')
 
@@ -81,24 +83,22 @@ class CartService(APIService):
 
 class CartItemService(APIService):
 
-    __slots__ = 'viewset'
+    __slots__ = 'request',
 
-    def __init__(self, viewset):
-        self.viewset = viewset
+    def __init__(self, request):
+        self.request = request
 
     def _build_response_data(self, items):
-        return {
-            'cart_items': items,
-        }
+        return {'cart_items': items}
 
     def _serialize_data(self, items, paginate=False):
         if paginate:
-            page = self.viewset.paginate_queryset(items)
+            paginator = DefaultCustomPagination()
+            page = paginator.paginate_queryset(items, request=self.request)
             if page is not None:
-                serializer = self.viewset.get_serializer(page, many=True)
-                return self.viewset.get_paginated_response(
-                    serializer.data).data
-        serializer = self.viewset.get_serializer(items, many=True)
+                serializer = CartItemSerializer(page, many=True)
+                return paginator.get_paginated_data(serializer.data)
+        serializer = CartItemSerializer(items, many=True)
         return serializer.data
 
     @staticmethod

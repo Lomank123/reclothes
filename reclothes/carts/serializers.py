@@ -19,3 +19,10 @@ class CartItemSerializer(serializers.ModelSerializer):
         depth = 1
         model = CartItem
         fields = ('id', 'quantity', 'image', 'product_id', 'product_title')
+
+
+class CartItemViewSetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CartItem
+        fields = '__all__'

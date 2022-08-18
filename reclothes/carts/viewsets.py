@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from carts.consts import RECENT_CART_ITEMS_LIMIT
-from carts.serializers import CartItemSerializer, CartSerializer
+from carts.serializers import CartSerializer, CartItemViewSetSerializer
 from carts.services import (CartItemService, CartItemViewSetService,
                             CartService, CartViewSetService,
                             ChangeQuantityService)
@@ -23,23 +23,23 @@ class CartViewSet(ModelViewSet):
 
 
 class CartItemViewSet(ModelViewSet):
-    serializer_class = CartItemSerializer
+    serializer_class = CartItemViewSetSerializer
     permission_classes = (AllowAny, )
     pagination_class = DefaultCustomPagination
 
+    def get_queryset(self):
+        return CartItemViewSetService().execute()
+
     @action(methods=['get'], detail=False, url_path='all_by_cart')
     def load_all_items_by_cart(self, request):
-        return CartItemService(self).execute(
+        return CartItemService(request).execute(
             cart_id=request.GET.get('cart_id'), paginate=True)
 
     @action(methods=['get'], detail=False, url_path='header')
     def load_header_items(self, request):
-        return CartItemService(self).execute(
+        return CartItemService(request).execute(
             cart_id=request.GET.get('cart_id'), limit=RECENT_CART_ITEMS_LIMIT)
 
-    @action(methods=['post'], detail=False)
+    @action(methods=['patch'], detail=False)
     def change_quantity(self, request):
         return ChangeQuantityService(request).execute()
-
-    def get_queryset(self):
-        return CartItemViewSetService().execute()

@@ -19,8 +19,8 @@ class DefaultCustomPagination(PageNumberPagination):
     page_query_param = 'page'
     max_page_size = 20
 
-    def get_paginated_response(self, data):
-        return Response(OrderedDict([
+    def get_paginated_data(self, data):
+        return OrderedDict([
             ('count', self.page.paginator.count),
             ('number', self.page.number),
             ('num_pages', self.page.paginator.num_pages),
@@ -29,7 +29,10 @@ class DefaultCustomPagination(PageNumberPagination):
             ('first', self.get_first_link()),
             ('last', self.get_last_link()),
             ('results', data)
-        ]))
+        ])
+
+    def get_paginated_response(self, data):
+        return Response(self.get_paginated_data())
 
     # Returns url for the first page
     def get_first_link(self):

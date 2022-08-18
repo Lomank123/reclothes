@@ -39,13 +39,13 @@ function ajaxGet(url, callback, data=null) {
 }
 
 
-function buildCartButton() {
+function buildCartButton(id) {
     const addToCartButton = $(`
         <button class="btn btn-primary">
             <i class="d-flex justify-content-center align-items-center bi bi-cart cart-btn"></i>
         </button>
     `);
-    addToCartButton.click(() => {addToCart(product.id)});
+    addToCartButton.click(() => {addToCart(id)});
     return addToCartButton;
 }
 

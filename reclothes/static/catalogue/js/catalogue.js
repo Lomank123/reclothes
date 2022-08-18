@@ -59,7 +59,7 @@ function setCatalogue(data) {
                 <span>Price: ${product.regular_price}</span>
             </div>
         `);
-        const cartBtn = buildCartButton();
+        const cartBtn = buildCartButton(product.id);
         productBlock.append(infoBlock);
         productBlock.append(cartBtn);
         productsBlock.append(productBlock);

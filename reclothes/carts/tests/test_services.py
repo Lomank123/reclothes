@@ -3,7 +3,6 @@ from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.models import Cart, CartItem
 from carts.services import (CartItemService, CartMiddlewareService,
                             CartService, ChangeQuantityService)
-from carts.viewsets import CartItemViewSet
 from catalogue.models import Product, ProductType
 from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
@@ -137,35 +136,26 @@ class CartServiceTestCase(TestCase):
 class CartItemServiceTestCase(TestCase):
 
     @staticmethod
-    def _create_viewset(request):
-        viewset = CartItemViewSet(request=request)
-        viewset.format_kwarg = None
-        return viewset
-
-    @staticmethod
     def _create_rest_request():
         return Request(request=RequestFactory().request())
 
     def test_empty_cart_received(self):
         cart = create_cart()
         request = self._create_rest_request()
-        viewset = self._create_viewset(request)
 
-        response = CartItemService(viewset).execute(cart_id=cart.pk)
+        response = CartItemService(request).execute(cart_id=cart.pk)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['cart_items']), 0)
 
     def test_paginated_cart_items_received(self):
         cart = create_cart()
-        request = self._create_rest_request()
-        viewset = self._create_viewset(request)
-
         product_type = create_product_type('test1')
         product = create_product(type_id=product_type.pk)
         create_cart_item(cart.pk, product.pk)
+        request = self._create_rest_request()
 
-        response = CartItemService(viewset).execute(
+        response = CartItemService(request).execute(
             cart_id=cart.pk, paginate=True)
 
         self.assertEqual(response.status_code, 200)
@@ -176,9 +166,6 @@ class CartItemServiceTestCase(TestCase):
 
     def test_limited_cart_items_received(self):
         cart = create_cart()
-        request = self._create_rest_request()
-        viewset = self._create_viewset(request)
-
         product_type = create_product_type('test1')
         product = create_product(type_id=product_type.pk)
         product2 = create_product(type_id=product_type.pk)
@@ -190,8 +177,9 @@ class CartItemServiceTestCase(TestCase):
         create_cart_item(cart.pk, product3.pk)
         create_cart_item(cart.pk, product4.pk)
         create_cart_item(cart.pk, product5.pk)
+        request = self._create_rest_request()
 
-        response = CartItemService(viewset).execute(
+        response = CartItemService(request).execute(
             cart_id=cart.pk, limit=RECENT_CART_ITEMS_LIMIT)
 
         self.assertEqual(response.status_code, 200)

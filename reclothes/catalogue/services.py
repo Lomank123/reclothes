@@ -111,35 +111,33 @@ class CatalogueService(APIService):
         popular_tags = TagRepository.fetch(**filters)
         return popular_tags
 
-    def _paginate_products(self, products):
-        page = self.viewset.paginate_queryset(products)
-        serializer = self.viewset.get_serializer(page, many=True)
-        return self.viewset.get_paginated_response(serializer.data).data
+    def _serialize_products(self, products, paginate=False):
+        serializer_class = self.viewset.get_serializer_class()
+        if paginate:
+            page = self.viewset.paginate_queryset(products)
+            if page is not None:
+                serializer = serializer_class(page, many=True)
+                return self.viewset.paginator.get_paginated_data(
+                    serializer.data)
+        serializer = serializer_class(products, many=True)
+        return serializer.data
 
     def _build_response_data(self, tags, products):
-        tag_serializer = TagSerializer(tags, many=True)
-        return {
-            'products': products,
-            'popular_tags': tag_serializer.data,
-        }
+        return {'products': products, 'popular_tags': tags}
 
-    def execute(self):
+    def execute(self, paginate=False):
         """Return popular tags with filtered and paginated products."""
         products = self.viewset.get_queryset()
         filtered_products = self.viewset.filter_queryset(products)
         popular_tags = self._fetch_popular_tags(filtered_products)
-        paginated_products = self._paginate_products(filtered_products)
-        data = self._build_response_data(popular_tags, paginated_products)
+        serialized_tags = TagSerializer(popular_tags, many=True).data
+        serialized_products = self._serialize_products(
+            filtered_products, paginate=paginate)
+        data = self._build_response_data(serialized_tags, serialized_products)
         return self._build_response(data)
 
 
 class ProductViewSetService:
-
-    def execute(self):
-        return ProductRepository.fetch(is_active=True)
-
-
-class CatalogueViewSetService:
 
     def execute(self):
         return ProductRepository.fetch_active_with_category()

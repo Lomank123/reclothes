@@ -60,7 +60,7 @@ function changeQuantity(newQuantity, id, productId) {
         url: `${changeCartItemQuantityUrl}/`,
         headers: {"X-CSRFToken": csrftoken},
         data: data,
-        method: 'POST',
+        method: 'PATCH',
         dataType: 'json',
         success: () => {
             window.location.reload();

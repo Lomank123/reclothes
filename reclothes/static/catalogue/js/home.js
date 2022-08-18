@@ -17,7 +17,7 @@ function setBestProducts(data) {
                 <span>Rating: ${product.avg_rate}</span>
             </div>
         `);
-        const cartBtn = buildCartButton();
+        const cartBtn = buildCartButton(product.id);
         singleProductBlock.append(info);
         singleProductBlock.append(cartBtn);
         bestProductsBlock.append(singleProductBlock);
@@ -38,7 +38,7 @@ function setHotProducts(data) {
                 <span>Purchases: ${product.purchases}</span>
             </div>
         `);
-        const cartBtn = buildCartButton();
+        const cartBtn = buildCartButton(product.id);
         singleProductBlock.append(info);
         singleProductBlock.append(cartBtn);
         hotProductsBlock.append(singleProductBlock);
@@ -57,7 +57,7 @@ function setNewestProducts(data) {
             <span>Price: ${product.regular_price}</span>
             </div>
         `);
-        const cartBtn = buildCartButton();
+        const cartBtn = buildCartButton(product.id);
         singleProductBlock.append(info);
         singleProductBlock.append(cartBtn);
         newestProductsBlock.append(singleProductBlock);
