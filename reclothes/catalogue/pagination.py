@@ -32,7 +32,7 @@ class DefaultCustomPagination(PageNumberPagination):
         ])
 
     def get_paginated_response(self, data):
-        return Response(self.get_paginated_data())
+        return Response(self.get_paginated_data(data))
 
     # Returns url for the first page
     def get_first_link(self):
