@@ -20,10 +20,13 @@ urlpatterns = [
     path('lomank/', admin.site.urls),
     path('api/', include(router.urls)),
     path('', include(('catalogue.urls', 'catalogue'), namespace='catalogue')),
-    path('auth/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('auth/', include(
+        ('accounts.urls', 'accounts'), namespace='accounts')),
     path('cart/', include(('carts.urls', 'carts'), namespace='carts')),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT)

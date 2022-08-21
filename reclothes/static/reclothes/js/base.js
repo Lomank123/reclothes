@@ -22,7 +22,7 @@ function formatDate(date) {
 }
 
 function ajaxGet(url, callback, data=null) {
-    $.ajax({
+    return $.ajax({
         url: url,
         headers: {"X-CSRFToken": csrftoken},
         data: data,

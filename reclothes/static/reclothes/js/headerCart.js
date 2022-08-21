@@ -1,11 +1,6 @@
 const cartBlock = $('#cart-header-block');
 let cartId = null;
 
-function setCartHeaderData(data) {
-    cartId = parseInt(data.cart.id);
-    setCartData(data);
-    ajaxGet(headerCartItemsUrl, setCartItemsData, data={cart_id: cartId});
-}
 
 function calculateItemsCount(count) {
     let countString = count.toString();
@@ -25,10 +20,6 @@ function setCartData(data) {
     `);
     cartButton.click(() => {handleCartBtnClick(data.cart.id)});
     cartBlock.append(cartButton);
-}
-
-function setCartItemsData(data) {
-    console.log("Cart items data set!");
 }
 
 
@@ -76,4 +67,4 @@ function addToCart(id) {
 }
 
 
-ajaxGet(sessionCartUrl, setCartHeaderData);
+ajaxGet(sessionCartUrl, setCartData);
