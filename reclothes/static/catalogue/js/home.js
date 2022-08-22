@@ -1,13 +1,10 @@
-let productsIds = [];
-
-
-function displayHomeData(result) {
-    setBestProducts(result.best_products);
-    setHotProducts(result.hot_products);
-    setNewestProducts(result.newest_products);
+function displayHomeData(result, productsIds) {
+    setBestProducts(result.best_products, productsIds);
+    setHotProducts(result.hot_products, productsIds);
+    setNewestProducts(result.newest_products, productsIds);
 }
 
-function setBestProducts(data) {
+function setBestProducts(data, ids) {
     const bestProductsBlock = $("#best-products-block");
     bestProductsBlock.empty();
     data.forEach((product) => {
@@ -21,7 +18,7 @@ function setBestProducts(data) {
             </div>
         `);
         const cartBtn = buildCartButton(product.id);
-        if (productsIds.includes(product.id)) {
+        if (ids.includes(product.id)) {
             cartBtn.prop('disabled', true);
         }
         singleProductBlock.append(info);
@@ -31,7 +28,7 @@ function setBestProducts(data) {
 }
 
 
-function setHotProducts(data) {
+function setHotProducts(data, ids) {
     const hotProductsBlock = $("#hot-products-block");
     hotProductsBlock.empty();
     data.forEach((product) => {
@@ -45,7 +42,7 @@ function setHotProducts(data) {
             </div>
         `);
         const cartBtn = buildCartButton(product.id);
-        if (productsIds.includes(parseInt(product.id))) {
+        if (ids.includes(parseInt(product.id))) {
             cartBtn.prop('disabled', true);
         }
         singleProductBlock.append(info);
@@ -54,20 +51,20 @@ function setHotProducts(data) {
     });
 }
 
-function setNewestProducts(data) {
+function setNewestProducts(data, ids) {
     const newestProductsBlock = $("#newest-products-block");
     newestProductsBlock.empty();
     data.forEach((product) => {
         const singleProductBlock = $(`<div class="single-product-block"></div>`);
         const info = $(`
             <div class="flex-block">
-            <a href="/product/${product.id}">Title: ${product.title}</a>
-            <span>Type: ${product.type}</span>
-            <span>Price: ${product.regular_price}</span>
+                <a href="/product/${product.id}">Title: ${product.title}</a>
+                <span>Type: ${product.type}</span>
+                <span>Price: ${product.regular_price}</span>
             </div>
         `);
         const cartBtn = buildCartButton(product.id);
-        if (productsIds.includes(parseInt(product.id))) {
+        if (ids.includes(parseInt(product.id))) {
             cartBtn.prop('disabled', true);
         }
         singleProductBlock.append(info);
@@ -77,17 +74,10 @@ function setNewestProducts(data) {
 }
 
 
-function getProductsIds(data) {
-    cartId = parseInt(data.cart.id);
-    ajaxGet(headerCartItemsUrl, setProductsIds, data={cart_id: cartId});
-}
-
-
-function setProductsIds(data) {
-    data.cart_items.forEach(cartItem => {
-        productsIds.push(cartItem.product_id);
+$(window).on('load', () => {
+    getProductsIds().then((productsIds) => {
+        ajaxGet(homeProductsUrl).then((homeData) => {
+            displayHomeData(homeData, productsIds);
+        });
     });
-    ajaxGet(homeProductsUrl, displayHomeData);
-}
-
-ajaxGet(sessionCartUrl, getProductsIds);
+});

@@ -14,14 +14,18 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
 const csrftoken = getCookie('csrftoken');
+
 
 function formatDate(date) {
     const result = new Date(date);
     return result.toLocaleDateString();
 }
 
-function ajaxGet(url, callback, data=null) {
+
+function ajaxGet(url, data=null) {
     return $.ajax({
         url: url,
         headers: {"X-CSRFToken": csrftoken},
@@ -30,7 +34,6 @@ function ajaxGet(url, callback, data=null) {
         dataType: 'json',
         success: (result) => {
             console.log(result);
-            callback(result);
         },
         error: (error) => {
             console.log(error);

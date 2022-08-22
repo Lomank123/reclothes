@@ -4,17 +4,14 @@ const mainLabel = $('#catalogue-main-label');
 const paginationBlock = $('#pagination-block');
 
 const searchParams = new URLSearchParams(window.location.search);
-
 // Buttons
 const applyButton = $('#apply-filters-btn');
 applyButton.click(applyFilters);
-
 const discardButton = $('#discard-filters-btn');
 discardButton.click(discardFilters);
 if (window.location.search !== "") {
     discardButton.prop('disabled', false);
 }
-
 const searchButton = $('#search-btn');
 searchButton.click(applySearch);
 
@@ -23,7 +20,9 @@ function getCurrentCategory() {
     const categoryId = searchParams.get('category_id');
     if (categoryId !== null) {
         const currentCategoryUrl = `${defaultCategoriesUrl}/${categoryId}`;
-        ajaxGet(currentCategoryUrl, setCurrentCategory);
+        ajaxGet(currentCategoryUrl).then((res) => {
+            setCurrentCategory(res);
+        });
     }
 }
 
@@ -33,15 +32,15 @@ function setCurrentCategory(data) {
 }
 
 
-function setData(data) {
+function setData(data, productsIds) {
     setTags(data.popular_tags);
-    setCatalogue(data.products.results);
+    setCatalogue(data.products.results, productsIds);
     // from pagination.js
     setPagination(data.products);
 }
 
 
-function setCatalogue(data) {
+function setCatalogue(data, productsIds) {
     // Cleaning block
     productsBlock.empty();
     if (data.length == 0) {
@@ -60,6 +59,9 @@ function setCatalogue(data) {
             </div>
         `);
         const cartBtn = buildCartButton(product.id);
+        if (productsIds.includes(parseInt(product.id))) {
+            cartBtn.prop('disabled', true);
+        }
         productBlock.append(infoBlock);
         productBlock.append(cartBtn);
         productsBlock.append(productBlock);
@@ -145,8 +147,12 @@ function discardFilters() {
 }
 
 
-// Get catalogue data
-ajaxGet(catalogueDataUrl.href, setData);
-// Get current category data if exists
-getCurrentCategory();
-setFilters();
+$(window).on('load', () => {
+    getProductsIds().then((productsIds) => {
+        ajaxGet(catalogueDataUrl.href).then((catalogueData) => {
+            setData(catalogueData, productsIds);
+            getCurrentCategory();
+            setFilters();
+        });
+    });
+});

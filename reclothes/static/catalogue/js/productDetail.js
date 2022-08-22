@@ -10,25 +10,8 @@ let imgs = [];
 let imgIndex = 0;
 
 
-function getProductData() {
-    const csrftoken = getCookie('csrftoken');
-    $.ajax({
-        url: `/api/product/${productId}`,
-        headers: {"X-CSRFToken": csrftoken},
-        method: 'GET',
-        dataType: 'json',
-        success: (result) => {
-            console.log(result);
-            displayProductInfo(result);
-        },
-        error: (error) => {
-            console.log(error);
-        }
-    });
-}
-
-function displayProductInfo(result) {
-    setMainInfo(result.product);
+function displayProductInfo(result, productsIds) {
+    setMainInfo(result.product, productsIds);
     setImages(result.images);
     setDescription(result.product.description);
     setAdditionalInfo(result.attrs);
@@ -57,21 +40,21 @@ function getAvailability(isActive, inStock) {
     };
 }
 
-function setAddToCartButton(availability, id) {
+function setAddToCartButton(availability, id, productsIds) {
     const button = $(`
         <button id="add-to-cart-btn" type="button" class="btn btn-primary">
             ${availability.text}
         </button>
     `);
     button.click(() => {addToCart(id)});
-    if (availability.active !== 1) {
+    if (availability.active !== 1 || productsIds.includes(parseInt(id))) {
         button.prop('disabled', true);
     }
     const detailPriceBlock = $('#detail-price-block');
     detailPriceBlock.append(button);
 }
 
-function setMainInfo(data) {
+function setMainInfo(data, productsIds) {
     mainInfoBlock.empty();
     const info = $(`
         <div id="info-block">
@@ -96,7 +79,7 @@ function setMainInfo(data) {
     }
 
     const availability = getAvailability(data.is_active, data.in_stock);
-    setAddToCartButton(availability, data.id);
+    setAddToCartButton(availability, data.id, productsIds);
     setTopInfo(data.product_type, data.category);
     setTagsInfo(data.tags);
     setDatesInfo(data.updated_at, data.created_at);
@@ -316,4 +299,11 @@ function buildRating(starsNum) {
     return rateBar;
 }
 
-getProductData();
+
+$(window).on('load', () => {
+    getProductsIds().then((productsIds) => {
+        ajaxGet(`/api/product/${productId}`).then((productData) => {
+            displayProductInfo(productData, productsIds);
+        });
+    });
+});

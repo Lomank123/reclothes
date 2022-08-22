@@ -94,4 +94,8 @@ function setCartItemsData(data) {
 }
 
 
-ajaxGet(paginatedCartItemsUrl, setCartItemsData);
+$(window).on('load', () => {
+    ajaxGet(paginatedCartItemsUrl).then((res) => {
+        setCartItemsData(res);
+    });
+});
