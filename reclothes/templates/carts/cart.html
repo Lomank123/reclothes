@@ -16,7 +16,7 @@
 <div id="cart-block">
   <div id="cart-items-block"></div>
   {% include 'utils/pagination.html' %}
-  <button id="order-create-btn" type="button" class="btn btn-primary">Create order</button>
+  <a href="{% url 'orders:order' %}" id="order-create-btn" class="btn btn-primary">Create order</a>
 </div>
 
 
