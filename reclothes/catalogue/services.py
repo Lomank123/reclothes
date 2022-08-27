@@ -8,11 +8,7 @@ from catalogue.consts import (BEST_PRODUCT_IN_PAGE_LIMIT,
                               NEWEST_PRODUCT_IN_PAGE_LIMIT)
 from catalogue.repositories import (CategoryRepository, ProductImageRepository,
                                     ProductRepository, TagRepository)
-from catalogue.serializers import (CategorySerializer,
-                                   ProductAttributeValueSerializer,
-                                   ProductDetailSerializer,
-                                   ProductImageSerializer,
-                                   ProductReviewSerializer,
+from catalogue.serializers import (CategorySerializer, ProductDetailSerializer,
                                    SubCategorySerializer, TagSerializer)
 
 
@@ -43,20 +39,7 @@ class ProductDetailService(APIService):
         data = {}
         if product is not None:
             product_serializer = ProductDetailSerializer(product)
-            images_serializer = ProductImageSerializer(
-                product.ordered_images, many=True)
-            attrs_serializer = ProductAttributeValueSerializer(
-                product.attrs_with_values, many=True)
-            reviews_serializer = ProductReviewSerializer(
-                product.reviews_with_users, many=True)
-
-            complete_data = {
-                "product": product_serializer.data,
-                "attrs": attrs_serializer.data,
-                "images": images_serializer.data,
-                "reviews": reviews_serializer.data,
-            }
-
+            complete_data = {"product": product_serializer.data}
             data.update(complete_data)
         return data
 

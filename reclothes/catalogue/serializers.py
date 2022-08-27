@@ -60,45 +60,6 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductDetailSerializer(serializers.ModelSerializer):
-    category = CategoryDetailSerializer()
-    product_type = ProductTypeSerializer()
-    tags = TagSerializer(many=True)
-    avg_rate = serializers.FloatField(default=0.00)
-
-    class Meta:
-        model = Product
-        fields = (
-            'id',
-            'category',
-            'product_type',
-            'tags',
-            'avg_rate',
-            'in_stock',
-            'title',
-            'description',
-            'regular_price',
-            'is_active',
-            'created_at',
-            'updated_at',
-        )
-
-
-class ProductCatalogueSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-
-    class Meta:
-        model = Product
-        fields = (
-            'id',
-            'title',
-            'regular_price',
-            'is_active',
-            'quantity',
-            'category',
-        )
-
-
 class ProductAttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -127,3 +88,48 @@ class ProductReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
         fields = ('id', 'user', 'text', 'rating', 'created_at')
+
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    category = CategoryDetailSerializer()
+    product_type = ProductTypeSerializer()
+    tags = TagSerializer(many=True)
+    avg_rate = serializers.FloatField(default=0.00)
+    ordered_images = ProductImageSerializer(many=True)
+    attrs_with_values = ProductAttributeValueSerializer(many=True)
+    reviews_with_users = ProductReviewSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            'category',
+            'product_type',
+            'tags',
+            'avg_rate',
+            'in_stock',
+            'title',
+            'description',
+            'regular_price',
+            'is_active',
+            'created_at',
+            'updated_at',
+            'ordered_images',
+            'attrs_with_values',
+            'reviews_with_users',
+        )
+
+
+class ProductCatalogueSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            'title',
+            'regular_price',
+            'is_active',
+            'quantity',
+            'category',
+        )

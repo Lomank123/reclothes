@@ -12,10 +12,10 @@ let imgIndex = 0;
 
 function displayProductInfo(result, productsIds) {
     setMainInfo(result.product, productsIds);
-    setImages(result.images);
+    setImages(result.product.ordered_images);
     setDescription(result.product.description);
-    setAdditionalInfo(result.attrs);
-    setReviewsInfo(result.reviews);
+    setAdditionalInfo(result.product.attrs_with_values);
+    setReviewsInfo(result.product.reviews_with_users);
 }
 
 function getAvailability(isActive, inStock) {

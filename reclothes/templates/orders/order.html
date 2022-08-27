@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+{% load i18n static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'utils/css/pagination.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'orders/css/order.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Catalogue" %}{% endblock title %}
+
+{% block content %}
+
+<h3 id="order-main-label" class="page-label">{% translate "Order" %}</h3>
+<hr />
+
+<div id="order-main-block">
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'utils/js/pagination.js' %}"></script>
+<script src="{% static 'orders/js/order.js' %}"></script>
+{% endblock scripts %}

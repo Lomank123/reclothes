@@ -80,6 +80,7 @@ class OrderItem(models.Model):
         return f"Order item ({self.pk})"
 
 
+# TODO: Move to payment app
 class Payment(models.Model):
     type = models.CharField(
         max_length=10,
