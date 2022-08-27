@@ -103,14 +103,14 @@ class CartItemService(APIService):
 
     @staticmethod
     def _annotate_product_with_image(qs):
-        """Return queryset with annotated product title and feature image."""
+        '''Return queryset with annotated product title and feature image.'''
 
         if len(qs) == 0:
             return qs
 
         img_subquery = (
             ProductImageRepository
-            .prepare_feature_image_subquery(outer_ref_value="product_id")
+            .prepare_feature_image_subquery(outer_ref_value='product_id')
         )
         annotate_data = {
             'product_title': F('product__title'),

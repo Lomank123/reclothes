@@ -9,7 +9,7 @@ const applyButton = $('#apply-filters-btn');
 applyButton.click(applyFilters);
 const discardButton = $('#discard-filters-btn');
 discardButton.click(discardFilters);
-if (window.location.search !== "") {
+if (window.location.search !== '') {
     discardButton.prop('disabled', false);
 }
 const searchButton = $('#search-btn');
@@ -45,16 +45,16 @@ function setCatalogue(data, productsIds) {
     productsBlock.empty();
     if (data.length == 0) {
         // Add message
-        const emptyMsg = $(`<span id="empty-msg" class="default-block">No products found.</span>`);
+        const emptyMsg = $(`<span id='empty-msg' class='default-block'>No products found.</span>`);
         productsBlock.append(emptyMsg);
         return;
     }
     // Adding items
     data.forEach(product => {
-        const productBlock = $(`<div class="default-block catalogue-product-block"></div>`);
+        const productBlock = $(`<div class='default-block catalogue-product-block'></div>`);
         const infoBlock = $(`
-            <div class="catalogue-product-info-block">
-                <a href="/product/${product.id}">${product.title}</a>
+            <div class='catalogue-product-info-block'>
+                <a href='/product/${product.id}'>${product.title}</a>
                 <span>Price: ${product.regular_price}</span>
             </div>
         `);
@@ -74,7 +74,7 @@ function setTags(data) {
         tagsBlock.hide();
     }
     data.forEach(tag => {
-        const tagButton = $(`<button type="button" class="btn btn-link tag">${tag.name}</button>`);
+        const tagButton = $(`<button type='button' class='btn btn-link tag'>${tag.name}</button>`);
         tagButton.click(() => { handleTagClick(tag.id); });
         const tagBlock = $(`<div></div>`);
         tagBlock.append(tagButton);
@@ -150,9 +150,13 @@ function discardFilters() {
 $(window).on('load', () => {
     getProductsIds().then((productsIds) => {
         ajaxGet(catalogueDataUrl.href).then((catalogueData) => {
-            setData(catalogueData, productsIds);
-            getCurrentCategory();
-            setFilters();
+            if ('detail' in catalogueData) {
+                console.log('Error occured!');
+            } else {
+                setData(catalogueData.data, productsIds);
+                getCurrentCategory();
+                setFilters();
+            }
         });
     });
 });

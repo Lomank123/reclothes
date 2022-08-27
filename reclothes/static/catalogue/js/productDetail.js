@@ -11,11 +11,11 @@ let imgIndex = 0;
 
 
 function displayProductInfo(result, productsIds) {
-    setMainInfo(result.product, productsIds);
-    setImages(result.product.ordered_images);
-    setDescription(result.product.description);
-    setAdditionalInfo(result.product.attrs_with_values);
-    setReviewsInfo(result.product.reviews_with_users);
+    setMainInfo(result, productsIds);
+    setDescription(result.description);
+    setImages(result.ordered_images);
+    setAdditionalInfo(result.attrs_with_values);
+    setReviewsInfo(result.reviews_with_users);
 }
 
 function getAvailability(isActive, inStock) {
@@ -303,7 +303,12 @@ function buildRating(starsNum) {
 $(window).on('load', () => {
     getProductsIds().then((productsIds) => {
         ajaxGet(`/api/product/${productId}`).then((productData) => {
-            displayProductInfo(productData, productsIds);
+            if ('detail' in productData) {
+                console.log("Error occured!");
+            } else {
+                displayProductInfo(productData.data, productsIds);
+                console.log(productData.data);
+            }
         });
     });
 });

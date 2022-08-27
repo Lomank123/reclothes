@@ -2,21 +2,6 @@ const subCategoriesBlock = $('#subcategories-block');
 let isSubCategories = false;
 
 
-function getCategories(url, callback) {
-    $.ajax({
-        url: url,
-        method: "GET",
-        dataType: "json",
-        success: (result) => {
-            console.log(result);
-            callback(result);
-        },
-        error: (error) => {
-            console.log(error);
-        },
-    });
-}
-
 function handleCategoryClick(id) {
     const params = new URLSearchParams(window.location.search);
     params.set('category_id', id);
@@ -62,6 +47,13 @@ function getURL() {
 }
 
 
-const apiCallURL = getURL();
-console.log(apiCallURL);
-getCategories(apiCallURL, setCategories);
+$(window).on('load', () => {
+    const apiCallURL = getURL();
+    ajaxGet(apiCallURL).then((result) => {
+        if ('detail' in result) {
+            console.log("Error occured!");
+        } else {
+            setCategories(result.data);
+        }
+    });
+});

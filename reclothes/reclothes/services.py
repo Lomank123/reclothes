@@ -5,17 +5,31 @@ from rest_framework.response import Response
 class AbstractAPIService:
 
     def _build_response_data(self):
-        pass
+        '''Construct response data and return it as dict.'''
 
     def _build_response(self):
-        pass
+        '''Construct Response and return it.'''
+
+    def execute(self):
+        '''Entrypoint of every service.'''
 
 
 class APIService(AbstractAPIService):
+    '''Base implementation of service. Use it when create new services.'''
 
-    @staticmethod
-    def _build_response(data: dict) -> Response:
+    errors = dict()
+
+    def _build_response_data(self, **kwargs) -> dict:
+        if self.errors:
+            return {'detail': self.errors}
+        return {'data': kwargs}
+
+    def _build_response(self, data: dict) -> Response:
         response = Response(data=data, status=status.HTTP_200_OK)
-        if len(data) == 0:
-            response.status_code = status.HTTP_404_NOT_FOUND
+        if self.errors:
+            response.status_code = status.HTTP_400_BAD_REQUEST
         return response
+
+    def execute(self, **kwargs) -> Response:
+        data = self._build_response_data(**kwargs)
+        return self._build_response(data)

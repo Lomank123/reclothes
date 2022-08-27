@@ -5,13 +5,13 @@ function displayHomeData(result, productsIds) {
 }
 
 function setBestProducts(data, ids) {
-    const bestProductsBlock = $("#best-products-block");
+    const bestProductsBlock = $('#best-products-block');
     bestProductsBlock.empty();
     data.forEach((product) => {
-        const singleProductBlock = $(`<div class="single-product-block"></div>`);
+        const singleProductBlock = $(`<div class='single-product-block'></div>`);
         const info = $(`
-            <div class="flex-block">
-                <a href="/product/${product.id}">Title: ${product.title}</a>
+            <div class='flex-block'>
+                <a href='/product/${product.id}'>Title: ${product.title}</a>
                 <span>Type: ${product.type}</span>
                 <span>Price: ${product.regular_price}</span>
                 <span>Rating: ${product.avg_rate}</span>
@@ -29,13 +29,13 @@ function setBestProducts(data, ids) {
 
 
 function setHotProducts(data, ids) {
-    const hotProductsBlock = $("#hot-products-block");
+    const hotProductsBlock = $('#hot-products-block');
     hotProductsBlock.empty();
     data.forEach((product) => {
-        const singleProductBlock = $(`<div class="single-product-block"></div>`);
+        const singleProductBlock = $(`<div class='single-product-block'></div>`);
         const info = $(`
-            <div class="flex-block">
-                <a href="/product/${product.id}">Title: ${product.title}</a>
+            <div class='flex-block'>
+                <a href='/product/${product.id}'>Title: ${product.title}</a>
                 <span>Type: ${product.type}</span>
                 <span>Price: ${product.regular_price}</span>
                 <span>Purchases: ${product.purchases}</span>
@@ -52,13 +52,13 @@ function setHotProducts(data, ids) {
 }
 
 function setNewestProducts(data, ids) {
-    const newestProductsBlock = $("#newest-products-block");
+    const newestProductsBlock = $('#newest-products-block');
     newestProductsBlock.empty();
     data.forEach((product) => {
-        const singleProductBlock = $(`<div class="single-product-block"></div>`);
+        const singleProductBlock = $(`<div class='single-product-block'></div>`);
         const info = $(`
-            <div class="flex-block">
-                <a href="/product/${product.id}">Title: ${product.title}</a>
+            <div class='flex-block'>
+                <a href='/product/${product.id}'>Title: ${product.title}</a>
                 <span>Type: ${product.type}</span>
                 <span>Price: ${product.regular_price}</span>
             </div>
@@ -77,7 +77,11 @@ function setNewestProducts(data, ids) {
 $(window).on('load', () => {
     getProductsIds().then((productsIds) => {
         ajaxGet(homeProductsUrl).then((homeData) => {
-            displayHomeData(homeData, productsIds);
+            if ('detail' in homeData) {
+                console.log('Error occured!');
+            } else {
+                displayHomeData(homeData.data, productsIds);
+            }
         });
     });
 });
