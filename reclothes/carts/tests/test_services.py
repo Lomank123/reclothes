@@ -22,7 +22,8 @@ def create_cart(user_id=None):
 
 
 def create_cart_item(cart_id, product_id):
-    return CartItem.objects.create(cart_id=cart_id, product_id=product_id)
+    return CartItem.objects.create(
+        cart_id=cart_id, product_id=product_id)
 
 
 def create_product_type(name):
@@ -116,9 +117,10 @@ class CartServiceTestCase(TestCase):
         request = create_request(user, session)
 
         response = CartService(request).execute()
+        data = response.data['data']
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.data.get('cart', False))
+        self.assertTrue(data.get('id', False))
 
     def test_cart_not_found(self):
         user = create_user()
@@ -130,7 +132,8 @@ class CartServiceTestCase(TestCase):
 
         response = CartService(request).execute()
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('detail' in response.data.keys())
 
 
 class CartItemServiceTestCase(TestCase):
@@ -144,9 +147,10 @@ class CartItemServiceTestCase(TestCase):
         request = self._create_rest_request()
 
         response = CartItemService(request).execute(cart_id=cart.pk)
+        data = response.data['data']
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['cart_items']), 0)
+        self.assertEqual(len(data['cart_items']), 0)
 
     def test_paginated_cart_items_received(self):
         cart = create_cart()
@@ -157,12 +161,12 @@ class CartItemServiceTestCase(TestCase):
 
         response = CartItemService(request).execute(
             cart_id=cart.pk, paginate=True)
+        data = response.data['data']
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['cart_items']['results']), 1)
-        self.assertTrue('image' in response.data['cart_items']['results'][0])
-        self.assertTrue(
-            'product_title' in response.data['cart_items']['results'][0])
+        self.assertEqual(len(data['cart_items']['results']), 1)
+        self.assertTrue('image' in data['cart_items']['results'][0])
+        self.assertTrue('product_title' in data['cart_items']['results'][0])
 
     def test_limited_cart_items_received(self):
         cart = create_cart()
@@ -181,10 +185,10 @@ class CartItemServiceTestCase(TestCase):
 
         response = CartItemService(request).execute(
             cart_id=cart.pk, limit=RECENT_CART_ITEMS_LIMIT)
+        data = response.data['data']
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            len(response.data['cart_items']), RECENT_CART_ITEMS_LIMIT)
+        self.assertEqual(len(data['cart_items']), RECENT_CART_ITEMS_LIMIT)
 
 
 class ChangeQuantityServiceTestCase(TestCase):
@@ -205,11 +209,12 @@ class ChangeQuantityServiceTestCase(TestCase):
 
         # Act
         response = ChangeQuantityService(request).execute()
+        data = response.data['data']
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.data.get('value', False))
-        self.assertEqual(response.data['value'], 2)
+        self.assertTrue(data.get('value', False))
+        self.assertEqual(data['value'], 2)
         self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 2)
 
     def test_new_quantity_too_little(self):
@@ -231,7 +236,7 @@ class ChangeQuantityServiceTestCase(TestCase):
 
         # Assert
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(response.data.get('msg', False))
+        self.assertTrue('detail' in response.data.keys())
         self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)
 
     def test_new_quantity_more_than_max_possible(self):
@@ -253,5 +258,5 @@ class ChangeQuantityServiceTestCase(TestCase):
 
         # Assert
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(response.data.get('msg', False))
+        self.assertTrue('detail' in response.data.keys())
         self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)

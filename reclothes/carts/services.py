@@ -4,15 +4,13 @@ from catalogue.pagination import DefaultCustomPagination
 from catalogue.repositories import ProductImageRepository, ProductRepository
 from django.db.models import F
 from reclothes.services import APIService
-from rest_framework import status
-from rest_framework.response import Response
 
-from carts.consts import (INVALID_QUANTITY_ERROR_MSG, NEW_CART_ATTACHED_MSG,
-                          NEW_CART_CREATED_MSG)
+from carts.consts import (CART_NOT_FOUND_MSG, NEW_CART_ATTACHED_MSG,
+                          NEW_CART_CREATED_MSG, QUANTITY_MAX_ERROR_MSG,
+                          QUANTITY_MIN_ERROR_MSG)
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
-
 
 logger = logging.getLogger('django')
 
@@ -61,23 +59,31 @@ class CartService(APIService):
     __slots__ = 'session_manager',
 
     def __init__(self, request):
+        super().__init__()
         self.session_manager = CartSessionManager(request)
 
-    @staticmethod
-    def _build_response_data(cart):
-        data = {}
-        if cart is not None:
-            cart_serializer = CartSerializer(cart)
-            complete_data = {
-                'cart': cart_serializer.data,
-            }
-            data.update(complete_data)
-        return data
+    def _validate_data(self, cart):
+        if cart is None:
+            self.errors['cart'] = CART_NOT_FOUND_MSG
+            return False
+        return True
+
+    def _serialize_data(self, cart, is_valid):
+        if not is_valid:
+            return dict()
+        return CartSerializer(cart).data
+
+    def _build_response_data(self, cart):
+        if self.errors:
+            return {'detail': self.errors}
+        return {'data': cart}
 
     def execute(self, limit=None):
         cart_id = self.session_manager.get_cart_id()
         cart = CartRepository.fetch_active(single=True, id=cart_id)
-        data = self._build_response_data(cart)
+        is_valid = self._validate_data(cart)
+        serialized_cart = self._serialize_data(cart, is_valid)
+        data = self._build_response_data(serialized_cart)
         return self._build_response(data)
 
 
@@ -86,10 +92,12 @@ class CartItemService(APIService):
     __slots__ = 'request',
 
     def __init__(self, request):
+        super().__init__()
         self.request = request
 
     def _build_response_data(self, items):
-        return {'cart_items': items}
+        data = {'cart_items': items}
+        return super()._build_response_data(**data)
 
     def _serialize_data(self, items, paginate=False):
         if paginate:
@@ -131,26 +139,23 @@ class ChangeQuantityService(APIService):
     __slots__ = 'request'
 
     def __init__(self, request):
+        super().__init__()
         self.request = request
 
     def _change_quantity(self, cart_item, product_quantity):
         new_quantity = int(self.request.POST['value'])
-        if 0 < new_quantity <= product_quantity:
-            CartItemRepository.change_quantity(cart_item, new_quantity)
-            return new_quantity
-        else:
+        if new_quantity > product_quantity:
+            self.errors['value'] = QUANTITY_MAX_ERROR_MSG
             return -1
+        elif new_quantity <= 0:
+            self.errors['value'] = QUANTITY_MIN_ERROR_MSG
+            return -1
+        CartItemRepository.change_quantity(cart_item, new_quantity)
+        return new_quantity
 
     def _build_response_data(self, quantity):
-        return {'value': quantity}
-
-    @staticmethod
-    def _build_response(data):
-        response = Response(data=data, status=status.HTTP_200_OK)
-        if data['value'] < 0:
-            response.status_code = status.HTTP_400_BAD_REQUEST
-            response.data = {'msg': INVALID_QUANTITY_ERROR_MSG}
-        return response
+        data = {'value': quantity}
+        return super()._build_response_data(**data)
 
     def execute(self):
         product_id = self.request.POST['product_id']

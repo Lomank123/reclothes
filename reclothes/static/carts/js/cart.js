@@ -96,6 +96,10 @@ function setCartItemsData(data) {
 
 $(window).on('load', () => {
     ajaxGet(paginatedCartItemsUrl).then((res) => {
-        setCartItemsData(res);
+        if ('detail' in res) {
+            console.log('Error occured!');
+        } else {
+            setCartItemsData(res.data);
+        }
     });
 });

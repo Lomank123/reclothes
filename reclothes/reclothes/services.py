@@ -17,7 +17,8 @@ class AbstractAPIService:
 class APIService(AbstractAPIService):
     '''Base implementation of service. Use it when create new services.'''
 
-    errors = dict()
+    def __init__(self):
+        self.errors = dict()
 
     def _build_response_data(self, **kwargs) -> dict:
         if self.errors:

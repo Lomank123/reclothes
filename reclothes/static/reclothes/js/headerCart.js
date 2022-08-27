@@ -11,14 +11,14 @@ function calculateItemsCount(count) {
 }
 
 function setCartData(data) {
-    const count = calculateItemsCount(data.cart.items_count);
+    const count = calculateItemsCount(data.items_count);
     const cartButton = $(`
         <button type="button" class="btn btn-lg transparent-btn" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
             ${count}
         </button>
     `);
-    cartButton.click(() => {handleCartBtnClick(data.cart.id)});
+    cartButton.click(() => {handleCartBtnClick(data.id)});
     cartBlock.append(cartButton);
 }
 
@@ -78,14 +78,27 @@ function extractProductsIds(data) {
 
 function getProductsIds() {
     return ajaxGet(sessionCartUrl).then((res) => {
-        cartId = parseInt(res.cart.id);
-        return ajaxGet(headerCartItemsUrl, data={cart_id: cartId}).then((data) => {
-            return extractProductsIds(data);
-        });
+        if ('detail' in res) {
+            console.log('Error occured!');
+        } else {
+            cartId = parseInt(res.data.id);
+            return ajaxGet(headerCartItemsUrl, data={cart_id: cartId}).then((cartItems) => {
+                if ('detail' in cartItems) {
+                    console.log('Error occured!');
+                } else {
+                    return extractProductsIds(cartItems.data);
+                }
+            });
+        }
+
     });
 }
 
 
 ajaxGet(sessionCartUrl).then((res) => {
-    setCartData(res);
+    if ('detail' in res) {
+        console.log('Error occured!');
+    } else {
+        setCartData(res.data);
+    }
 });
