@@ -11,10 +11,10 @@ from django.test import RequestFactory, TestCase
 from rest_framework.request import Request
 
 
-def create_user(username=None, password='123123123Aa'):
-    if username is None:
+def create_user(email=None, password='123123123Aa'):
+    if email is None:
         return AnonymousUser()
-    return CustomUser.objects.create(username=username, password=password)
+    return CustomUser.objects.create(email=email, password=password)
 
 
 def create_cart(user_id=None):
@@ -71,7 +71,7 @@ def create_post_request(path='/', data=dict()):
 class CartMiddlewareServiceTestCase(TestCase):
 
     def test_anonymous_cart_create_and_set_to_session(self):
-        user = create_user(username='test1')
+        user = create_user(email='test1@gmail.com')
         session = create_session(user)
         request = create_request(user, session)
 
@@ -81,7 +81,7 @@ class CartMiddlewareServiceTestCase(TestCase):
         self.assertEqual(Cart.objects.count(), 1)
 
     def test_cart_create_and_attach_to_user_and_set_to_session(self):
-        user = create_user(username='test1')
+        user = create_user(email='test1@gmail.com')
         session = create_session(user)
         request = create_request(user, session)
 
@@ -91,7 +91,7 @@ class CartMiddlewareServiceTestCase(TestCase):
         self.assertEqual(Cart.objects.filter(user=user).count(), 1)
 
     def test_user_cart_check_in_session(self):
-        user = create_user(username='test1')
+        user = create_user(email='test1@gmail.com')
         session = create_session(user)
         cart = create_cart(user.pk)
         session['cart_id'] = cart.pk

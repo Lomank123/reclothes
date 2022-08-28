@@ -7,8 +7,8 @@ from catalogue.services import (CatalogueService, CategoryService,
                                 HomeViewService, ProductDetailService)
 from catalogue.viewsets import ProductViewSet
 from django.test import RequestFactory, TestCase
-from orders.models import (Address, Order, OrderItem, Payment, PaymentTypes,
-                           StatusTypes)
+from orders.models import (Address, City, Order, OrderItem, Payment,
+                           PaymentTypes, StatusTypes)
 from rest_framework.request import Request
 
 
@@ -28,8 +28,8 @@ def create_product(type_id, title='test', quantity=10, regular_price=100.00):
 class CatalogueServicesTestCase(TestCase):
 
     @staticmethod
-    def _create_user(username, password='123123123Aa'):
-        return CustomUser.objects.create(username=username, password=password)
+    def _create_user(email, password='123123123Aa'):
+        return CustomUser.objects.create(email=email, password=password)
 
     @staticmethod
     def _create_product_attr(name, type_id):
@@ -60,8 +60,12 @@ class CatalogueServicesTestCase(TestCase):
         return CartItem.objects.create(product_id=product_id, cart_id=cart_id)
 
     @staticmethod
-    def _create_address(name):
-        return Address.objects.create(name=name)
+    def _create_city(name):
+        return City.objects.create(name=name)
+
+    @staticmethod
+    def _create_address(name, city):
+        return Address.objects.create(name=name, city=city)
 
     @staticmethod
     def _create_payment(order_id, type=PaymentTypes.CASH, total_price=123):
@@ -87,8 +91,8 @@ class CatalogueServicesTestCase(TestCase):
 
     def _create_data(self):
         # Users
-        user = self._create_user('test1')
-        user2 = self._create_user('test2')
+        user = self._create_user(email='test1@gmail.com')
+        user2 = self._create_user(email='test2@gmail.com')
         # Products
         product_type = create_product_type('type1')
         attr1 = self._create_product_attr('attr1', type_id=product_type.pk)
@@ -124,7 +128,8 @@ class CatalogueServicesTestCase(TestCase):
             product_id=product1.pk, cart_id=cart2.pk)
         self._create_cart_item(product_id=product2.pk, cart_id=cart2.pk)
         # Orders
-        address = self._create_address('addr1')
+        city = self._create_city('city1')
+        address = self._create_address('addr1', city=city)
         order1 = self._create_order(user_id=user.pk, address_id=address.pk)
         order2 = self._create_order(user_id=user.pk, address_id=address.pk)
         self._create_payment(order1.pk)

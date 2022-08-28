@@ -29,9 +29,9 @@ class AccountsSignupView(CreateView):
     success_url = '/'
 
     def form_valid(self, form):
-        valid = super(AccountsSignupView, self).form_valid(form)
+        valid = super().form_valid(form)
         raw_password = form.cleaned_data.get('password1')
-        username = form.cleaned_data.get('username')
-        user = authenticate(username=username, password=raw_password)
+        email = form.cleaned_data.get('email')
+        user = authenticate(username=email, password=raw_password)
         login(self.request, user)
         return valid

@@ -34,7 +34,7 @@
 			<div class="auth-text">
         <div id="cart-header-block"></div>
         {% if user.is_authenticated %} 
-					<span class="auth-link">Welcome, <a href="#">{{ user.username }}</a></span>
+					<span class="auth-link">Welcome, <a href="#">{{ user.email }}</a></span>
           <a href="{% url 'accounts:logout' %}" class="auth-link">Log out</a>
         {% else %}
           <a href="{% url 'accounts:login' %}" class="auth-link">Sign in</a> 

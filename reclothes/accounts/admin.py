@@ -9,9 +9,8 @@ from accounts.models import CustomUser
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = (
-        'username',
-        'id',
         'email',
+        'id',
         'city',
         'is_staff',
         'is_superuser',
@@ -20,13 +19,13 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2'),
+            'fields': ('email', 'city', 'password1', 'password2'),
         }),
     )
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('email', 'password')}),
         (_('Personal info'), {
-            'fields': ('first_name', 'last_name', 'email', 'city'),
+            'fields': ('first_name', 'last_name', 'city'),
         }),
         (_('Permissions'), {
             'fields': (
@@ -43,4 +42,4 @@ class CustomUserAdmin(UserAdmin):
     )
     readonly_fields = ('last_login', 'date_joined')
     list_filter = ('is_staff', 'is_active', 'is_superuser')
-    search_fields = ('username', 'first_name', 'last_name', 'email')
+    search_fields = ('first_name', 'last_name', 'email')

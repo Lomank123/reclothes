@@ -261,7 +261,7 @@ function setReviewsInfo(data) {
             <div class="user-review-block">
                 <div class="detail-review-user-block">
                     <img src="${noImgUrl}" class="user-avatar" />
-                    <a href="#" class="review-username">${reviewData.user.username}</a>
+                    <a href="#" class="review-email">${reviewData.user.email}</a>
                 </div>
                 
                 <span class="review-date">${creationDate}</span>

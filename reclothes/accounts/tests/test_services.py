@@ -7,8 +7,8 @@ from carts.models import Cart
 class LoginViewServiceTestCase(TestCase):
 
     @staticmethod
-    def _create_user(username, password="123123123Aa"):
-        return CustomUser.objects.create(username=username, password=password)
+    def _create_user(email, password="123123123Aa"):
+        return CustomUser.objects.create(email=email, password=password)
 
     @staticmethod
     def _create_cart(user_id, **kwargs):
@@ -16,7 +16,7 @@ class LoginViewServiceTestCase(TestCase):
 
     def test_login_with_existing_cart_successful(self):
         # Arrange
-        user = self._create_user("test1")
+        user = self._create_user("test1@gmail.com")
         cart = self._create_cart(user.pk)
         self.assertEqual(Cart.objects.count(), 1)
         client = Client()
@@ -35,7 +35,7 @@ class LoginViewServiceTestCase(TestCase):
 
     def test_login_without_valid_user_cart_successful(self):
         # Arrange
-        user = self._create_user("test1")
+        user = self._create_user("test1@gmail.com")
         self._create_cart(user.pk, is_deleted=True)
         self._create_cart(user.pk, is_archived=True)
         client = Client()
