@@ -1,9 +1,9 @@
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
-from orders.serializers import (AddressSerializer, OrderDetailSerializer,
+from orders.serializers import (CityDetailSerializer, OrderDetailSerializer,
                                 OrderItemSerializer, OrderSerializer)
-from orders.services import (AddressViewSetService, OrderItemViewSetService,
+from orders.services import (CityViewSetService, OrderItemViewSetService,
                              OrderViewSetService)
 
 
@@ -27,9 +27,9 @@ class OrderItemViewSet(ModelViewSet):
         return OrderItemViewSetService().execute()
 
 
-class AddressViewSet(ModelViewSet):
-    serializer_class = AddressSerializer
+class CityViewSet(ModelViewSet):
+    serializer_class = CityDetailSerializer
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        return AddressViewSetService().execute()
+        return CityViewSetService().execute()

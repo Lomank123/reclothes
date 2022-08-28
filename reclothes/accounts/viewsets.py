@@ -10,4 +10,4 @@ class CustomUserViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        return CustomUserViewSetService.execute()
+        return CustomUserViewSetService().execute()

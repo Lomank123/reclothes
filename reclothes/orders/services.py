@@ -1,4 +1,4 @@
-from orders.repositories import (AddressRepository, OrderItemRepository,
+from orders.repositories import (CityRepository, OrderItemRepository,
                                  OrderRepository)
 
 
@@ -14,7 +14,7 @@ class OrderItemViewSetService:
         return OrderItemRepository.fetch()
 
 
-class AddressViewSetService:
+class CityViewSetService:
 
     def execute(self):
-        return AddressRepository.fetch()
+        return CityRepository.fetch()

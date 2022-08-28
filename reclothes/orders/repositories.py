@@ -1,4 +1,4 @@
-from orders.models import Address, Order, OrderItem
+from orders.models import City, Order, OrderItem
 
 
 class OrderRepository:
@@ -25,11 +25,11 @@ class OrderItemRepository:
         return qs
 
 
-class AddressRepository:
+class CityRepository:
 
     @staticmethod
     def fetch(first=False, limit=None, **kwargs):
-        qs = Address.objects.filter(**kwargs)
+        qs = City.objects.filter(**kwargs)
         if first:
             return qs.first()
         elif limit:
