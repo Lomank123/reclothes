@@ -16,7 +16,27 @@ class StatusTypes(models.TextChoices):
     REFUNDED = _('Refunded')
 
 
+class City(models.Model):
+    name = models.CharField(
+        max_length=255, verbose_name=_('Name'), unique=True)
+    is_available = models.BooleanField(
+        default=True, verbose_name=_('Available'))
+
+    class Meta:
+        verbose_name = _('City')
+        verbose_name_plural = _('Cities')
+
+    def __str__(self):
+        return f'{self.name} ({self.pk})'
+
+
 class Address(models.Model):
+    city = models.ForeignKey(
+        to=City,
+        on_delete=models.PROTECT,
+        related_name='addresses',
+        verbose_name=_('City'),
+    )
     name = models.CharField(max_length=255, verbose_name=_('Address'))
     is_available = models.BooleanField(
         default=True, verbose_name=_('Available'))
