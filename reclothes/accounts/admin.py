@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import CustomUser
 
@@ -11,12 +12,35 @@ class CustomUserAdmin(UserAdmin):
         'username',
         'id',
         'email',
+        'city',
         'is_staff',
         'is_superuser',
         'is_active',
-        'date_joined',
-        'last_login',
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+        }),
+    )
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {
+            'fields': ('first_name', 'last_name', 'email', 'city'),
+        }),
+        (_('Permissions'), {
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions',
+            ),
+        }),
+        (_('Important dates'), {
+            'fields': ('last_login', 'date_joined'),
+        }),
     )
     readonly_fields = ('last_login', 'date_joined')
-    list_filter = ('is_staff', 'is_active')
-    search_fields = ('email', 'username', 'id')
+    list_filter = ('is_staff', 'is_active', 'is_superuser')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
