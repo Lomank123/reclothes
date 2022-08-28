@@ -1,6 +1,7 @@
 const cartItemsBlock = $('#cart-items-block');
 const orderBtn = $('#order-create-btn');
 const paginationBlock = $('#pagination-block');
+const totalPriceBlock = $('#cart-total-price-block');
 
 
 function setPaginatedCartItems(cartItems) {
@@ -15,6 +16,7 @@ function setPaginatedCartItems(cartItems) {
         const infoBlock = $(`
             <div class="item-info-block">
                 <a href="/product/${item.product_id}">${item.product_title}</a>
+                <span class="item-total-price">Price: ${item.total_price}$</span>
             </div>
         `);
         const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
@@ -94,7 +96,27 @@ function setCartItemsData(data) {
 }
 
 
+function setTotalPrice(totalPrice) {
+    const priceBlock = $(`
+        <div id="total-price">
+            <span>Total price: ${totalPrice}$</span>
+        </div>
+    `);
+    totalPriceBlock.append(priceBlock);
+}
+
+
 $(window).on('load', () => {
+    // Cart
+    ajaxGet(sessionCartUrl).then((res) => {
+        if ('detail' in res) {
+            console.log('Error occured!');
+        } else {
+            setTotalPrice(res.data.total_price);
+        }
+    });
+
+    // Cart Items
     ajaxGet(paginatedCartItemsUrl).then((res) => {
         if ('detail' in res) {
             console.log('Error occured!');

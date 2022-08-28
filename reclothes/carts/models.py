@@ -1,5 +1,6 @@
 from catalogue.models import CustomBaseModel
 from django.db import models
+from django.db.models import Sum, F
 from django.utils.translation import gettext_lazy as _
 
 
@@ -22,6 +23,12 @@ class Cart(CustomBaseModel):
 
     def __str__(self):
         return f"Cart {self.pk}"
+
+    @property
+    def total_price(self):
+        result = self.cart_items.aggregate(
+            total=Sum(F('product__regular_price') * F('quantity')))
+        return result['total']
 
 
 class CartItem(models.Model):
@@ -52,3 +59,7 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f'Cart item ({self.pk})'
+
+    @property
+    def total_price(self):
+        return self.product.regular_price * self.quantity

@@ -1,4 +1,5 @@
 from catalogue.models import CustomBaseModel
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -68,6 +69,14 @@ class Order(CustomBaseModel):
         choices=StatusTypes.choices,
         default=StatusTypes.IN_PROGRESS,
         verbose_name=_('Order status'),
+    )
+    total_price = models.DecimalField(
+        validators=[MinValueValidator(0.01)],
+        verbose_name=_("Regular price"),
+        help_text=_("Maximum 9999999999.99"),
+        max_digits=12,
+        decimal_places=2,
+        default=0,
     )
 
     class Meta:

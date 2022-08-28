@@ -8,7 +8,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ('id', 'items_count')
+        fields = ('id', 'items_count', 'total_price')
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -18,7 +18,14 @@ class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         depth = 1
         model = CartItem
-        fields = ('id', 'quantity', 'image', 'product_id', 'product_title')
+        fields = (
+            'id',
+            'quantity',
+            'image',
+            'product_id',
+            'product_title',
+            'total_price',
+        )
 
 
 class CartItemViewSetSerializer(serializers.ModelSerializer):
