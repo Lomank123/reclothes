@@ -1,10 +1,11 @@
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
-from orders.serializers import (CityDetailSerializer, OrderDetailSerializer,
+from orders.serializers import (AddressSerializer, OrderDetailSerializer,
                                 OrderItemSerializer, OrderSerializer)
-from orders.services import (CityViewSetService, OrderItemViewSetService,
-                             OrderViewSetService)
+from orders.services import (AddressViewSetService, LoadByUserCityService,
+                             OrderItemViewSetService, OrderViewSetService)
 
 
 class OrderViewSet(ModelViewSet):
@@ -27,9 +28,13 @@ class OrderItemViewSet(ModelViewSet):
         return OrderItemViewSetService().execute()
 
 
-class CityViewSet(ModelViewSet):
-    serializer_class = CityDetailSerializer
+class AddressViewSet(ModelViewSet):
+    serializer_class = AddressSerializer
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        return CityViewSetService().execute()
+        return AddressViewSetService().execute()
+
+    @action(methods=['get'], detail=False, url_path='user_city')
+    def load_by_user_city(self, request):
+        return LoadByUserCityService(request).execute()

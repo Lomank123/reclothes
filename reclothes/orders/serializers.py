@@ -31,14 +31,6 @@ class CitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CityDetailSerializer(serializers.ModelSerializer):
-    addresses = AddressSerializer(many=True, required=False)
-
-    class Meta:
-        model = City
-        fields = '__all__'
-
-
 class OrderDetailSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, required=False)
     address = AddressSerializer(required=False)
