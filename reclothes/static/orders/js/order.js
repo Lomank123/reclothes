@@ -3,8 +3,6 @@ const addressBlock = $(`#address-block`);
 const createOrderBtn = $(`#create-order-btn`);
 
 const formData = {
-    cart_id: null,
-    total_price: null,
     address_id: null,
 };
 
@@ -53,16 +51,11 @@ $(window).on('load', async () => {
     }
     setAddresses(addressData.data.addresses);
 
-    // Total price and cart data
+    // Total price
     const cartData = await ajaxCall(sessionCartUrl);
     if ('detail' in cartData) {
         console.log('Error occured!');
         return;
     };
-    // Set cart data to form
-    formData.total_price = cartData.data.total_price;
-    formData.cart_id = cartData.data.id;
-    // Display total price
     setTotalPrice(cartData.data);
-
 });

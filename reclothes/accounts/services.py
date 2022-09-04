@@ -19,7 +19,7 @@ class LoginViewService:
 
     def _fetch_session_cart(self):
         # We always have session cart id because of middleware
-        cart_id = self.session_manager.get_cart_id()
+        cart_id = self.session_manager.load_cart_id_from_session()
         return CartRepository.fetch_active(single=True, id=cart_id)
 
     def _fetch_user_cart(self):

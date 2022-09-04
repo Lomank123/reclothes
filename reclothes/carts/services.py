@@ -23,7 +23,7 @@ class CartMiddlewareService:
         self.session_manager = CartSessionManager(request)
 
     def _fetch_session_cart(self):
-        cart_id = self.session_manager.get_cart_id()
+        cart_id = self.session_manager.load_cart_id_from_session()
         return CartRepository.fetch_active(single=True, id=cart_id)
 
     def _check_or_create_cart(self, session_cart):
@@ -79,7 +79,7 @@ class CartService(APIService):
         return {'data': cart}
 
     def execute(self, limit=None):
-        cart_id = self.session_manager.get_cart_id()
+        cart_id = self.session_manager.load_cart_id_from_session()
         cart = CartRepository.fetch_active(single=True, id=cart_id)
         is_valid = self._validate_data(cart)
         serialized_cart = self._serialize_data(cart, is_valid)

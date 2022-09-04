@@ -10,7 +10,7 @@ class CartRepository:
         return Cart.objects.create(*args, **kwargs)
 
     @staticmethod
-    def fetch_active(single=False, **kwargs):
+    def fetch_active(single=False, limit=None, **kwargs):
         """
         Return non-deleted and non-archived cart qs with items count.
 
@@ -21,6 +21,8 @@ class CartRepository:
             .filter(is_archived=False, is_deleted=False, **kwargs)
             .annotate(items_count=Count('cart_items__id'))
         )
+        if limit:
+            return qs[:limit]
         if single:
             return qs.first()
         return qs
