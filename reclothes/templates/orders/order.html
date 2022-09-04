@@ -13,7 +13,15 @@
 <h3 id="order-main-label" class="page-label">{% translate "Order" %}</h3>
 <hr />
 
-<div id="order-main-block"></div>
+<div id="order-main-block" class="default-block">
+  <div id="order-total-block" class="flex-block"></div>
+  <div id="address-block" class="flex-block">
+    <select id="address-choices" class="form-select address-select" aria-label="Choose address">
+      <option value="null">Choose address</option>
+    </select>
+  </div>
+  <button id="create-order-btn" class="btn btn-primary" type="button">Order</button>
+</div>
 
 {% endblock content %}
 

@@ -25,7 +25,7 @@ function setPaginatedCartItems(cartItems) {
                 <i class="bi bi-trash d-flex justify-content-center align-items-center"></i>
             </button>
         `);
-        deleteItemButton.click(() => {deleteCartItem(item.id)});
+        deleteItemButton.click(async () => {await deleteCartItem(item.id)});
 
         newItem.append(infoBlock);
         newItem.append(quantityBlock);
@@ -42,8 +42,8 @@ function buildQuantityBlock(quantity, id, productId) {
     const quantityBlock = $(`<div class="quantity-block"></div>`);
     const currentQuantity = parseInt(quantity);
 
-    addBtn.click(() => {changeQuantity(currentQuantity + 1, id, productId)});
-    subBtn.click(() => {changeQuantity(currentQuantity - 1, id, productId)});
+    addBtn.click(async () => {await changeQuantity(currentQuantity + 1, id, productId)});
+    subBtn.click(async () => {await changeQuantity(currentQuantity - 1, id, productId)});
 
     quantityBlock.append(addBtn);
     quantityBlock.append(quantityField);
@@ -52,41 +52,26 @@ function buildQuantityBlock(quantity, id, productId) {
 }
 
 
-function changeQuantity(newQuantity, id, productId) {
+async function changeQuantity(newQuantity, id, productId) {
     const data = {
         value: newQuantity,
         cart_item_id: id,
         product_id: productId,
-    }
-    $.ajax({
-        url: `${changeCartItemQuantityUrl}/`,
-        headers: {"X-CSRFToken": csrftoken},
-        data: data,
-        method: 'PATCH',
-        dataType: 'json',
-        success: () => {
-            window.location.reload();
-        },
-        error: (error) => {
-            console.log(error.responseText);
-        }
-    });
+    };
+    const url = `${changeCartItemQuantityUrl}/`;
+    const result = await ajaxCall(url, 'PATCH', data);
+    if ('detail' in result) {
+        console.log('Cannot change quantity.');
+        return;
+    };
+    window.location.reload();
 }
 
 
-function deleteCartItem(id) {
-    $.ajax({
-        url: `${defaultCartItemUrl}/${id}`,
-        headers: {"X-CSRFToken": csrftoken},
-        method: 'DELETE',
-        dataType: 'json',
-        success: () => {
-            window.location.reload();
-        },
-        error: (error) => {
-            console.log(error.responseText);
-        },
-    });
+async function deleteCartItem(id) {
+    const url = `${defaultCartItemUrl}/${id}`;
+    await ajaxCall(url, 'DELETE');
+    window.location.reload();
 }
 
 
@@ -106,22 +91,20 @@ function setTotalPrice(totalPrice) {
 }
 
 
-$(window).on('load', () => {
+$(window).on('load', async () => {
     // Cart
-    ajaxGet(sessionCartUrl).then((res) => {
-        if ('detail' in res) {
-            console.log('Error occured!');
-        } else {
-            setTotalPrice(res.data.total_price);
-        }
-    });
+    const cartData = await ajaxCall(sessionCartUrl);
+    if ('detail' in cartData) {
+        console.log('Error occured!');
+        return;
+    }
+    setTotalPrice(cartData.data.total_price);
 
     // Cart Items
-    ajaxGet(paginatedCartItemsUrl).then((res) => {
-        if ('detail' in res) {
-            console.log('Error occured!');
-        } else {
-            setCartItemsData(res.data);
-        }
-    });
+    const paginatedData = await ajaxCall(paginatedCartItemsUrl);
+    if ('detail' in paginatedData) {
+        console.log('Error occured!');
+        return;
+    }
+    setCartItemsData(paginatedData.data);
 });

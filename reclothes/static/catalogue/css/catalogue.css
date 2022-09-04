@@ -59,6 +59,10 @@
   margin-top: 10px;
 }
 
+#search-btn {
+  min-height: 38px;
+}
+
 
 /* Tags */
 

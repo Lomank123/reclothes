@@ -74,14 +74,16 @@ function setNewestProducts(data, ids) {
 }
 
 
-$(window).on('load', () => {
-    getProductsIds().then((productsIds) => {
-        ajaxGet(homeProductsUrl).then((homeData) => {
-            if ('detail' in homeData) {
-                console.log('Error occured!');
-            } else {
-                displayHomeData(homeData.data, productsIds);
-            }
-        });
-    });
+$(window).on('load', async () => {
+    const productsIds = await getProductsIds();
+    if ('detail' in productsIds) {
+        console.log('Error occured!');
+        return;
+    }
+    const homeData = await ajaxCall(homeProductsUrl);
+    if ('detail' in homeData) {
+        console.log('Error occured!');
+        return;
+    }
+    displayHomeData(homeData.data, productsIds);
 });

@@ -17,6 +17,7 @@ function getCookie(name) {
 
 
 const csrftoken = getCookie('csrftoken');
+const defaultHeaders = {"X-CSRFToken": csrftoken};
 
 
 function formatDate(date) {
@@ -25,12 +26,12 @@ function formatDate(date) {
 }
 
 
-function ajaxGet(url, data=null) {
+function ajaxCall(url, method = 'GET', data = {}, headers = defaultHeaders) {
     return $.ajax({
         url: url,
-        headers: {"X-CSRFToken": csrftoken},
+        headers: headers,
         data: data,
-        method: 'GET',
+        method: method,
         dataType: 'json',
         success: (result) => {
             console.log(result);

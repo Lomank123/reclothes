@@ -2,6 +2,7 @@ const baseUrl = 'http://127.0.0.1:8000';
 const apiUrl = "/api";
 
 // Default api urls
+const defaultOrderUrl = `${apiUrl}/order`;
 const defaultProductUrl = `${apiUrl}/product`;
 const defaultCartUrl = `${apiUrl}/cart`;
 const defaultCartItemUrl = `${apiUrl}/cart_item`;

@@ -16,22 +16,6 @@ const searchButton = $('#search-btn');
 searchButton.click(applySearch);
 
 
-function getCurrentCategory() {
-    const categoryId = searchParams.get('category_id');
-    if (categoryId !== null) {
-        const currentCategoryUrl = `${defaultCategoriesUrl}/${categoryId}`;
-        ajaxGet(currentCategoryUrl).then((res) => {
-            setCurrentCategory(res);
-        });
-    }
-}
-
-
-function setCurrentCategory(data) {
-    mainLabel.text(data.name);
-}
-
-
 function setData(data, productsIds) {
     setTags(data.popular_tags);
     setCatalogue(data.products.results, productsIds);
@@ -147,16 +131,28 @@ function discardFilters() {
 }
 
 
-$(window).on('load', () => {
-    getProductsIds().then((productsIds) => {
-        ajaxGet(catalogueDataUrl.href).then((catalogueData) => {
-            if ('detail' in catalogueData) {
-                console.log('Error occured!');
-            } else {
-                setData(catalogueData.data, productsIds);
-                getCurrentCategory();
-                setFilters();
-            }
-        });
-    });
+$(window).on('load', async () => {
+    // Filters
+    setFilters();
+
+    // Product ids and catalogue data
+    const productsIds = await getProductsIds();
+    const catalogueData = await ajaxCall(catalogueDataUrl.href);
+    if ('detail' in catalogueData) {
+        console.log('Error occured!');
+        return;
+    }
+    setData(catalogueData.data, productsIds);
+
+    // Current category
+    const categoryId = searchParams.get('category_id');
+    if (categoryId !== null) {
+        const currentCategoryUrl = `${defaultCategoriesUrl}/${categoryId}`;
+        const currentCategory = await ajaxCall(currentCategoryUrl);
+        if ('detail' in currentCategory) {
+            console.log('Error occured!');
+        } else {
+            mainLabel.text(currentCategory.name);
+        };
+    };
 });

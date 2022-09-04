@@ -47,13 +47,12 @@ function getURL() {
 }
 
 
-$(window).on('load', () => {
+$(window).on('load', async () => {
     const apiCallURL = getURL();
-    ajaxGet(apiCallURL).then((result) => {
-        if ('detail' in result) {
-            console.log("Error occured!");
-        } else {
-            setCategories(result.data);
-        }
-    });
+    const categories = await ajaxCall(apiCallURL);
+    if ('detail' in categories) {
+        console.log("Error occured!");
+        return;
+    };
+    setCategories(categories.data);
 });

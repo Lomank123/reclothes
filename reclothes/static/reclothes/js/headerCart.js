@@ -26,7 +26,7 @@ function setCartData(data) {
 function handleCartBtnClick(id) {
     const pageUrl = new URL(cartPageUrl);
     pageUrl.searchParams.set('cart_id', id);
-    window.location.replace(`${pageUrl.href}`);
+    window.location.replace(pageUrl.href);
 }
 
 
@@ -36,69 +36,58 @@ function buildCartButton(id) {
             <i class="d-flex justify-content-center align-items-center bi bi-cart cart-btn"></i>
         </button>
     `);
-    addToCartButton.click(() => {addToCart(id)});
+    addToCartButton.click(async () => {await addToCart(id)});
     return addToCartButton;
 }
 
 
-function addToCart(id) {
-    if (cartId !== null) {
-        const data = {
-            'cart': cartId,
-            'product': id,
-            'quantity': 1,
-        }
-        $.ajax({
-            url: `${defaultCartItemUrl}/`,
-            headers: {"X-CSRFToken": csrftoken},
-            data: data,
-            method: 'POST',
-            dataType: 'json',
-            success: (result) => {
-                console.log(result);
-                window.location.reload();
-            },
-            error: (error) => {
-                console.log(error);
-            }
-        });
+async function addToCart(id) {
+    if (cartId === null) {
+        console.log('Cart id is null, cannot add to cart.');
+        return;
     }
 
+    const data = {
+        'cart': cartId,
+        'product': id,
+        'quantity': 1,
+    }
+    const result = await ajaxCall(`${defaultCartItemUrl}/`, 'POST', data);
+    if ('detail' in result) {
+        console.log(result);
+        return;
+    }
+    window.location.reload();
 }
 
 
-function extractProductsIds(data) {
+async function getProductsIds() {
+    const cartData = await ajaxCall(sessionCartUrl);
+    if ('detail' in cartData) {
+        console.log('Error occured with cart.');
+        return;
+    }
+
+    cartId = parseInt(cartData.data.id);
+    cartItemsData = await ajaxCall(headerCartItemsUrl, 'GET', {cart_id: cartId});
+    if ('detail' in cartItemsData) {
+        console.log('Error occured with cart items.');
+        return;
+    }
+
     const productsIds = [];
-    data.cart_items.forEach(cartItem => {
+    cartItemsData.data.cart_items.forEach(cartItem => {
         productsIds.push(cartItem.product_id);
     });
     return productsIds;
 }
 
 
-function getProductsIds() {
-    return ajaxGet(sessionCartUrl).then((res) => {
-        if ('detail' in res) {
-            console.log('Error occured!');
-        } else {
-            cartId = parseInt(res.data.id);
-            return ajaxGet(headerCartItemsUrl, data={cart_id: cartId}).then((cartItems) => {
-                if ('detail' in cartItems) {
-                    console.log('Error occured!');
-                } else {
-                    return extractProductsIds(cartItems.data);
-                }
-            });
-        }
-
-    });
-}
-
-
-ajaxGet(sessionCartUrl).then((res) => {
-    if ('detail' in res) {
-        console.log('Error occured!');
-    } else {
-        setCartData(res.data);
+$(window).on('load', async () => {
+    const cartData = await ajaxCall(sessionCartUrl);
+    if ('detail' in cartData) {
+        console.log('Error occured with cart');
+        return;
     }
+    setCartData(cartData.data);
 });

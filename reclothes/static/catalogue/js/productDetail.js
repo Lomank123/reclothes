@@ -46,7 +46,7 @@ function setAddToCartButton(availability, id, productsIds) {
             ${availability.text}
         </button>
     `);
-    button.click(() => {addToCart(id)});
+    button.click(async () => {await addToCart(id)});
     if (availability.active !== 1 || productsIds.includes(parseInt(id))) {
         button.prop('disabled', true);
     }
@@ -143,7 +143,6 @@ function setDatesInfo(creationDate, lastUpdate) {
             <span class="date-span">Last update: ${formatDate(lastUpdate)}</span>
         </div>
     `);
-
     bottomInfoBlock.append(datesBlock);
 }
 
@@ -300,15 +299,13 @@ function buildRating(starsNum) {
 }
 
 
-$(window).on('load', () => {
-    getProductsIds().then((productsIds) => {
-        ajaxGet(`/api/product/${productId}`).then((productData) => {
-            if ('detail' in productData) {
-                console.log("Error occured!");
-            } else {
-                displayProductInfo(productData.data, productsIds);
-                console.log(productData.data);
-            }
-        });
-    });
+$(window).on('load', async () => {
+    const productsIds = await getProductsIds();
+    const productDataUrl = `${defaultProductUrl}/${productId}`;
+    const productData = await ajaxCall(productDataUrl);
+    if ('detail' in productData) {
+        console.log("Error occured!");
+        return;
+    };
+    displayProductInfo(productData.data, productsIds);
 });
