@@ -7,8 +7,8 @@ from catalogue.services import (CatalogueService, CategoryService,
                                 HomeViewService, ProductDetailService)
 from catalogue.viewsets import ProductViewSet
 from django.test import RequestFactory, TestCase
-from orders.models import (Address, City, Order, OrderItem, Payment,
-                           PaymentTypes, StatusTypes)
+from orders.models import Address, City, Order, OrderItem, StatusTypes
+from payment.models import Payment, PaymentTypes
 from rest_framework.request import Request
 
 
