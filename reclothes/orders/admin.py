@@ -1,6 +1,12 @@
 from django.contrib import admin
 
 from orders.models import Address, City, Order, OrderItem
+from payment.models import Payment
+
+
+class PaymentInline(admin.TabularInline):
+    list_display = ('__str__', 'id', 'type', 'total_price', 'order')
+    model = Payment
 
 
 class OrderItemInline(admin.TabularInline):
@@ -41,7 +47,7 @@ class OrderAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('created_at', 'updated_at')
     search_fields = ('id', )
-    inlines = (OrderItemInline, )
+    inlines = (OrderItemInline, PaymentInline)
 
 
 @admin.register(OrderItem)

@@ -1,14 +1,16 @@
+import datetime
+
 from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
 from django.db import transaction
+from payment.models import PaymentTypes
 from reclothes.services import APIService
 
-from orders.consts import (ADDRESS_NOT_FOUND_MSG, CART_NOT_FOUND_MSG,
-                           PAYMENT_TYPE_NOT_FOUND_MSG)
-from orders.models import PaymentTypes
+from orders import consts
 from orders.repositories import (AddressRepository, OrderItemRepository,
                                  OrderRepository)
 from orders.serializers import AddressSerializer, OrderDetailSerializer
+from payment.repositories import PaymentRepository
 
 
 class CreateOrderService(APIService):
@@ -20,11 +22,41 @@ class CreateOrderService(APIService):
         self.request = request
         self.session_manager = CartSessionManager(request)
 
-    # TODO: Add validation here
     def _validate_card_data(self, card_data, payment_type):
         '''Return errors dict or None if valid.'''
+        err = dict()
+
         if payment_type == PaymentTypes.CASH.value:
             return None
+
+        name = card_data.get('name', None)
+        if name is None:
+            err['name'] = consts.NAME_NOT_FOUND_MSG
+
+        # Date format: MM/YY
+        date = card_data.get('expiry_date', None)
+        date_list = date.split('/')
+        if date_list is None:
+            err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
+        try:
+            date = datetime.date(year=date_list[1], month=date_list[0])
+        except ValueError:
+            err['expiry_date'] = consts.INVALID_DATE_MSG
+
+        card_number = card_data.get('number', None)
+        if card_number is None:
+            err['number'] = consts.CART_NOT_FOUND_MSG
+        elif len(card_number) != consts.CARD_NUMBER_SIZE:
+            err['number'] = consts.INVALID_CARD_NUMBER_MSG
+
+        code = card_data.get('code', None)
+        if code is None:
+            err['code'] = consts.CODE_NOT_FOUND_MSG
+        elif len(code) != consts.CODE_SIZE:
+            err['code'] = consts.INVALID_CODE_MSG
+
+        if err:
+            return err
         return None
 
     def _create_order_with_items(self, cart, address_id):
@@ -42,6 +74,7 @@ class CreateOrderService(APIService):
 
         return order
 
+    # TODO: Test this carefully
     @transaction.atomic
     def execute(self):
         address_id = self.request.data.get('address_id', None)
@@ -53,13 +86,13 @@ class CreateOrderService(APIService):
 
         # Error handling
         if payment_type is None:
-            self.errors['payment_type'] = PAYMENT_TYPE_NOT_FOUND_MSG
+            self.errors['payment_type'] = consts.PAYMENT_TYPE_NOT_FOUND_MSG
         if card_errors is not None:
             self.errors['card'] = card_errors
         if address_id is None:
-            self.errors['address_id'] = ADDRESS_NOT_FOUND_MSG
+            self.errors['address_id'] = consts.ADDRESS_NOT_FOUND_MSG
         if cart_id is None:
-            self.errors['cart_id'] = CART_NOT_FOUND_MSG
+            self.errors['cart_id'] = consts.CART_NOT_FOUND_MSG
         if self.errors:
             return self._build_response(dict())
 
@@ -69,6 +102,11 @@ class CreateOrderService(APIService):
         new_cart = CartRepository.create(user=self.request.user)
         self.session_manager.set_cart_id_if_not_exists(
             cart_id=new_cart.pk, forced=True)
+        PaymentRepository.create(
+            type=payment_type,
+            order=order,
+            total_price=order.total_price,
+        )
 
         # Response
         serialized_order_data = OrderDetailSerializer(order).data

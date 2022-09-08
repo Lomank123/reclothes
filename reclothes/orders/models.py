@@ -4,11 +4,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class PaymentTypes(models.TextChoices):
-    CASH = 'Cash'
-    CARD = 'Card'
-
-
 class StatusTypes(models.TextChoices):
     DECLINED = 'Declined'
     ACCEPTED = 'Accepted'
@@ -72,7 +67,7 @@ class Order(CustomBaseModel):
     )
     total_price = models.DecimalField(
         validators=[MinValueValidator(0.01)],
-        verbose_name=_("Regular price"),
+        verbose_name=_("Total price"),
         help_text=_("Maximum 9999999999.99"),
         max_digits=12,
         decimal_places=2,
@@ -107,24 +102,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'Order item ({self.pk})'
-
-
-# TODO: Move to payment app
-class Payment(models.Model):
-    type = models.CharField(
-        max_length=10,
-        choices=PaymentTypes.choices,
-        default=PaymentTypes.CASH,
-        verbose_name=_('Payment Type'),
-    )
-    total_price = models.DecimalField(
-        max_digits=7, decimal_places=2, verbose_name=_('Total price'))
-    order = models.OneToOneField(
-        Order, on_delete=models.RESTRICT, verbose_name=_('Order'))
-
-    class Meta:
-        verbose_name = _('Payment')
-        verbose_name_plural = _('Payments')
-
-    def __str__(self):
-        return f'Payment ({self.pk}) to order ({self.order.pk})'
