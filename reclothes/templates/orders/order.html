@@ -2,7 +2,7 @@
 {% load i18n static %}
 
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'utils/css/pagination.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'utils/css/payment-form.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'orders/css/order.css' %}">
 {% endblock styles %}
 
@@ -14,17 +14,39 @@
 <hr />
 
 <div id="order-main-block" class="default-block">
-  <div id="order-total-block" class="flex-block"></div>
+
   <div id="address-block" class="flex-block">
+    <h5>Choose address</h5>
     <select id="address-choices" class="form-select address-select" aria-label="Choose address">
-      <option value="null">Choose address</option>
+      <option value="null">{% translate "Choose address" %}</option>
     </select>
   </div>
-  <button id="create-order-btn" class="btn btn-primary" type="button">Order</button>
+
+  <div id="payment-block" class="flex-block">
+    <h5>Choose payment type</h5>
+    <div id="payment-choice-block">
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment-choice" id="card-payment" value="Card" checked>
+        <label class="form-check-label" for="card-payment">Card</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment-choice" id="cash-payment" value="Cash">
+        <label class="form-check-label" for="cash-payment">Cash</label>
+      </div>
+    </div>
+    <div id="payment-form-block">
+      {% include 'utils/payment-form.html' %}
+    </div>
+  </div>
+
+  <div id="order-total-block" class="flex-block"></div>
+
+  <button id="create-order-btn" class="btn btn-primary" type="button">{% translate "Order" %}</button>
 </div>
 
 {% endblock content %}
 
 {% block scripts %}
+<script src="{% static 'utils/js/paymentForm.js' %}"></script>
 <script src="{% static 'orders/js/order.js' %}"></script>
 {% endblock scripts %}

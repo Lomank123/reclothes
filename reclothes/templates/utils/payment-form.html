@@ -1,0 +1,36 @@
+<div class="payment-form flex-block">
+  <h5>Payment credentials</h5>
+
+  <!-- Card holder name -->
+  <div class="form-group flex-block">
+    <label for="card-holder"><b>Cart holder name</b></label>
+    <input type="text" class="form-control" id="card-holder" placeholder="Enter card holder name">
+  </div>
+
+  <!-- Card number -->
+  <div class="form-group flex-block">
+    <label for="card-number"><b>Card number</b></label>
+    <input type="text" class="form-control" id="card-number" placeholder="Enter 16-digit card number" minlength="16" maxlength="16">
+  </div>
+
+  <!-- Valid thru -->
+  <div class="flex-block">
+    <span><b>Valid Thru</b></span>
+
+    <div class="card-date-block">
+      <div class="form-group date-field">
+        <input type="number" class="form-control" id="card-month" placeholder="Month">
+      </div>
+      <div class="form-group">
+        <input type="number" class="form-control" id="card-year" placeholder="Year">
+      </div>
+    </div>
+  </div>
+
+  <!-- CVV/CVC -->
+  <div class="form-group flex-block">
+    <label for="card-code"><b>CVV/CVC</b></label>
+    <input type="password" class="form-control" id="card-code" placeholder="Enter 3-digit code" minlength="3" maxlength="3">
+  </div>
+
+</div>

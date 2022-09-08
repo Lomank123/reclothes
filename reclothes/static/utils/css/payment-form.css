@@ -1,0 +1,8 @@
+.card-date-block {
+  display: flex;
+  justify-content: start;
+}
+
+.date-field {
+  margin-right: 10px;
+}

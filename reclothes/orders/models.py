@@ -5,16 +5,16 @@ from django.utils.translation import gettext_lazy as _
 
 
 class PaymentTypes(models.TextChoices):
-    CASH = _('Cash')
-    CARD = _('Card')
+    CASH = 'Cash'
+    CARD = 'Card'
 
 
 class StatusTypes(models.TextChoices):
-    DECLINED = _('Declined')
-    ACCEPTED = _('Accepted')
-    DONE = _('Done')
-    IN_PROGRESS = _('In progress')
-    REFUNDED = _('Refunded')
+    DECLINED = 'Declined'
+    ACCEPTED = 'Accepted'
+    DONE = 'Done'
+    IN_PROGRESS = 'In progress'
+    REFUNDED = 'Refunded'
 
 
 class City(models.Model):

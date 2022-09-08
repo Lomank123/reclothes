@@ -1,9 +1,11 @@
-const totalPriceBlock = $(`#order-total-block`);
-const addressBlock = $(`#address-block`);
-const createOrderBtn = $(`#create-order-btn`);
+const totalPriceBlock = $('#order-total-block');
+const addressBlock = $('#address-block');
+const createOrderBtn = $('#create-order-btn');
+const paymentFormBlock = $('#payment-form-block');
 
 const formData = {
     address_id: null,
+    payment_type: "",
 };
 
 // Address change listener
@@ -16,9 +18,20 @@ addressSelect.change(() => {
     formData.address_id = value;
 });
 
+// Radio buttons
+const cardRadioBtn = $('#card-payment');
+cardRadioBtn.click(() => {
+    paymentFormBlock.show();
+});
+
+const cashRadioBtn = $('#cash-payment');
+cashRadioBtn.click(() => {
+    paymentFormBlock.hide();
+});
+
 
 function setTotalPrice(cart) {
-    const totalPrice = $(`<span id="total-price">Total price: <b>${cart.total_price}$</b></span>`);
+    const totalPrice = $(`<h5 id="total-price">Total price: <b>${cart.total_price}$</b></h5>`);
     totalPriceBlock.append(totalPrice);
 }
 
@@ -33,7 +46,14 @@ function setAddresses(addresses) {
 
 // Order button listener
 createOrderBtn.click(async () => {
+    // Add card credentials
+    const cardData = getCardData();
+    const payment = $('input[name=payment-choice]:checked').val();
+
+    formData.card = cardData;
+    formData.payment_type = payment;
     console.log(formData);
+
     const result = await ajaxCall(`${defaultOrderUrl}/`, 'POST', formData);
     if ('detail' in result) {
         console.log('Error');

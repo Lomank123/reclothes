@@ -3,7 +3,9 @@ from carts.utils import CartSessionManager
 from django.db import transaction
 from reclothes.services import APIService
 
-from orders.consts import ADDRESS_NOT_FOUND_MSG, CART_NOT_FOUND_MSG
+from orders.consts import (ADDRESS_NOT_FOUND_MSG, CART_NOT_FOUND_MSG,
+                           PAYMENT_TYPE_NOT_FOUND_MSG)
+from orders.models import PaymentTypes
 from orders.repositories import (AddressRepository, OrderItemRepository,
                                  OrderRepository)
 from orders.serializers import AddressSerializer, OrderDetailSerializer
@@ -17,6 +19,13 @@ class CreateOrderService(APIService):
         super().__init__()
         self.request = request
         self.session_manager = CartSessionManager(request)
+
+    # TODO: Add validation here
+    def _validate_card_data(self, card_data, payment_type):
+        '''Return errors dict or None if valid.'''
+        if payment_type == PaymentTypes.CASH.value:
+            return None
+        return None
 
     def _create_order_with_items(self, cart, address_id):
         # Order
@@ -35,11 +44,18 @@ class CreateOrderService(APIService):
 
     @transaction.atomic
     def execute(self):
-        # TODO: Add Payment choice here
         address_id = self.request.data.get('address_id', None)
         cart_id = self.session_manager.load_cart_id_from_session()
+        # Payment
+        payment_type = self.request.data.get('payment_type', None)
+        card_data = self.request.data.get('card', None)
+        card_errors = self._validate_card_data(card_data, payment_type)
 
         # Error handling
+        if payment_type is None:
+            self.errors['payment_type'] = PAYMENT_TYPE_NOT_FOUND_MSG
+        if card_errors is not None:
+            self.errors['card'] = card_errors
         if address_id is None:
             self.errors['address_id'] = ADDRESS_NOT_FOUND_MSG
         if cart_id is None:
