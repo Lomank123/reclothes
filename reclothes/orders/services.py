@@ -1,11 +1,12 @@
+from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
 from django.db import transaction
 from reclothes.services import APIService
 
+from orders.consts import ADDRESS_NOT_FOUND_MSG, CART_NOT_FOUND_MSG
 from orders.repositories import (AddressRepository, OrderItemRepository,
                                  OrderRepository)
 from orders.serializers import AddressSerializer, OrderDetailSerializer
-from carts.repositories import CartRepository
 
 
 class CreateOrderService(APIService):
@@ -18,30 +19,43 @@ class CreateOrderService(APIService):
         self.session_manager = CartSessionManager(request)
 
     def _create_order_with_items(self, cart, address_id):
-        cart_items = cart.cart_items
+        # Order
+        order_data = {
+            'user': cart.user,
+            'address_id': address_id,
+            'total_price': cart.total_price,
+        }
+        order = OrderRepository.create(**order_data)
 
-    def _remove_old_cart(self, old_cart):
-        '''Mark old_cart as deleted and remove it from session.'''
-        pass
+        # Order Items
+        for item in cart.cart_items:
+            OrderItemRepository.create(order=order, cart_item=item)
 
-    def _create_and_attach_new_cart(self):
-        '''Create new cart, attach to user and add to session.'''
-        user = self.request.user
+        return order
 
     @transaction.atomic
     def execute(self):
         # TODO: Add Payment choice here
-        address_id = self.request.data['address_id']
+        address_id = self.request.data.get('address_id', None)
         cart_id = self.session_manager.load_cart_id_from_session()
+
+        # Error handling
+        if address_id is None:
+            self.errors['address_id'] = ADDRESS_NOT_FOUND_MSG
+        if cart_id is None:
+            self.errors['cart_id'] = CART_NOT_FOUND_MSG
+        if self.errors:
+            return self._build_response(dict())
+
         cart = CartRepository.fetch_active(single=True, id=cart_id)
         order = self._create_order_with_items(cart, address_id)
-        serialized_order_data = OrderDetailSerializer(order).data
-
-        # Cart manupulations
-        self._remove_old_cart(cart)
-        self._create_and_attach_new_cart()
+        CartRepository.delete(cart=cart)
+        new_cart = CartRepository.create(user=self.request.user)
+        self.session_manager.set_cart_id_if_not_exists(
+            cart_id=new_cart.pk, forced=True)
 
         # Response
+        serialized_order_data = OrderDetailSerializer(order).data
         data = self._build_response_data(**serialized_order_data)
         return self._build_response(data)
 

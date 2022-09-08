@@ -12,6 +12,10 @@ class OrderRepository:
             return qs[:limit]
         return qs
 
+    @staticmethod
+    def create(**kwargs):
+        return Order.objects.create(**kwargs)
+
 
 class OrderItemRepository:
 
@@ -23,6 +27,10 @@ class OrderItemRepository:
         elif limit:
             return qs[:limit]
         return qs
+
+    @staticmethod
+    def create(**kwargs):
+        return OrderItem.objects.create(**kwargs)
 
 
 class AddressRepository:

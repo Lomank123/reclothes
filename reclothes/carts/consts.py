@@ -9,3 +9,6 @@ QUANTITY_MAX_ERROR_MSG = 'Max quantity reached.'
 
 # int
 RECENT_CART_ITEMS_LIMIT = 4
+
+# Session keys
+CART_ID_SESSION_KEY = 'cart_id'
