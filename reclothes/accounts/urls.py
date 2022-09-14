@@ -1,14 +1,17 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from accounts import views, viewsets
+from accounts.views import (AccountsLoginView, AccountsLogoutView,
+                            AccountsSignupView, UserProfileView)
+from accounts.viewsets import CustomUserViewSet
 
 
 router = DefaultRouter()
-router.register("user", viewsets.CustomUserViewSet, basename="user")
+router.register("user", CustomUserViewSet, basename="user")
 
 urlpatterns = [
-    path('login/', views.AccountsLoginView.as_view(), name='login'),
-    path('logout/', views.AccountsLogoutView.as_view(), name='logout'),
-    path('signup/', views.AccountsSignupView.as_view(), name='signup'),
+    path('login/', AccountsLoginView.as_view(), name='login'),
+    path('logout/', AccountsLogoutView.as_view(), name='logout'),
+    path('signup/', AccountsSignupView.as_view(), name='signup'),
+    path('profile/', UserProfileView.as_view(), name='profile'),
 ]

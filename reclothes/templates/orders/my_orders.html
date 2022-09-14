@@ -2,6 +2,7 @@
 {% load i18n static %}
 
 {% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'orders/css/my-orders.css' %}">
 {% endblock styles %}
 
 {% block title %}{% translate "My orders" %}{% endblock title %}
@@ -18,4 +19,5 @@
 {% endblock content %}
 
 {% block scripts %}
+<script src="{% static 'orders/js/myOrders.js' %}"></script>
 {% endblock scripts %}

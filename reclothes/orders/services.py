@@ -138,14 +138,20 @@ class LoadAddressesService(APIService):
 
 class OrderViewSetService:
 
+    __slots__ = 'request',
+
+    def __init__(self, request):
+        self.request = request
+
+    def _build_filters(self):
+        filters = dict()
+        if not self.request.user.is_superuser:
+            filters['user'] = self.request.user
+        return filters
+
     def execute(self):
-        return OrderRepository.fetch()
-
-
-class OrderItemViewSetService:
-
-    def execute(self):
-        return OrderItemRepository.fetch()
+        filters = self._build_filters()
+        return OrderRepository.fetch(**filters)
 
 
 class AddressViewSetService:

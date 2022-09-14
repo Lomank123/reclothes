@@ -1,9 +1,10 @@
 from accounts.models import CustomUser
 from carts.tests.test_services import (create_cart, create_cart_item,
                                        create_product, create_product_type,
-                                       create_user)
+                                       create_request, create_user)
 from django.test import TestCase
-from orders.models import Address, City
+from orders.models import Address, City, Order, StatusTypes
+from orders.services import OrderViewSetService
 from payment.models import PaymentTypes
 
 
@@ -116,3 +117,44 @@ class CreateOrderServiceTestCase(TestCase):
             self.path, data=data, content_type=self.content_type)
 
         self.assertEqual(response.status_code, 200)
+
+
+class OrderViewSetServiceTestCase(TestCase):
+
+    @staticmethod
+    def _create_order(user, address):
+        return Order.objects.create(
+            user=user,
+            address=address,
+            status=StatusTypes.IN_PROGRESS.value,
+            total_price=123,
+        )
+
+    def test_non_admin_got_own_orders(self):
+        user = create_user(email='test1@gmail.com')
+        user2 = create_user(email='test2@gmail.com')
+        city = create_city('city1')
+        address = create_address('addr1', city=city)
+        order = self._create_order(user=user, address=address)
+        self._create_order(user=user2, address=address)
+        request = create_request(user=user)
+
+        qs = OrderViewSetService(request).execute()
+
+        self.assertEqual(len(qs), 1)
+        self.assertEqual(order, qs.first())
+
+    def test_admin_got_all_orders(self):
+        admin = create_user(email='admin1@gmail.com')
+        admin.is_superuser = True
+        admin.save()
+        user2 = create_user(email='test2@gmail.com')
+        city = create_city('city1')
+        address = create_address('addr1', city=city)
+        self._create_order(user=admin, address=address)
+        self._create_order(user=user2, address=address)
+        request = create_request(user=admin)
+
+        qs = OrderViewSetService(request).execute()
+
+        self.assertEqual(len(qs), 2)

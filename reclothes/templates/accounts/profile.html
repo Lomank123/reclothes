@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+{% load i18n static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/profile.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Profile" %}{% endblock title %}
+
+{% block content %}
+
+<h3 id="profile-main-label" class="page-label">{% translate "Profile" %}</h3>
+<hr />
+
+<div id="profile-main-block" class="default-block">
+  <div>
+    <a href="{% url 'orders:my-orders' %}">{% translate "My orders" %}</a>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'accounts/js/profile.js' %}"></script>
+{% endblock scripts %}

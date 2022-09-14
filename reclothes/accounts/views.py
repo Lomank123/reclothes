@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 
 from accounts.forms import CustomUserCreationForm
@@ -35,3 +36,7 @@ class AccountsSignupView(CreateView):
         user = authenticate(username=email, password=raw_password)
         login(self.request, user)
         return valid
+
+
+class UserProfileView(TemplateView):
+    template_name = 'accounts/profile.html'
