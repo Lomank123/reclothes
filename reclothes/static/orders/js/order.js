@@ -61,6 +61,8 @@ createOrderBtn.click(async () => {
         console.log('Error');
         return;
     }
+
+    window.location.href = `${orderSuccessUrl}?order_id=${result.data.id}`;
 });
 
 

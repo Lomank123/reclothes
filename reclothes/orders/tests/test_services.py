@@ -1,11 +1,10 @@
 from accounts.models import CustomUser
 from carts.tests.test_services import (create_cart, create_cart_item,
                                        create_product, create_product_type,
-                                       create_session, create_user)
+                                       create_user)
 from django.test import TestCase
 from orders.models import Address, City
 from payment.models import PaymentTypes
-from rest_framework.request import Request
 
 
 def create_city(name):
@@ -32,12 +31,6 @@ class CreateOrderServiceTestCase(TestCase):
         # City
         city = create_city('city1')
         create_address('addr1', city=city)
-
-    def _fill_and_create_rest_request(self, request):
-        user = CustomUser.objects.first()
-        request.user = user
-        request.session = create_session(user)
-        return Request(request)
 
     # End-to-end test
     def test_no_data_provided(self):

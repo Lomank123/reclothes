@@ -1,0 +1,18 @@
+.success-links-block {
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+}
+.success-text-block {
+  align-items: center;
+  justify-content: center;
+}
+.success-order-id {
+  font-size: larger;
+}
+.my-orders-btn {
+  margin-left: 5px;
+}
+.home-btn {
+  margin-right: 5px;
+}

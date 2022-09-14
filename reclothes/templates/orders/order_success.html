@@ -1,0 +1,32 @@
+{% extends 'layout/base.html' %}
+{% load i18n static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'orders/css/order-success.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Order success!" %}{% endblock title %}
+
+{% block content %}
+
+<h3 id="order-success-main-label" class="page-label">{% translate "Success!" %}</h3>
+<hr />
+
+<div id="order-success-main-block" class="default-block">
+
+  <div class="success-text-block flex-block">
+    <span class="success-order-id">{% translate "Your order id is: " %}<b>{{ order_id }}</b></span>
+    <span class="success-add-text">{% translate "You will be notified when your order is ready." %}</span>
+  </div>
+
+  <div class="success-links-block flex-block">
+    <a href="{% url 'catalogue:home' %}" class="btn btn-primary home-btn">{% translate "Catalogue" %}</a>
+    <a href="{% url 'orders:my-orders' %}" class="btn btn-primary my-orders-btn">{% translate "My orders" %}</a>
+  </div>
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+{% endblock scripts %}

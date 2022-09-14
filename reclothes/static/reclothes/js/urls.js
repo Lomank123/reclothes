@@ -31,6 +31,9 @@ const addressesByCityUrl = `${defaultAddressUrl}/user_city`;
 // Non-api urls
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 const cartPageUrl = `${baseUrl}/cart`;
+const orderUrl = `${baseUrl}/order`;
+const orderSuccessUrl = `${orderUrl}/success`;
+const myOrdersUrl = `${orderUrl}/my-orders`;
 
 function getUrlWithSearch(defaultUrl) {
     let url = new URL(defaultUrl, baseUrl);
