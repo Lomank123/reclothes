@@ -22,38 +22,37 @@ class CreateOrderService(APIService):
         self.request = request
         self.session_manager = CartSessionManager(request)
 
-    def _validate_card_data(self, payment_type):
+    def _validate_card_data(self, card):
         '''Return errors dict or None if valid.'''
+        name = card.get('name', None)
+        date = card.get('expiry_date', None)    # Date format: MM/YY
+        card_number = card.get('number', None)
+        code = card.get('code', None)
         err = dict()
 
-        if payment_type == PaymentTypes.CASH.value:
-            return None
-
-        name = self.request.data.get('card[name]', None)
+        # TODO: Use card[name] if not serializer
+        # If data is not full
+        if date is None:
+            err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
         if name is None:
             err['name'] = consts.NAME_NOT_FOUND_MSG
-
-        # Date format: MM/YY
-        date = self.request.data.get('card[expiry_date]', None)
-        date_list = date.split('/')
-        if date_list is None:
-            err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
-        try:
-            date = datetime.date(
-                year=int(date_list[1]), month=int(date_list[0]), day=1)
-        except ValueError:
-            err['expiry_date'] = consts.INVALID_DATE_MSG
-
-        card_number = self.request.data.get('card[number]', None)
         if card_number is None:
             err['number'] = consts.CART_NOT_FOUND_MSG
-        elif len(card_number) != consts.CARD_NUMBER_SIZE:
-            err['number'] = consts.INVALID_CARD_NUMBER_MSG
-
-        code = self.request.data.get('card[code]', None)
         if code is None:
             err['code'] = consts.CODE_NOT_FOUND_MSG
-        elif len(code) != consts.CODE_SIZE:
+        if err:
+            return err
+
+        # Additional validation
+        try:
+            date_list = date.split('/')
+            date = datetime.date(
+                year=int(date_list[1]), month=int(date_list[0]), day=1)
+        except Exception:
+            err['expiry_date'] = consts.INVALID_DATE_MSG
+        if len(card_number) != consts.CARD_NUMBER_SIZE:
+            err['number'] = consts.INVALID_CARD_NUMBER_MSG
+        if len(code) != consts.CODE_SIZE:
             err['code'] = consts.INVALID_CODE_MSG
 
         if err:
@@ -78,19 +77,20 @@ class CreateOrderService(APIService):
     @transaction.atomic
     def execute(self):
         address_id = self.request.data.get('address_id', None)
-        if address_id == 'NaN':
-            address_id = None
-        cart_id = self.session_manager.load_cart_id_from_session()
-        # Payment
         payment_type = self.request.data.get('payment_type', None)
-        card_errors = self._validate_card_data(payment_type)
+        cart_id = self.session_manager.load_cart_id_from_session()
+
+        # Card validation
+        if payment_type != PaymentTypes.CASH.value:
+            card = self.request.data.get('card', dict())
+            card_errors = self._validate_card_data(card)
+            if card_errors is not None:
+                self.errors['card'] = card_errors
 
         # Error handling
         if payment_type is None:
             self.errors['payment_type'] = consts.PAYMENT_TYPE_NOT_FOUND_MSG
-        if card_errors is not None:
-            self.errors['card'] = card_errors
-        if address_id is None:
+        if address_id is None or address_id == 'NaN':
             self.errors['address_id'] = consts.ADDRESS_NOT_FOUND_MSG
         if cart_id is None:
             self.errors['cart_id'] = consts.CART_NOT_FOUND_MSG
