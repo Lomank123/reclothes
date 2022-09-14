@@ -16,22 +16,22 @@
 <div id="order-main-block" class="default-block">
 
   <div id="address-block" class="flex-block">
-    <h5>Choose address</h5>
+    <h5>{% translate "Choose address" %}</h5>
     <select id="address-choices" class="form-select address-select" aria-label="Choose address">
       <option value="null">{% translate "Choose address" %}</option>
     </select>
   </div>
 
   <div id="payment-block" class="flex-block">
-    <h5>Choose payment type</h5>
+    <h5>{% translate "Choose payment type" %}</h5>
     <div id="payment-choice-block">
       <div class="form-check">
         <input class="form-check-input" type="radio" name="payment-choice" id="card-payment" value="Card" checked>
-        <label class="form-check-label" for="card-payment">Card</label>
+        <label class="form-check-label" for="card-payment">{% translate "Card" %}</label>
       </div>
       <div class="form-check">
         <input class="form-check-input" type="radio" name="payment-choice" id="cash-payment" value="Cash">
-        <label class="form-check-label" for="cash-payment">Cash</label>
+        <label class="form-check-label" for="cash-payment">{% translate "Cash" %}</label>
       </div>
     </div>
     <div id="payment-form-block">

@@ -22,34 +22,35 @@ class CreateOrderService(APIService):
         self.request = request
         self.session_manager = CartSessionManager(request)
 
-    def _validate_card_data(self, card_data, payment_type):
+    def _validate_card_data(self, payment_type):
         '''Return errors dict or None if valid.'''
         err = dict()
 
         if payment_type == PaymentTypes.CASH.value:
             return None
 
-        name = card_data.get('name', None)
+        name = self.request.data.get('card[name]', None)
         if name is None:
             err['name'] = consts.NAME_NOT_FOUND_MSG
 
         # Date format: MM/YY
-        date = card_data.get('expiry_date', None)
+        date = self.request.data.get('card[expiry_date]', None)
         date_list = date.split('/')
         if date_list is None:
             err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
         try:
-            date = datetime.date(year=date_list[1], month=date_list[0])
+            date = datetime.date(
+                year=int(date_list[1]), month=int(date_list[0]), day=1)
         except ValueError:
             err['expiry_date'] = consts.INVALID_DATE_MSG
 
-        card_number = card_data.get('number', None)
+        card_number = self.request.data.get('card[number]', None)
         if card_number is None:
             err['number'] = consts.CART_NOT_FOUND_MSG
         elif len(card_number) != consts.CARD_NUMBER_SIZE:
             err['number'] = consts.INVALID_CARD_NUMBER_MSG
 
-        code = card_data.get('code', None)
+        code = self.request.data.get('card[code]', None)
         if code is None:
             err['code'] = consts.CODE_NOT_FOUND_MSG
         elif len(code) != consts.CODE_SIZE:
@@ -69,20 +70,20 @@ class CreateOrderService(APIService):
         order = OrderRepository.create(**order_data)
 
         # Order Items
-        for item in cart.cart_items:
+        for item in cart.cart_items.all():
             OrderItemRepository.create(order=order, cart_item=item)
 
         return order
 
-    # TODO: Test this carefully
     @transaction.atomic
     def execute(self):
         address_id = self.request.data.get('address_id', None)
+        if address_id == 'NaN':
+            address_id = None
         cart_id = self.session_manager.load_cart_id_from_session()
         # Payment
         payment_type = self.request.data.get('payment_type', None)
-        card_data = self.request.data.get('card', None)
-        card_errors = self._validate_card_data(card_data, payment_type)
+        card_errors = self._validate_card_data(payment_type)
 
         # Error handling
         if payment_type is None:
@@ -94,7 +95,8 @@ class CreateOrderService(APIService):
         if cart_id is None:
             self.errors['cart_id'] = consts.CART_NOT_FOUND_MSG
         if self.errors:
-            return self._build_response(dict())
+            data = self._build_response_data()
+            return self._build_response(data)
 
         cart = CartRepository.fetch_active(single=True, id=cart_id)
         order = self._create_order_with_items(cart, address_id)

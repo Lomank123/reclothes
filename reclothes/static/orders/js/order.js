@@ -50,7 +50,9 @@ createOrderBtn.click(async () => {
     const cardData = getCardData();
     const payment = $('input[name=payment-choice]:checked').val();
 
-    formData.card = cardData;
+    if (payment == 'Card') {
+        formData.card = cardData;
+    }
     formData.payment_type = payment;
     console.log(formData);
 

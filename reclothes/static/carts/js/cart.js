@@ -82,6 +82,11 @@ function setCartItemsData(data) {
 
 
 function setTotalPrice(totalPrice) {
+    if (totalPrice === null) {
+        totalPriceBlock.hide();
+        return;
+    }
+
     const priceBlock = $(`
         <div id="total-price">
             <span>Total price: ${totalPrice}$</span>
