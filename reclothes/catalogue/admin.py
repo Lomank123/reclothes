@@ -15,18 +15,50 @@ class ProductImageInline(admin.TabularInline):
     readonly_fields = ('created_at', 'updated_at')
     model = ProductImage
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.company is None:
+            return qs.none()
+        return qs.filter(product__company=request.user.company)
+
 
 class ProductFileInline(admin.TabularInline):
     readonly_fields = ('created_at', 'updated_at')
     model = ProductFile
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.company is None:
+            return qs.none()
+        return qs.filter(product__company=request.user.company)
+
 
 class ActivationKeyInline(admin.TabularInline):
     model = ActivationKey
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.company is None:
+            return qs.none()
+        return qs.filter(product__company=request.user.company)
+
 
 class ProductAttributeValueInline(admin.TabularInline):
     model = ProductAttributeValue
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.company is None:
+            return qs.none()
+        return qs.filter(product__company=request.user.company)
 
 
 @admin.register(ProductType)
@@ -76,7 +108,8 @@ class ProductAdmin(admin.ModelAdmin):
         return qs.filter(company=request.user.company)
 
     def save_model(self, request, obj, form, change):
-        obj.company = request.user.company
+        if not request.user.is_superuser:
+            obj.company = request.user.company
         super().save_model(request, obj, form, change)
 
 

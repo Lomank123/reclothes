@@ -355,8 +355,8 @@ class ActivationKey(models.Model):
 
     class Meta:
         ordering = ["-expired_at"]
-        verbose_name = _("Product")
-        verbose_name_plural = _("Products")
+        verbose_name = _("Activation key")
+        verbose_name_plural = _("Activation keys")
 
     def __str__(self):
         return f'Activation key ({self.pk}) to product ({self.product.pk})'
