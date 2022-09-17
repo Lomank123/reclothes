@@ -19,7 +19,6 @@ function setPaginatedCartItems(cartItems) {
                 <span class="item-total-price">Price: ${item.total_price}$</span>
             </div>
         `);
-        const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
         const deleteItemButton = $(`
             <button type="button" class="btn btn-primary delete-cart-item-btn">
                 <i class="bi bi-trash d-flex justify-content-center align-items-center"></i>
@@ -28,7 +27,10 @@ function setPaginatedCartItems(cartItems) {
         deleteItemButton.click(async () => {await deleteCartItem(item.id)});
 
         newItem.append(infoBlock);
-        newItem.append(quantityBlock);
+        if (item.product_is_limited) {
+            const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
+            newItem.append(quantityBlock);
+        }
         newItem.append(deleteItemButton);
         cartItemsBlock.append(newItem);
     });

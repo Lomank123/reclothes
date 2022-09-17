@@ -80,7 +80,6 @@ class Tag(CustomBaseModel):
 
 
 class ProductType(models.Model):
-    """Type of product (e.g. boots, T-shirt, jacket)."""
     name = models.CharField(
         max_length=255,
         verbose_name=_("Type"),
@@ -95,7 +94,7 @@ class ProductType(models.Model):
         ordering = ['-is_active']
 
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.pk})'
 
 
 class ProductAttribute(models.Model):
@@ -119,7 +118,7 @@ class ProductAttribute(models.Model):
         verbose_name_plural = _("Product Attributes")
 
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.pk})'
 
 
 class Product(CustomBaseModel):
@@ -146,7 +145,7 @@ class Product(CustomBaseModel):
     quantity = models.IntegerField(
         default=0,
         verbose_name=_("Quantity"),
-        help_text=_("How many products have left"),
+        help_text=_("How many products have left."),
     )
     regular_price = models.DecimalField(
         validators=[MinValueValidator(0.01)],
@@ -159,6 +158,11 @@ class Product(CustomBaseModel):
         verbose_name=_("Active"),
         help_text=_("Change product visibility"),
         default=True,
+    )
+    is_limited = models.BooleanField(
+        default=True,
+        verbose_name=_("Limited"),
+        help_text=_("Depends on quantity."),
     )
 
     class Meta:

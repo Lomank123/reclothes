@@ -39,6 +39,7 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
         'quantity',
         'is_active',
+        'is_limited',
     )
     list_filter = ('is_active', )
     readonly_fields = ('created_at', 'updated_at')

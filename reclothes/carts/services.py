@@ -122,6 +122,7 @@ class CartItemService(APIService):
         )
         annotate_data = {
             'product_title': F('product__title'),
+            'product_is_limited': F('product__is_limited'),
             'image': img_subquery,
         }
         return CartItemRepository.annotate(qs, **annotate_data)

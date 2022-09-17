@@ -12,8 +12,9 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product_title = serializers.CharField()
-    image = serializers.CharField()
+    product_title = serializers.CharField(required=False)
+    product_is_limited = serializers.BooleanField(required=False)
+    image = serializers.CharField(required=False)
 
     class Meta:
         depth = 1
@@ -24,6 +25,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             'image',
             'product_id',
             'product_title',
+            'product_is_limited',
             'total_price',
         )
 

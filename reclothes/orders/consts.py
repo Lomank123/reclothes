@@ -1,8 +1,5 @@
 # Error messages
 CART_NOT_FOUND_MSG = 'Cart not found.'
-ADDRESS_NOT_FOUND_MSG = 'Address not found.'
-PAYMENT_TYPE_NOT_FOUND_MSG = 'Payment type not found.'
-# Card messages
 NAME_NOT_FOUND_MSG = 'Card holder name not found.'
 EXPIRY_DATE_NOT_FOUND_MSG = 'Date not found.'
 INVALID_DATE_MSG = 'Invalid date.'

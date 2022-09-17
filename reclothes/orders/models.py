@@ -26,37 +26,12 @@ class City(models.Model):
         return f'{self.name} ({self.pk})'
 
 
-class Address(models.Model):
-    city = models.ForeignKey(
-        to=City,
-        on_delete=models.PROTECT,
-        related_name='addresses',
-        verbose_name=_('City'),
-    )
-    name = models.CharField(max_length=255, verbose_name=_('Address'))
-    is_available = models.BooleanField(
-        default=True, verbose_name=_('Available'))
-
-    class Meta:
-        verbose_name = _('Address')
-        verbose_name_plural = _('Addresses')
-
-    def __str__(self):
-        return self.name
-
-
 class Order(CustomBaseModel):
     user = models.ForeignKey(
         'accounts.CustomUser',
         on_delete=models.CASCADE,
         verbose_name=_('User'),
         blank=True, null=True,
-        related_name='orders',
-    )
-    address = models.ForeignKey(
-        Address,
-        on_delete=models.DO_NOTHING,
-        verbose_name=_('Address'),
         related_name='orders',
     )
     status = models.CharField(

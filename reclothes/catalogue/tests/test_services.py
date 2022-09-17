@@ -7,8 +7,7 @@ from catalogue.services import (CatalogueService, CategoryService,
                                 HomeViewService, ProductDetailService)
 from catalogue.viewsets import ProductViewSet
 from django.test import RequestFactory, TestCase
-from orders.models import Address, City, Order, OrderItem, StatusTypes
-from payment.models import Payment, PaymentTypes
+from orders.models import Order, OrderItem, StatusTypes
 from rest_framework.request import Request
 
 
@@ -60,29 +59,8 @@ class CatalogueServicesTestCase(TestCase):
         return CartItem.objects.create(product_id=product_id, cart_id=cart_id)
 
     @staticmethod
-    def _create_city(name):
-        return City.objects.create(name=name)
-
-    @staticmethod
-    def _create_address(name, city):
-        return Address.objects.create(name=name, city=city)
-
-    @staticmethod
-    def _create_payment(order_id, type=PaymentTypes.CASH, total_price=123):
-        return Payment.objects.create(
-            order_id=order_id, type=type, total_price=total_price)
-
-    @staticmethod
-    def _create_order(
-        user_id,
-        address_id,
-        status=StatusTypes.IN_PROGRESS,
-    ):
-        return Order.objects.create(
-            user_id=user_id,
-            address_id=address_id,
-            status=status
-        )
+    def _create_order(user_id, status=StatusTypes.IN_PROGRESS):
+        return Order.objects.create(user_id=user_id, status=status)
 
     @staticmethod
     def _create_order_item(order_id, cart_item_id):
@@ -128,12 +106,8 @@ class CatalogueServicesTestCase(TestCase):
             product_id=product1.pk, cart_id=cart2.pk)
         self._create_cart_item(product_id=product2.pk, cart_id=cart2.pk)
         # Orders
-        city = self._create_city('city1')
-        address = self._create_address('addr1', city=city)
-        order1 = self._create_order(user_id=user.pk, address_id=address.pk)
-        order2 = self._create_order(user_id=user.pk, address_id=address.pk)
-        self._create_payment(order1.pk)
-        self._create_payment(order2.pk)
+        order1 = self._create_order(user_id=user.pk)
+        order2 = self._create_order(user_id=user.pk)
         # Order items
         self._create_order_item(order_id=order1.pk, cart_item_id=cart_item1.pk)
         self._create_order_item(order_id=order1.pk, cart_item_id=cart_item2.pk)
