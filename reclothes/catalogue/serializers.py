@@ -1,9 +1,10 @@
 from accounts.serializers import CompanySerializer, CustomUserSerializer
 from rest_framework import serializers
 
-from catalogue.models import (Category, Product, ProductAttribute,
-                              ProductAttributeValue, ProductImage,
-                              ProductReview, ProductType, Tag)
+from catalogue.models import (ActivationKey, Category, Product,
+                              ProductAttribute, ProductAttributeValue,
+                              ProductFile, ProductImage, ProductReview,
+                              ProductType, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -139,3 +140,26 @@ class ProductCatalogueSerializer(serializers.ModelSerializer):
             'quantity',
             'category',
         )
+
+
+class ProductFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductFile
+        fields = '__all__'
+
+
+class ActivationKeySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ActivationKey
+        fields = '__all__'
+
+
+class DownloadProductSerializer(serializers.ModelSerializer):
+    files = ProductFileSerializer(many=True, required=False)
+    activation_keys = ActivationKeySerializer(many=True, required=False)
+
+    class Meta:
+        model = Product
+        fields = ('id', 'files', 'activation_keys')

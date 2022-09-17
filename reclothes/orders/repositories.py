@@ -16,6 +16,10 @@ class OrderRepository:
     def create(**kwargs):
         return Order.objects.create(**kwargs)
 
+    @staticmethod
+    def fetch_products_ids(order):
+        return order.order_items.values_list('cart_item__product', flat=True)
+
 
 class OrderItemRepository:
 

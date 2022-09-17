@@ -131,6 +131,14 @@ class ProductRepository:
             products = qs[:limit]
         return products
 
+    @staticmethod
+    def fetch_by_ids_with_files_and_keys(ids):
+        return (
+            Product.objects
+            .prefetch_related('files', 'activation_keys')
+            .filter(id__in=ids)
+        )
+
 
 class CategoryRepository:
 

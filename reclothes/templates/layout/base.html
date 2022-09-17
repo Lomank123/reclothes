@@ -35,6 +35,9 @@
         <div id="cart-header-block"></div>
         {% if user.is_authenticated %} 
 					<span class="auth-link">Welcome, <a href="{% url 'accounts:profile' %}">{{ user.email }}</a></span>
+          {% if user.is_staff or user.is_superuser %}
+            <a href="{% url 'admin:index' %}" class="auth-link">Admin Dashboard</a>
+          {% endif %}
           <a href="{% url 'accounts:logout' %}" class="auth-link">Log out</a>
         {% else %}
           <a href="{% url 'accounts:login' %}" class="auth-link">Sign in</a> 

@@ -2,8 +2,12 @@ import datetime
 
 from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
+from catalogue.repositories import ProductRepository
+from catalogue.serializers import DownloadProductSerializer
 from django.db import transaction
 from reclothes.services import APIService
+from rest_framework import status
+from rest_framework.response import Response
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
@@ -126,3 +130,41 @@ class OrderViewSetService:
     def execute(self):
         filters = self._build_filters()
         return OrderRepository.fetch(**filters)
+
+
+class DownloadFileService(APIService):
+
+    def __init__(self, request):
+        super().__init__()
+        self.request = request
+
+    def _validate_order(self, order):
+        status_code = status.HTTP_200_OK
+        if order is None:
+            self.errors['order'] = consts.ORDER_NOT_FOUND_MSG
+            status_code = status.HTTP_404_NOT_FOUND
+        else:
+            # Check if user owns the order
+            if not order.user == self.request.user:
+                self.errors['order'] = consts.NOT_ORDER_OWNER_MSG
+                status_code = status.HTTP_403_FORBIDDEN
+        return status_code
+
+    def _build_response(self, data, status_code):
+        return Response(data=data, status=status_code)
+
+    def execute(self, order_id):
+        order = OrderRepository.fetch(first=True, id=order_id)
+        status_code = self._validate_order(order)
+
+        # Error handling
+        if status_code != status.HTTP_200_OK:
+            data = self._build_response_data()
+            return self._build_response(data, status_code)
+
+        products_ids = OrderRepository.fetch_products_ids(order)
+        products = ProductRepository.fetch_by_ids_with_files_and_keys(
+            products_ids)
+        serializer = DownloadProductSerializer(products, many=True)
+        data = self._build_response_data(products=serializer.data)
+        return self._build_response(data, status_code=status_code)
