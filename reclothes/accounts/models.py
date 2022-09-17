@@ -6,6 +6,25 @@ from django.utils.translation import gettext_lazy as _
 from accounts.managers import CustomUserManager
 
 
+class Company(models.Model):
+    name = models.CharField(max_length=255, verbose_name=_('Name'))
+    address = models.CharField(max_length=255, verbose_name=_('Address'))
+    contact_person = models.ForeignKey(
+        to='accounts.CustomUser',
+        on_delete=models.PROTECT,
+        related_name='companies',
+        verbose_name=_('Contact person'),
+    )
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = _('Company')
+        verbose_name_plural = _('Companies')
+
+    def __str__(self):
+        return f'{self.name} ({self.pk})'
+
+
 class CustomUser(AbstractUser):
     username = models.CharField(
         max_length=32,
@@ -18,12 +37,12 @@ class CustomUser(AbstractUser):
         help_text=_('Required and unique.'),
         verbose_name=_("Email address"),
     )
-    city = models.ForeignKey(
-        to='orders.City',
-        blank=True, null=True,
-        on_delete=models.SET_NULL,
+    company = models.ForeignKey(
+        to=Company,
+        on_delete=models.PROTECT,
+        null=True, blank=True,
         related_name='users',
-        verbose_name=_('City'),
+        verbose_name=_('Company'),
     )
 
     objects = CustomUserManager()

@@ -69,6 +69,7 @@ class CreateOrderService(APIService):
 
     # TODO: Implement this
     def _decrease_product_quantity(self, cart):
+        # Decrease only if is_limited set to True!
         pass
 
     @transaction.atomic

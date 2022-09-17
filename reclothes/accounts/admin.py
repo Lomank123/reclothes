@@ -2,7 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, Company
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'address', 'contact_person')
+    search_fields = ('name', 'id')
 
 
 @admin.register(CustomUser)
@@ -11,7 +17,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         'email',
         'id',
-        'city',
+        'company',
         'is_staff',
         'is_superuser',
         'is_active',
@@ -19,13 +25,13 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'city', 'password1', 'password2'),
+            'fields': ('email', 'password1', 'password2'),
         }),
     )
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (_('Personal info'), {
-            'fields': ('first_name', 'last_name', 'city'),
+            'fields': ('first_name', 'last_name', 'company'),
         }),
         (_('Permissions'), {
             'fields': (

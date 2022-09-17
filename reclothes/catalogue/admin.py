@@ -38,6 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
         'product_type',
         'category',
         'quantity',
+        'company',
         'is_active',
         'is_limited',
     )

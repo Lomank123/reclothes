@@ -143,6 +143,7 @@ class Product(CustomBaseModel):
     description = models.TextField(
         verbose_name=_("Description"), help_text=_("Not required"), blank=True)
     quantity = models.IntegerField(
+        validators=[MinValueValidator(0)],
         default=0,
         verbose_name=_("Quantity"),
         help_text=_("How many products have left."),
@@ -163,6 +164,13 @@ class Product(CustomBaseModel):
         default=True,
         verbose_name=_("Limited"),
         help_text=_("Depends on quantity."),
+    )
+    company = models.ForeignKey(
+        to='accounts.Company',
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name='products',
+        verbose_name=_('Company'),
     )
 
     class Meta:

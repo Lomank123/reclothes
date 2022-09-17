@@ -1,18 +1,11 @@
 from django.contrib import admin
 
-from orders.models import City, Order, OrderItem
+from orders.models import Order, OrderItem
 
 
 class OrderItemInline(admin.TabularInline):
     list_display = ('__str__', 'id', 'cart_item')
     model = OrderItem
-
-
-@admin.register(City)
-class CityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id', 'is_available')
-    list_filter = ('is_available', )
-    search_fields = ('id', 'name')
 
 
 @admin.register(Order)

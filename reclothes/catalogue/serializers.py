@@ -1,4 +1,4 @@
-from accounts.serializers import CustomUserSerializer
+from accounts.serializers import CompanySerializer, CustomUserSerializer
 from rest_framework import serializers
 
 from catalogue.models import (Category, Product, ProductAttribute,
@@ -91,23 +91,27 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
-    category = CategoryDetailSerializer()
-    product_type = ProductTypeSerializer()
-    tags = TagSerializer(many=True)
+    category = CategoryDetailSerializer(required=False)
+    product_type = ProductTypeSerializer(required=False)
+    tags = TagSerializer(required=False, many=True)
+    ordered_images = ProductImageSerializer(required=False, many=True)
+    attrs_with_values = ProductAttributeValueSerializer(
+        required=False, many=True)
+    reviews_with_users = ProductReviewSerializer(required=False, many=True)
+    company = CompanySerializer(required=False)
     avg_rate = serializers.FloatField(default=0.00)
-    ordered_images = ProductImageSerializer(many=True)
-    attrs_with_values = ProductAttributeValueSerializer(many=True)
-    reviews_with_users = ProductReviewSerializer(many=True)
 
     class Meta:
         model = Product
         fields = (
             'id',
             'category',
+            'company',
             'product_type',
             'tags',
             'avg_rate',
             'in_stock',
+            'is_limited',
             'title',
             'description',
             'regular_price',
@@ -121,12 +125,14 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 
 class ProductCatalogueSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = CategorySerializer(required=False)
+    company = CompanySerializer(required=False)
 
     class Meta:
         model = Product
         fields = (
             'id',
+            'company',
             'title',
             'regular_price',
             'is_active',
