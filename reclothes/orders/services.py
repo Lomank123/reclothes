@@ -76,13 +76,16 @@ class CreateOrderService(APIService):
     def execute(self):
         data = self.request.data
         cart_id = self.session_manager.load_cart_id_from_session()
-        card = {
+        card_1 = {
             'name': data.get('card[name]'),
             'number': data.get('card[number]'),
             'code': data.get('card[code]'),
             'expiry_date': data.get('card[expiry_date]'),
         }
+        card = data.get('card', card_1)
         card_errors = self._validate_card_data(card)
+
+        print(card)
 
         # Error handling
         if card_errors is not None:
