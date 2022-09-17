@@ -1,6 +1,6 @@
-from django.db.models import Avg, Count, F, Subquery, OuterRef
+from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 
-from catalogue.models import Product, ProductImage, Category, Tag
+from catalogue.models import Category, Product, ProductImage, Tag
 
 
 class ProductRepository:
@@ -17,7 +17,10 @@ class ProductRepository:
         return (
             Product.objects
             .select_related('category')
-            .filter(is_active=True)
+            .filter(
+                (Q(is_active=True) & Q(quantity__gt=0)) |
+                Q(is_limited=False)
+            )
         )
 
     @staticmethod
@@ -42,7 +45,10 @@ class ProductRepository:
         '''Return newest active products.'''
         qs = (
             Product.objects
-            .filter(is_active=True, quantity__gte=0)
+            .filter(
+                (Q(is_active=True) & Q(quantity__gt=0)) |
+                Q(is_limited=False)
+            )
             .annotate(
                 type=F('product_type__name'), feature_image=img_subquery)
             .values(
@@ -70,7 +76,10 @@ class ProductRepository:
         '''
         qs = (
             Product.objects
-            .filter(is_active=True, quantity__gte=0)
+            .filter(
+                (Q(is_active=True) & Q(quantity__gt=0)) |
+                Q(is_limited=False)
+            )
             .annotate(
                 purchases=Count('cart_items__orderitem'),
                 type=F('product_type__name'),
@@ -97,7 +106,10 @@ class ProductRepository:
         '''Get active products with best reviews rating ratio.'''
         qs = (
             Product.objects
-            .filter(is_active=True, quantity__gte=0)
+            .filter(
+                (Q(is_active=True) & Q(quantity__gt=0)) |
+                Q(is_limited=False)
+            )
             .annotate(
                 avg_rate=Avg('reviews__rating'),
                 type=F('product_type__name'),

@@ -4,7 +4,7 @@ from mptt.admin import MPTTModelAdmin
 from catalogue.forms import ProductModelForm
 from catalogue.models import (Category, Product, ProductAttribute,
                               ProductAttributeValue, ProductImage,
-                              ProductReview, ProductType, Tag)
+                              ProductReview, ProductType, Tag, ProductFile, ActivationKey)
 
 
 class ProductAttributeInline(admin.TabularInline):
@@ -14,6 +14,15 @@ class ProductAttributeInline(admin.TabularInline):
 class ProductImageInline(admin.TabularInline):
     readonly_fields = ('created_at', 'updated_at')
     model = ProductImage
+
+
+class ProductFileInline(admin.TabularInline):
+    readonly_fields = ('created_at', 'updated_at')
+    model = ProductFile
+
+
+class ActivationKeyInline(admin.TabularInline):
+    model = ActivationKey
 
 
 class ProductAttributeValueInline(admin.TabularInline):
@@ -43,9 +52,32 @@ class ProductAdmin(admin.ModelAdmin):
         'is_limited',
     )
     list_filter = ('is_active', )
-    readonly_fields = ('created_at', 'updated_at')
     search_fields = ('id', 'title')
-    inlines = (ProductAttributeValueInline, ProductImageInline)
+    inlines = (
+        ProductAttributeValueInline,
+        ProductImageInline,
+        ProductFileInline,
+        ActivationKeyInline,
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            self.readonly_fields = ('created_at', 'updated_at')
+        else:
+            self.readonly_fields = ('company', 'created_at', 'updated_at')
+        return super().get_readonly_fields(request, obj)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.company is None:
+            return qs.none()
+        return qs.filter(company=request.user.company)
+
+    def save_model(self, request, obj, form, change):
+        obj.company = request.user.company
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Category)

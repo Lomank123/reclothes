@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
-from catalogue.utils import get_product_media_path
+from catalogue.utils import get_product_media_path, get_product_file_path
 
 
 class CustomBaseModel(models.Model):
@@ -292,8 +292,9 @@ class ProductImage(CustomBaseModel):
     )
     alt_text = models.CharField(
         max_length=255,
+        default="Alt text",
         verbose_name=_("Alternative text"),
-        help_text=_("Add alternative text"),
+        help_text=_("This displays when image fails to load."),
     )
     is_feature = models.BooleanField(
         default=False, verbose_name=_("Feature image"))
@@ -304,3 +305,62 @@ class ProductImage(CustomBaseModel):
 
     def __str__(self):
         return f'{self.alt_text} {self.pk}'
+
+
+class ProductFile(CustomBaseModel):
+    product = models.ForeignKey(
+        Product,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name="files",
+        verbose_name=_("Product"),
+    )
+    file = models.FileField(
+        upload_to=get_product_file_path,
+        verbose_name=_("File"),
+        help_text=_('User will be able to download this file after purchase.'),
+    )
+    link = models.URLField(
+        max_length=255,
+        blank=True, null=True,
+        verbose_name=_('Download link'),
+    )
+    is_main = models.BooleanField(
+        default=False, verbose_name=_("Main file"))
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = _("Product File")
+        verbose_name_plural = _("Product Files")
+
+    def __str__(self):
+        return f'File {self.pk} to product {self.product.pk}'
+
+
+class ActivationKey(models.Model):
+    product = models.ForeignKey(
+        to=Product,
+        on_delete=models.PROTECT,
+        related_name='activation_keys',
+        verbose_name=_('Product'),
+    )
+    key = models.CharField(
+        max_length=512,
+        unique=True,
+        verbose_name=_('Activation key'),
+        help_text=_('Must be unique'),
+    )
+    expired_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_('Expiry date'))
+
+    class Meta:
+        ordering = ["-expired_at"]
+        verbose_name = _("Product")
+        verbose_name_plural = _("Products")
+
+    def __str__(self):
+        return f'Activation key ({self.pk}) to product ({self.product.pk})'
+
+    @property
+    def expired(self):
+        return self.expired_at < timezone.now()
