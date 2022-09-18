@@ -31,7 +31,8 @@ const cartPageUrl = `${baseUrl}/cart`;
 const orderUrl = `${baseUrl}/order`;
 const orderSuccessUrl = `${orderUrl}/success`;
 const myOrdersUrl = `${orderUrl}/my-orders`;
-const downloadProductFileUrl = `${orderUrl}/download`;
+const orderFileUrl = `${orderUrl}/files`;
+const downloadFileUrl = `${orderUrl}/download`;
 
 function getUrlWithSearch(defaultUrl) {
     let url = new URL(defaultUrl, baseUrl);

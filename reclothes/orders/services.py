@@ -132,7 +132,7 @@ class OrderViewSetService:
         return OrderRepository.fetch(**filters)
 
 
-class DownloadFileService(APIService):
+class OrderFileService(APIService):
 
     def __init__(self, request):
         super().__init__()

@@ -1,8 +1,11 @@
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from django.http.response import FileResponse, HttpResponseForbidden
+from catalogue.models import ProductFile
+from orders.models import Order
 
-from orders.services import DownloadFileService
+from orders.services import OrderFileService
 
 
 class OrderView(TemplateView):
@@ -24,9 +27,26 @@ class MyOrdersView(TemplateView):
     template_name = 'orders/my_orders.html'
 
 
-class DonwloadFileView(APIView):
+class DowloadFileView(View):
+
+    def _is_user_owner(self, request):
+        order_id = request.GET.get('order_id', None)
+        order = Order.objects.filter(id=order_id).first()
+        return order.user == request.user
+
+    def get(self, request):
+        if not self._is_user_owner(request):
+            return HttpResponseForbidden()
+
+        file_id = request.GET.get('file_id', None)
+        product_file = ProductFile.objects.filter(id=file_id).first()
+        response = FileResponse(product_file.file, as_attachment=True)
+        return response
+
+
+class OrderFileView(APIView):
     permission_classes = (AllowAny, )
 
     def get(self, request):
         order_id = request.GET.get('order_id', None)
-        return DownloadFileService(request).execute(order_id=order_id)
+        return OrderFileService(request).execute(order_id=order_id)
