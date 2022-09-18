@@ -158,8 +158,14 @@ class ActivationKeySerializer(serializers.ModelSerializer):
 
 class DownloadProductSerializer(serializers.ModelSerializer):
     files = ProductFileSerializer(many=True, required=False)
-    activation_keys = ActivationKeySerializer(many=True, required=False)
+    keys = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ('id', 'files', 'activation_keys')
+        fields = ('id', 'files', 'keys')
+
+    def get_keys(self, product):
+        order_id = self.context.get('order_id')
+        keys = product.activation_keys.filter(order_id=order_id)
+        return ActivationKeySerializer(
+            keys[:product.keys_limit], many=True).data

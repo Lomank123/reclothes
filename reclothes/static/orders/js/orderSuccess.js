@@ -33,5 +33,5 @@ $(window).on('load', async () => {
         return;
     };
 
-    // setFiles(fileData.data.products);
+    setFiles(fileData.data.products);
 });

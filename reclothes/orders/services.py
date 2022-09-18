@@ -8,6 +8,7 @@ from django.db import transaction
 from reclothes.services import APIService
 from rest_framework import status
 from rest_framework.response import Response
+from django.utils import timezone
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
@@ -59,15 +60,31 @@ class CreateOrderService(APIService):
             return err
         return None
 
-    def _create_order_with_items(self, cart):
-        # Order
+    def _create_order(self, cart):
+        """
+        Here we create order
+        with items and add activation keys to it.
+        """
         order_data = {
             'user': cart.user,
             'total_price': cart.total_price,
         }
         order = OrderRepository.create(**order_data)
-        # Order Items
-        for item in cart.cart_items.all():
+        items = cart.cart_items.select_related('product')
+
+        for item in items:
+            keys = (
+                item.product.activation_keys
+                .filter(order__isnull=True, expired_at__gte=timezone.now())
+                [:item.product.keys_limit]
+            )
+
+            if len(keys) < item.product.keys_limit:
+                raise ValueError('Not enough keys.')
+
+            for key in keys:
+                key.order = order
+                key.save()
             OrderItemRepository.create(order=order, cart_item=item)
         return order
 
@@ -101,7 +118,16 @@ class CreateOrderService(APIService):
             return self._build_response(data)
 
         cart = CartRepository.fetch_active(single=True, id=cart_id)
-        order = self._create_order_with_items(cart)
+
+        # https://docs.djangoproject.com/en/4.1/topics/db/transactions/#controlling-transactions-explicitly
+        try:
+            with transaction.atomic():
+                order = self._create_order(cart)
+        except ValueError as e:
+            self.errors['order'] = str(e)
+            data = self._build_response_data()
+            return self._build_response(data)
+
         CartRepository.delete(cart=cart)
         new_cart = CartRepository.create(user=self.request.user)
         self.session_manager.set_cart_id_if_not_exists(
@@ -165,6 +191,7 @@ class OrderFileService(APIService):
         products_ids = OrderRepository.fetch_products_ids(order)
         products = ProductRepository.fetch_by_ids_with_files_and_keys(
             products_ids)
-        serializer = DownloadProductSerializer(products, many=True)
+        serializer = DownloadProductSerializer(
+            products, many=True, context={'order_id': order_id})
         data = self._build_response_data(products=serializer.data)
         return self._build_response(data, status_code=status_code)

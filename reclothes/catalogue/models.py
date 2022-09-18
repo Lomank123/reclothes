@@ -172,6 +172,11 @@ class Product(CustomBaseModel):
         related_name='products',
         verbose_name=_('Company'),
     )
+    keys_limit = models.IntegerField(
+        default=1,
+        verbose_name=_('Keys limit'),
+        help_text=_('How many keys should user get per purchase.'),
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -179,7 +184,7 @@ class Product(CustomBaseModel):
         verbose_name_plural = _("Products")
 
     def __str__(self):
-        return self.title
+        return f'{self.title} ({self.pk})'
 
     @property
     def in_stock(self):
@@ -343,6 +348,13 @@ class ActivationKey(models.Model):
         on_delete=models.PROTECT,
         related_name='activation_keys',
         verbose_name=_('Product'),
+    )
+    order = models.ForeignKey(
+        to='orders.Order',
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name='activation_keys',
+        verbose_name=_('Order'),
     )
     key = models.CharField(
         max_length=512,

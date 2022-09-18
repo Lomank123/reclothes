@@ -36,8 +36,8 @@ function ajaxCall(url, method = 'GET', data = {}, headers = defaultHeaders) {
         success: (result) => {
             console.log(result);
         },
-        error: (error) => {
-            console.log(error);
+        error: function(xhr, status, error) {
+            console.log(xhr.responseText);
         }
     });
 }
