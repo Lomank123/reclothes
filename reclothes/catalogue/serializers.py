@@ -143,17 +143,31 @@ class ProductCatalogueSerializer(serializers.ModelSerializer):
 
 
 class ProductFileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductFile
-        fields = '__all__'
+        fields = ('id', 'name', 'size', 'is_main', 'link')
+
+    def get_name(self, product_file):
+        file = product_file.file
+        if file is not None:
+            return file.name.split('/')[-1]
+        return ''
+
+    def get_size(self, product_file):
+        file = product_file.file
+        if file is not None:
+            return file.size
+        return 0
 
 
 class ActivationKeySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ActivationKey
-        fields = '__all__'
+        fields = ('key', )
 
 
 class DownloadProductSerializer(serializers.ModelSerializer):

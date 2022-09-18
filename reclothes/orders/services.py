@@ -106,8 +106,6 @@ class CreateOrderService(APIService):
         card = data.get('card', card_1)
         card_errors = self._validate_card_data(card)
 
-        print(card)
-
         # Error handling
         if card_errors is not None:
             self.errors['card'] = card_errors
