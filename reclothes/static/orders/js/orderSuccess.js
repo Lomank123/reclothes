@@ -5,32 +5,40 @@ const filesBlock = $('#files-block');
 function setFiles(products) {
     products.forEach(product => {
         const productFile = $(`
-            <div class="flex-block">
-                <span class="product-label"><b>Product ${product.id}</b></span>
+            <div class="default-block">
+                <span class="product-label">
+                    <b><a href="${productDetailUrl}/${product.id}/">${product.title}</b></a>
+                </span>
+                <div class="flex-block">
+                    <span><b>Guide</b></span>
+                    <span>${product.guide}</span>
+                </div>
             </div>
         `);
+
+        if (product.keys.length > 0) {
+            productFile.append($(`<hr />`));
+            productFile.append($(`<span><b>Activation keys</b></span>`));
+        }
+
         product.keys.forEach(key => {
             const keyBlock = $(`
                 <div class="flex-block">
-                    <span><b>Activation key</b></span>
-                    <span><b>Key:</b> ${key.key}</span>
+                    <span>${key.key}</span>
                 </div>
             `);
             productFile.append(keyBlock);
         });
+
+        if (product.files.length > 0) {
+            productFile.append($(`<hr />`));
+            productFile.append($(`<span><b>Files</b></span>`));
+        }
+
         product.files.forEach(file => {
             const downloadUrl = `${downloadFileUrl}?file_id=${file.id}&order_id=${orderId}`;
-            const fileBlock = $(`
-                <div class="flex-block file-block">
-                    <div class="flex-block">
-                        <span><b>File</b></span>
-                        <span><b>Name:</b> ${file.name}</span>
-                        <span><b>Size:</b> ${file.size}</span>
-                        <span><b>Alt link:</b> ${file.link}</span>
-                    </div>
-                </div>
-            `);
-            const fileLink = $(`<a href="${downloadUrl}" class="btn btn-primary download-btn">Download File</a>`);
+            const fileBlock = $(`<div class="flex-block"></div>`);
+            const fileLink = $(`<a href="${downloadUrl}">${file.name} (${file.size}KB)</a>`);
             fileBlock.append(fileLink);
             productFile.append(fileBlock);
         });

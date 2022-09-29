@@ -5,13 +5,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class StatusTypes(models.TextChoices):
-    IN_PROGRESS = 'In progress'
-    COMPLETE = 'Complete'
-    CANCELED = 'Canceled'
-    REFUNDED = 'Refunded'
-    # Extra ones (maybe delete later)
-    ACCEPTED = 'Accepted'
-    DECLINED = 'Declined'
+    IN_PROGRESS = 'IN_PROGRESS', _('In progress')
+    COMPLETE = 'COMPLETE', _('Complete')
+    CANCELED = 'CANCELED', _('Canceled')
+    REFUNDED = 'REFUNDED', _('Refunded')
 
 
 class Order(CustomBaseModel):

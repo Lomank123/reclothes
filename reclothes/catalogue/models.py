@@ -172,10 +172,14 @@ class Product(CustomBaseModel):
         related_name='products',
         verbose_name=_('Company'),
     )
+    guide = models.TextField(
+        verbose_name=_('Guide'),
+        help_text=_('Installation/Activation Guide'),
+    )
     keys_limit = models.IntegerField(
         default=1,
         verbose_name=_('Keys limit'),
-        help_text=_('How many keys should user get per purchase.'),
+        help_text=_('How many keys should user get per purchase. If 0, then no keys required.'),
     )
 
     class Meta:

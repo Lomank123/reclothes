@@ -25,7 +25,7 @@ class CreateOrderService(APIService):
         self.session_manager = CartSessionManager(request)
 
     def _validate_card_data(self, card):
-        '''Return errors dict or None if valid.'''
+        """Return errors dict or None if valid."""
         name = card.get('name', None)
         date = card.get('expiry_date', None)    # Date format: MM/YY
         card_number = card.get('number', None)
@@ -61,10 +61,7 @@ class CreateOrderService(APIService):
         return None
 
     def _create_order(self, cart):
-        """
-        Here we create order
-        with items and add activation keys to it.
-        """
+        """Create order with items and add activation keys to it."""
         order_data = {
             'user': cart.user,
             'total_price': cart.total_price,
@@ -79,7 +76,8 @@ class CreateOrderService(APIService):
                 [:item.product.keys_limit]
             )
 
-            if len(keys) < item.product.keys_limit:
+            limit = item.product.keys_limit
+            if len(keys) < limit and limit > 0:
                 raise ValueError('Not enough keys.')
 
             for key in keys:
