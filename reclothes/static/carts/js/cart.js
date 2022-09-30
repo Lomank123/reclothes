@@ -27,7 +27,7 @@ function setPaginatedCartItems(cartItems) {
         deleteItemButton.click(async () => {await deleteCartItem(item.id)});
 
         newItem.append(infoBlock);
-        if (item.product_is_limited) {
+        if (item.product_is_limited > 0) {
             const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
             newItem.append(quantityBlock);
         }

@@ -137,7 +137,6 @@ class ProductCatalogueSerializer(serializers.ModelSerializer):
             'title',
             'regular_price',
             'is_active',
-            'quantity',
             'category',
         )
 

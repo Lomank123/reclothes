@@ -23,9 +23,3 @@ class CartAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     search_fields = ('id', )
     inlines = (CartItemInline, )
-
-
-@admin.register(CartItem)
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'id', 'cart', 'product', 'quantity')
-    search_fields = ('id', )

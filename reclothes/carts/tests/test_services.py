@@ -30,12 +30,11 @@ def create_product_type(name):
     return ProductType.objects.create(name=name)
 
 
-def create_product(type_id, title='test', quantity=10, regular_price=100.00):
+def create_product(type_id, title='test', regular_price=100.00):
     return Product.objects.create(
         product_type_id=type_id,
         title=title,
-        quantity=quantity,
-        regular_price=regular_price
+        regular_price=regular_price,
     )
 
 

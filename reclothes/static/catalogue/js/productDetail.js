@@ -83,7 +83,7 @@ function setMainInfo(data, productsIds) {
     const availability = getAvailability(
         data.is_active,
         data.in_stock,
-        data.is_limited
+        data.is_limited,
     );
     setAddToCartButton(availability, data.id, productsIds);
     setTopInfo(data.product_type, data.category);

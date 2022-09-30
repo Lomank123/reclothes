@@ -13,7 +13,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_title = serializers.CharField(required=False)
-    product_is_limited = serializers.BooleanField(required=False)
+    product_is_limited = serializers.IntegerField(required=False)
     image = serializers.CharField(required=False)
 
     class Meta:

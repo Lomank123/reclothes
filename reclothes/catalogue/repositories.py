@@ -1,6 +1,7 @@
 from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
+from django.utils import timezone
 
-from catalogue.models import Category, Product, ProductImage, Tag, ProductFile
+from catalogue.models import Category, Product, ProductFile, ProductImage, Tag
 
 
 class ProductRepository:
@@ -15,14 +16,35 @@ class ProductRepository:
         return qs
 
     @staticmethod
+    def fetch_active(first=False, limit=None, **kwargs):
+        """
+        Return active products which either have no keys or have enough keys.
+        """
+        no_order = Q(activation_keys__order__isnull=True)
+        not_expired = Q(activation_keys__expired_at__gte=timezone.now())
+        active_keys_count = Count(
+            'activation_keys', filter=no_order & not_expired)
+        active_products = Q(is_active=True) & (
+            Q(keys_limit=0) | Q(keys_diff__gte=0))
+
+        qs = (
+            Product.objects
+            .annotate(keys_diff=active_keys_count - F('keys_limit'))
+            .filter(active_products)
+            .order_by('-id')
+        )
+        if first:
+            return qs.first()
+        elif limit:
+            return qs[:limit]
+        return qs
+
+    @staticmethod
     def fetch_active_with_category():
         return (
-            Product.objects
+            ProductRepository
+            .fetch_active()
             .select_related('category')
-            .filter(
-                (Q(is_active=True) & Q(quantity__gt=0)) |
-                Q(is_limited=False)
-            )
         )
 
     @staticmethod
@@ -46,11 +68,7 @@ class ProductRepository:
     def fetch_newest_products(img_subquery, limit=None):
         '''Return newest active products.'''
         qs = (
-            Product.objects
-            .filter(
-                (Q(is_active=True) & Q(quantity__gt=0)) |
-                Q(is_limited=False)
-            )
+            ProductRepository.fetch_active()
             .annotate(
                 type=F('product_type__name'), feature_image=img_subquery)
             .values(
@@ -76,11 +94,7 @@ class ProductRepository:
         Number of purchases means count of order items.
         '''
         qs = (
-            Product.objects
-            .filter(
-                (Q(is_active=True) & Q(quantity__gt=0)) |
-                Q(is_limited=False)
-            )
+            ProductRepository.fetch_active()
             .annotate(
                 purchases=Count('cart_items__orderitem'),
                 type=F('product_type__name'),
@@ -105,11 +119,7 @@ class ProductRepository:
     def fetch_best_products(img_subquery, limit=None):
         '''Get active products with best reviews rating ratio.'''
         qs = (
-            Product.objects
-            .filter(
-                (Q(is_active=True) & Q(quantity__gt=0)) |
-                Q(is_limited=False)
-            )
+            ProductRepository.fetch_active()
             .annotate(
                 avg_rate=Avg('reviews__rating'),
                 type=F('product_type__name'),

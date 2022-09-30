@@ -145,28 +145,12 @@ class Product(CustomBaseModel):
         verbose_name=_("Title"), help_text=_("Required"), max_length=255)
     description = models.TextField(
         verbose_name=_("Description"), help_text=_("Not required"), blank=True)
-    quantity = models.IntegerField(
-        validators=[MinValueValidator(0)],
-        default=0,
-        verbose_name=_("Quantity"),
-        help_text=_("How many products have left."),
-    )
     regular_price = models.DecimalField(
         validators=[MinValueValidator(0.01)],
         verbose_name=_("Regular price"),
         help_text=_("Maximum 9999.99"),
         max_digits=6,
         decimal_places=2,
-    )
-    is_active = models.BooleanField(
-        verbose_name=_("Active"),
-        help_text=_("Change product visibility"),
-        default=True,
-    )
-    is_limited = models.BooleanField(
-        default=True,
-        verbose_name=_("Limited"),
-        help_text=_("Depends on quantity."),
     )
     company = models.ForeignKey(
         to='accounts.Company',
@@ -178,6 +162,11 @@ class Product(CustomBaseModel):
     guide = models.TextField(
         verbose_name=_('Guide'),
         help_text=_('Installation/Activation Guide'),
+    )
+    is_active = models.BooleanField(
+        verbose_name=_("Active"),
+        help_text=_("Change product visibility"),
+        default=True,
     )
     keys_limit = models.IntegerField(
         default=1,
@@ -194,8 +183,18 @@ class Product(CustomBaseModel):
         return f'{self.title} ({self.pk})'
 
     @property
+    def is_limited(self):
+        return self.keys_limit == 0
+
+    @property
+    def active_keys(self):
+        """Return unexpired and unused keys."""
+        return self.activation_keys.filter(
+            order__isnull=True, expired_at__gte=timezone.now())
+
+    @property
     def in_stock(self):
-        return self.quantity > 0
+        return self.active_keys.count() > 0
 
     @property
     def ordered_images(self):

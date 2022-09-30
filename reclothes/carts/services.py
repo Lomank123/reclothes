@@ -111,7 +111,7 @@ class CartItemService(APIService):
 
     @staticmethod
     def _annotate_product_with_image(qs):
-        '''Return queryset with annotated product title and feature image.'''
+        """Return queryset with annotated product title and feature image."""
 
         if len(qs) == 0:
             return qs
@@ -122,7 +122,7 @@ class CartItemService(APIService):
         )
         annotate_data = {
             'product_title': F('product__title'),
-            'product_is_limited': F('product__is_limited'),
+            'product_is_limited': F('product__keys_limit'),
             'image': img_subquery,
         }
         return CartItemRepository.annotate(qs, **annotate_data)
@@ -143,12 +143,14 @@ class ChangeQuantityService(APIService):
         super().__init__()
         self.request = request
 
-    def _change_quantity(self, cart_item, product_quantity):
+    def _change_quantity(self, cart_item, product):
         new_quantity = int(self.request.POST['value'])
-        if new_quantity > product_quantity:
+        keys_count = product.active_keys.count()
+        required_keys_count = new_quantity * product.keys_limit
+        if required_keys_count > keys_count:
             self.errors['value'] = QUANTITY_MAX_ERROR_MSG
             return -1
-        elif new_quantity <= 0:
+        elif required_keys_count <= 0:
             self.errors['value'] = QUANTITY_MIN_ERROR_MSG
             return -1
         CartItemRepository.change_quantity(cart_item, new_quantity)
@@ -163,7 +165,7 @@ class ChangeQuantityService(APIService):
         product = ProductRepository.fetch(first=True, id=product_id)
         cart_item_id = self.request.POST['cart_item_id']
         cart_item = CartItemRepository.fetch(first=True, id=cart_item_id)
-        result = self._change_quantity(cart_item, product.quantity)
+        result = self._change_quantity(cart_item, product)
         data = self._build_response_data(result)
         return self._build_response(data)
 

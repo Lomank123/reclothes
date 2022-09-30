@@ -78,10 +78,8 @@ class ProductAdmin(admin.ModelAdmin):
         'regular_price',
         'product_type',
         'category',
-        'quantity',
         'company',
         'is_active',
-        'is_limited',
     )
     list_filter = ('is_active', )
     search_fields = ('id', 'title')

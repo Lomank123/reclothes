@@ -8,7 +8,6 @@ from django.db import transaction
 from reclothes.services import APIService
 from rest_framework import status
 from rest_framework.response import Response
-from django.utils import timezone
 from django.http.response import FileResponse
 from catalogue.repositories import ProductFileRepository
 
@@ -72,14 +71,10 @@ class CreateOrderService(APIService):
         items = cart.cart_items.select_related('product')
 
         for item in items:
-            keys = (
-                item.product.activation_keys
-                .filter(order__isnull=True, expired_at__gte=timezone.now())
-                [:item.product.keys_limit]
-            )
+            limit = item.product.keys_limit * item.quantity
+            keys = item.product.active_keys[:limit]
 
-            limit = item.product.keys_limit
-            if len(keys) < limit and limit > 0:
+            if len(keys) < limit and item.product.is_limited:
                 raise ValueError('Not enough keys.')
 
             for key in keys:
@@ -87,11 +82,6 @@ class CreateOrderService(APIService):
                 key.save()
             OrderItemRepository.create(order=order, cart_item=item)
         return order
-
-    # TODO: Implement this
-    def _decrease_product_quantity(self, cart):
-        # Decrease only if is_limited set to True!
-        pass
 
     @transaction.atomic
     def execute(self):
@@ -130,7 +120,6 @@ class CreateOrderService(APIService):
         new_cart = CartRepository.create(user=self.request.user)
         self.session_manager.set_cart_id_if_not_exists(
             cart_id=new_cart.pk, forced=True)
-        self._decrease_product_quantity(cart)
 
         # Response
         serialized_order_data = OrderDetailSerializer(order).data
