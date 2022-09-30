@@ -24,7 +24,7 @@ class CartMiddlewareService:
 
     def _fetch_session_cart(self):
         cart_id = self.session_manager.load_cart_id_from_session()
-        return CartRepository.fetch_active(single=True, id=cart_id)
+        return CartRepository.fetch_active(first=True, id=cart_id)
 
     def _check_or_create_cart(self, session_cart):
         forced = False
@@ -33,7 +33,7 @@ class CartMiddlewareService:
             user = self.session_manager.request.user
             if user.is_authenticated:
                 user_cart = CartRepository.fetch_active(
-                    single=True, user_id=user.pk)
+                    first=True, user_id=user.pk)
                 if user_cart is None:
                     new_user_cart = CartRepository.create(user_id=user.pk)
                     cart = new_user_cart
@@ -80,7 +80,7 @@ class CartService(APIService):
 
     def execute(self, limit=None):
         cart_id = self.session_manager.load_cart_id_from_session()
-        cart = CartRepository.fetch_active(single=True, id=cart_id)
+        cart = CartRepository.fetch_active(first=True, id=cart_id)
         is_valid = self._validate_data(cart)
         serialized_cart = self._serialize_data(cart, is_valid)
         data = self._build_response_data(serialized_cart)
@@ -160,9 +160,9 @@ class ChangeQuantityService(APIService):
 
     def execute(self):
         product_id = self.request.POST['product_id']
-        product = ProductRepository.fetch(single=True, id=product_id)
+        product = ProductRepository.fetch(first=True, id=product_id)
         cart_item_id = self.request.POST['cart_item_id']
-        cart_item = CartItemRepository.fetch(single=True, id=cart_item_id)
+        cart_item = CartItemRepository.fetch(first=True, id=cart_item_id)
         result = self._change_quantity(cart_item, product.quantity)
         data = self._build_response_data(result)
         return self._build_response(data)

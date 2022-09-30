@@ -56,6 +56,7 @@ class Category(MPTTModel):
         order_insertion_by = ["name"]
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
 
@@ -67,11 +68,12 @@ class Category(MPTTModel):
             "catalogue:category_list", kwargs={"category_slug": self.slug})
 
 
-class Tag(CustomBaseModel):
+class Tag(models.Model):
     """Tags to different products."""
     name = models.CharField(max_length=255, verbose_name=_("Name"))
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Tag")
         verbose_name_plural = _("Tags")
 
@@ -89,16 +91,16 @@ class ProductType(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Type")
         verbose_name_plural = _("Product Types")
-        ordering = ['-is_active']
 
     def __str__(self):
         return f'{self.name} ({self.pk})'
 
 
 class ProductAttribute(models.Model):
-    """Allows to add properties to certain product types (e.g. shoe size)."""
+    """Allows to add properties to certain product types."""
 
     product_type = models.ForeignKey(
         ProductType,
@@ -109,11 +111,12 @@ class ProductAttribute(models.Model):
     name = models.CharField(
         max_length=255,
         verbose_name=_("Attribute name"),
-        help_text=_("Required and unique"),
+        help_text=_("Required and unique."),
         unique=True,
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Attribute")
         verbose_name_plural = _("Product Attributes")
 
@@ -183,7 +186,7 @@ class Product(CustomBaseModel):
     )
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['-id']
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
 
@@ -235,6 +238,7 @@ class ProductAttributeValue(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Attribute Value")
         verbose_name_plural = _("Product Attribute Values")
         # Product can't have duplicate attributes
@@ -246,7 +250,7 @@ class ProductAttributeValue(models.Model):
         ]
 
     def __str__(self):
-        return self.value
+        return f'Value {self.value} of {self.attribute.name}'
 
 
 class ProductReview(CustomBaseModel):
@@ -273,6 +277,7 @@ class ProductReview(CustomBaseModel):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Review")
         verbose_name_plural = _("Product Reviews")
         # User cannot leave more than 1 comment to each product
@@ -284,7 +289,7 @@ class ProductReview(CustomBaseModel):
         ]
 
     def __str__(self):
-        return f'Review ({self.pk})'
+        return f'Review ({self.pk}) to Product ({self.product.pk})'
 
 
 class ProductImage(CustomBaseModel):
@@ -309,11 +314,12 @@ class ProductImage(CustomBaseModel):
         default=False, verbose_name=_("Feature image"))
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Image")
         verbose_name_plural = _("Product Images")
 
     def __str__(self):
-        return f'{self.alt_text} {self.pk}'
+        return f'Image {self.pk} to Product ({self.product.pk})'
 
 
 class ProductFile(CustomBaseModel):
@@ -343,7 +349,7 @@ class ProductFile(CustomBaseModel):
         verbose_name_plural = _("Product Files")
 
     def __str__(self):
-        return f'File {self.pk} to product {self.product.pk}'
+        return f'File {self.pk} to Product {self.product.pk}'
 
 
 class ActivationKey(models.Model):
@@ -364,18 +370,18 @@ class ActivationKey(models.Model):
         max_length=512,
         unique=True,
         verbose_name=_('Activation key'),
-        help_text=_('Must be unique'),
+        help_text=_('Must be unique.'),
     )
     expired_at = models.DateTimeField(
         null=True, blank=True, verbose_name=_('Expiry date'))
 
     class Meta:
-        ordering = ["-expired_at"]
+        ordering = ['-id']
         verbose_name = _("Activation key")
         verbose_name_plural = _("Activation keys")
 
     def __str__(self):
-        return f'Activation key ({self.pk}) to product ({self.product.pk})'
+        return f'Key ({self.pk}) to Product ({self.product.pk})'
 
     @property
     def expired(self):

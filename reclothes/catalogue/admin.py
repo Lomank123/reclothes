@@ -124,7 +124,6 @@ class CategoryAdmin(MPTTModelAdmin):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'id')
-    readonly_fields = ('created_at', 'updated_at')
     search_fields = ('id', )
 
 

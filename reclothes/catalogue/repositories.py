@@ -1,15 +1,17 @@
 from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 
-from catalogue.models import Category, Product, ProductImage, Tag
+from catalogue.models import Category, Product, ProductImage, Tag, ProductFile
 
 
 class ProductRepository:
 
     @staticmethod
-    def fetch(single=False, **kwargs):
+    def fetch(first=False, limit=None, **kwargs):
         qs = Product.objects.filter(**kwargs)
-        if single:
+        if first:
             return qs.first()
+        elif limit:
+            return qs[:limit]
         return qs
 
     @staticmethod
@@ -62,10 +64,9 @@ class ProductRepository:
             )
             .order_by('-created_at')
         )
-        products = qs
         if limit:
-            products = qs[:limit]
-        return products
+            return qs[:limit]
+        return qs
 
     @staticmethod
     def fetch_hot_products(img_subquery, limit=None):
@@ -96,10 +97,9 @@ class ProductRepository:
             )
             .order_by('-purchases')
         )
-        products = qs
         if limit:
-            products = qs[:limit]
-        return products
+            return qs[:limit]
+        return qs
 
     @staticmethod
     def fetch_best_products(img_subquery, limit=None):
@@ -126,10 +126,9 @@ class ProductRepository:
             )
             .order_by('-avg_rate')
         )
-        products = qs
         if limit:
-            products = qs[:limit]
-        return products
+            return qs[:limit]
+        return qs
 
     @staticmethod
     def fetch_by_ids_with_files_and_keys(ids):
@@ -143,15 +142,25 @@ class ProductRepository:
 class CategoryRepository:
 
     @staticmethod
-    def fetch(**kwargs):
-        return Category.objects.filter(**kwargs)
+    def fetch(first=False, limit=None, **kwargs):
+        qs = Category.objects.filter(**kwargs)
+        if first:
+            return qs.first()
+        elif limit:
+            return qs[:limit]
+        return qs
 
 
 class TagRepository:
 
     @staticmethod
-    def fetch(**kwargs):
-        return Tag.objects.filter(**kwargs)
+    def fetch(first=False, limit=None, **kwargs):
+        qs = Tag.objects.filter(**kwargs)
+        if first:
+            return qs.first()
+        elif limit:
+            return qs[:limit]
+        return qs
 
 
 class ProductImageRepository:
@@ -164,3 +173,15 @@ class ProductImageRepository:
             .filter(product_id=OuterRef(outer_ref_value), is_feature=True)
             .values('image')[:1]
         )
+
+
+class ProductFileRepository:
+
+    @staticmethod
+    def fetch(first=False, limit=None, **kwargs):
+        qs = ProductFile.objects.filter(**kwargs)
+        if first:
+            return qs.first()
+        elif limit:
+            return qs[:limit]
+        return qs

@@ -9,6 +9,8 @@ from reclothes.services import APIService
 from rest_framework import status
 from rest_framework.response import Response
 from django.utils import timezone
+from django.http.response import FileResponse
+from catalogue.repositories import ProductFileRepository
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
@@ -113,7 +115,7 @@ class CreateOrderService(APIService):
             data = self._build_response_data()
             return self._build_response(data)
 
-        cart = CartRepository.fetch_active(single=True, id=cart_id)
+        cart = CartRepository.fetch_active(first=True, id=cart_id)
 
         # https://docs.djangoproject.com/en/4.1/topics/db/transactions/#controlling-transactions-explicitly
         try:
@@ -175,7 +177,8 @@ class OrderFileService(APIService):
     def _build_response(self, data, status_code):
         return Response(data=data, status=status_code)
 
-    def execute(self, order_id):
+    def execute(self):
+        order_id = self.request.GET.get('order_id', None)
         order = OrderRepository.fetch(first=True, id=order_id)
         status_code = self._validate_order(order)
 
@@ -191,3 +194,14 @@ class OrderFileService(APIService):
             products, many=True, context={'order_id': order_id})
         data = self._build_response_data(products=serializer.data)
         return self._build_response(data, status_code=status_code)
+
+
+class DownloadFileService:
+
+    def __init__(self, request):
+        self.request = request
+
+    def execute(self):
+        file_id = self.request.GET.get('file_id', None)
+        product_file = ProductFileRepository.fetch(first=True, id=file_id)
+        return FileResponse(product_file.file, as_attachment=True)

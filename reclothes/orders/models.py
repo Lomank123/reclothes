@@ -35,7 +35,7 @@ class Order(CustomBaseModel):
     )
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-id']
         verbose_name = _('Order')
         verbose_name_plural = _('Orders')
 
@@ -57,8 +57,9 @@ class OrderItem(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _('Order item')
         verbose_name_plural = _('Order items')
 
     def __str__(self):
-        return f'Order item ({self.pk})'
+        return f'Item ({self.pk}) to Order ({self.order.pk})'
