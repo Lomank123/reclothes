@@ -36,9 +36,8 @@ function setFiles(products) {
         }
 
         product.files.forEach(file => {
-            const downloadUrl = `${downloadFileUrl}?file_id=${file.id}&order_id=${orderId}`;
             const fileBlock = $(`<div class="flex-block"></div>`);
-            const fileLink = $(`<a href="${downloadUrl}">${file.name} (${file.size}KB)</a>`);
+            const fileLink = $(`<a href="${downloadFileUrl}/${file.token}/">${file.name} (${file.size}KB)</a>`);
             fileBlock.append(fileLink);
             productFile.append(fileBlock);
         });

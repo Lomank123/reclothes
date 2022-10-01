@@ -24,17 +24,17 @@ const sessionCartUrl = `${defaultCartUrl}/session_cart`;
 const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
 const changeCartItemQuantityUrl = `${defaultCartItemUrl}/change_quantity`;
 const paginatedCartItemsUrl = getUrlWithSearch(defaultPaginatedCartItemsUrl);
+// Orders
+const orderFileUrl = `${defaultOrderUrl}/files`;
 
 // Non-api urls
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 const cartPageUrl = `${baseUrl}/cart`;
 const productDetailUrl = `${baseUrl}/product`;
-const generateOneTimeUrl = `/generate_url`;
 
 const orderUrl = `${baseUrl}/order`;
 const orderSuccessUrl = `${orderUrl}/success`;
 const myOrdersUrl = `${orderUrl}/my-orders`;
-const orderFileUrl = `${orderUrl}/files`;
 const downloadFileUrl = `${orderUrl}/download`;
 
 function getUrlWithSearch(defaultUrl) {

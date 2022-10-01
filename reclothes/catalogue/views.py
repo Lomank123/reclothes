@@ -1,7 +1,4 @@
 from django.views.generic.base import TemplateView
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from catalogue.services import GenerateOneTimeUrlService
 
 
 class HomeView(TemplateView):
@@ -23,10 +20,3 @@ class CatalogueView(TemplateView):
 
 class CategoriesView(TemplateView):
     template_name = 'catalogue/categories.html'
-
-
-class GenerateOneTimeUrlView(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def post(self, request):
-        return GenerateOneTimeUrlService(request).execute()

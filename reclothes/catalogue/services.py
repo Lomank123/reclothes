@@ -7,11 +7,9 @@ from catalogue.consts import (BEST_PRODUCT_IN_PAGE_LIMIT,
                               MOST_POPULAR_TAGS_LIMIT,
                               NEWEST_PRODUCT_IN_PAGE_LIMIT,
                               PRODUCT_NOT_FOUND_MSG)
-from catalogue.repositories import (CategoryRepository, OneTimeUrlRepository,
-                                    ProductImageRepository, ProductRepository,
-                                    TagRepository, ProductFileRepository)
-from catalogue.serializers import (CategorySerializer, OneTimeUrlSerializer,
-                                   ProductDetailSerializer,
+from catalogue.repositories import (CategoryRepository, ProductImageRepository,
+                                    ProductRepository, TagRepository)
+from catalogue.serializers import (CategorySerializer, ProductDetailSerializer,
                                    SubCategorySerializer, TagSerializer)
 
 
@@ -141,26 +139,6 @@ class CatalogueService(APIService):
         serialized_products = self._serialize_products(
             filtered_products, paginate=paginate)
         data = self._build_response_data(serialized_tags, serialized_products)
-        return self._build_response(data)
-
-
-class GenerateOneTimeUrlService(APIService):
-
-    def __init__(self, request):
-        self.request = request
-
-    def execute(self):
-        file_id = self.request.data.get('file_id', None)
-        file = ProductFileRepository.fetch(first=True, id=file_id)
-
-        if file is None:
-            self.errors['file'] = 'File not found.'
-            data = self._build_response_data()
-            return self._build_response(data)
-
-        new_url = OneTimeUrlRepository.create(file=file)
-        serializer = OneTimeUrlSerializer(new_url)
-        data = self._build_response_data(**serializer.data)
         return self._build_response(data)
 
 

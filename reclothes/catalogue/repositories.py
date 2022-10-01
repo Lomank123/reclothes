@@ -210,9 +210,8 @@ class OneTimeUrlRepository:
         return qs
 
     @staticmethod
-    def set_as_used(url):
-        url.is_used = True
-        return url.save()
+    def delete(url):
+        url.delete()
 
     @staticmethod
     def create(**kwargs):

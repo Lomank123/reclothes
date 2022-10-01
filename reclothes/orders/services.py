@@ -202,6 +202,6 @@ class DownloadFileService:
         if url.is_used:
             return HttpResponseBadRequest(content='Already in use.')
 
-        OneTimeUrlRepository.set_as_used(url)
+        OneTimeUrlRepository.delete(url)
 
         return FileResponse(url.file.file, as_attachment=True)

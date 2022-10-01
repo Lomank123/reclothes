@@ -1,10 +1,8 @@
 from django.http.response import HttpResponseForbidden
 from django.views.generic.base import TemplateView, View
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
 
 from orders.permissions import is_order_owner
-from orders.services import DownloadFileService, OrderFileService
+from orders.services import DownloadFileService
 
 
 class OrderView(TemplateView):
@@ -32,16 +30,7 @@ class OrderSuccessView(TemplateView):
         return context
 
 
-# TODO: Handle errors properly
-# TODO: Maybe use APIView with FileResponse
 class DownloadFileView(View):
 
     def get(self, request, url_token):
         return DownloadFileService(url_token).execute()
-
-
-class OrderFileView(APIView):
-    permission_classes = (AllowAny, )
-
-    def get(self, request):
-        return OrderFileService(request).execute()
