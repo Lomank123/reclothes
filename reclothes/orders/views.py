@@ -32,10 +32,12 @@ class OrderSuccessView(TemplateView):
         return context
 
 
+# TODO: Handle errors properly
+# TODO: Maybe use APIView with FileResponse
 class DownloadFileView(View):
 
-    def get(self, request):
-        return DownloadFileService(request).execute()
+    def get(self, request, url_token):
+        return DownloadFileService(url_token).execute()
 
 
 class OrderFileView(APIView):

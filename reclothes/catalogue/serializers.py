@@ -1,7 +1,7 @@
 from accounts.serializers import CompanySerializer, CustomUserSerializer
 from rest_framework import serializers
 
-from catalogue.models import (ActivationKey, Category, Product,
+from catalogue.models import (ActivationKey, Category, OneTimeUrl, Product,
                               ProductAttribute, ProductAttributeValue,
                               ProductFile, ProductImage, ProductReview,
                               ProductType, Tag)
@@ -181,3 +181,10 @@ class DownloadProductSerializer(serializers.ModelSerializer):
         order_id = self.context.get('order_id')
         keys = product.activation_keys.filter(order_id=order_id)
         return ActivationKeySerializer(keys, many=True).data
+
+
+class OneTimeUrlSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OneTimeUrl
+        fields = ('url_token', 'id')

@@ -1,3 +1,6 @@
+from datetime import timedelta
+import uuid
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -5,7 +8,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
-from catalogue.utils import get_product_media_path, get_product_file_path
+from catalogue.consts import LINK_EXPIRE_HOURS
+from catalogue.utils import get_product_file_path, get_product_media_path
 
 
 class CustomBaseModel(models.Model):
@@ -349,6 +353,40 @@ class ProductFile(CustomBaseModel):
 
     def __str__(self):
         return f'File {self.pk} to Product {self.product.pk}'
+
+
+class OneTimeUrl(models.Model):
+    url_token = models.UUIDField(
+        default=uuid.uuid4, editable=False, verbose_name=_('Url token'))
+    file = models.ForeignKey(
+        to=ProductFile,
+        on_delete=models.CASCADE,
+        related_name='one_time_urls',
+        verbose_name=_('File'),
+    )
+    expired_at = models.DateTimeField(
+        editable=False, verbose_name=_('Expiry date'))
+    is_used = models.BooleanField(
+        default=False, verbose_name=_('Already used'))
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = _("One-Time Url")
+        verbose_name_plural = _("One-Time Urls")
+
+    def __str__(self):
+        return f'Url {self.pk} to File {self.file.pk}'
+
+    def save(self, *args, **kwargs):
+        if not self.expired_at:
+            self.expired_at = (
+                timezone.now() + timedelta(hours=LINK_EXPIRE_HOURS))
+        return super().save(*args, **kwargs)
+
+    @property
+    def token_hex(self):
+        """Return token without dashes."""
+        return self.url_token.hex
 
 
 class ActivationKey(models.Model):

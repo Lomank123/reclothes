@@ -2,13 +2,26 @@ from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 
 from catalogue.forms import ProductModelForm
-from catalogue.models import (Category, Product, ProductAttribute,
-                              ProductAttributeValue, ProductImage,
-                              ProductReview, ProductType, Tag, ProductFile, ActivationKey)
+from catalogue.models import (ActivationKey, Category, OneTimeUrl, Product,
+                              ProductAttribute, ProductAttributeValue,
+                              ProductFile, ProductImage, ProductReview,
+                              ProductType, Tag)
 
 
 class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
+
+
+class OneTimeUrlInline(admin.TabularInline):
+    readonly_fields = ('url_token', 'expired_at')
+    model = OneTimeUrl
+
+
+@admin.register(ProductFile)
+class ProductFileAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'id', 'file', 'is_main')
+    search_fields = ('id', )
+    inlines = (OneTimeUrlInline, )
 
 
 class ProductImageInline(admin.TabularInline):

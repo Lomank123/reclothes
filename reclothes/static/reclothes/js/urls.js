@@ -29,6 +29,7 @@ const paginatedCartItemsUrl = getUrlWithSearch(defaultPaginatedCartItemsUrl);
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 const cartPageUrl = `${baseUrl}/cart`;
 const productDetailUrl = `${baseUrl}/product`;
+const generateOneTimeUrl = `/generate_url`;
 
 const orderUrl = `${baseUrl}/order`;
 const orderSuccessUrl = `${orderUrl}/success`;

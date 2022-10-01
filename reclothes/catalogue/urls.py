@@ -17,4 +17,9 @@ urlpatterns = [
     ),
     path('catalogue/', views.CatalogueView.as_view(), name='catalogue'),
     path('categories/', views.CategoriesView.as_view(), name='categories'),
+    path(
+        'generate_url/',
+        views.GenerateOneTimeUrlView.as_view(),
+        name='generate_url',
+    )
 ]

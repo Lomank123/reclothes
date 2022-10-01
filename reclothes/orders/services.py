@@ -2,18 +2,19 @@ import datetime
 
 from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
-from catalogue.repositories import ProductRepository
+from catalogue.repositories import OneTimeUrlRepository, ProductRepository
 from catalogue.serializers import DownloadProductSerializer
 from django.db import transaction
+from django.http.response import (FileResponse, HttpResponseBadRequest,
+                                  HttpResponseNotFound)
 from reclothes.services import APIService
 from rest_framework import status
 from rest_framework.response import Response
-from django.http.response import FileResponse
-from catalogue.repositories import ProductFileRepository
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
 from orders.serializers import OrderDetailSerializer
+from catalogue.utils import valid_uuid
 
 
 class CreateOrderService(APIService):
@@ -187,10 +188,20 @@ class OrderFileService(APIService):
 
 class DownloadFileService:
 
-    def __init__(self, request):
-        self.request = request
+    def __init__(self, url_token):
+        self.url_token = url_token
 
     def execute(self):
-        file_id = self.request.GET.get('file_id', None)
-        product_file = ProductFileRepository.fetch(first=True, id=file_id)
-        return FileResponse(product_file.file, as_attachment=True)
+        if not valid_uuid(self.url_token):
+            return HttpResponseBadRequest(content='Invalid token.')
+
+        url = OneTimeUrlRepository.fetch(url_token=self.url_token).first()
+
+        if url is None:
+            return HttpResponseNotFound(content='Token not found.')
+        if url.is_used:
+            return HttpResponseBadRequest(content='Already in use.')
+
+        OneTimeUrlRepository.set_as_used(url)
+
+        return FileResponse(url.file.file, as_attachment=True)

@@ -1,7 +1,8 @@
 from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 from django.utils import timezone
 
-from catalogue.models import Category, Product, ProductFile, ProductImage, Tag
+from catalogue.models import (Category, OneTimeUrl, Product, ProductFile,
+                              ProductImage, Tag)
 
 
 class ProductRepository:
@@ -18,7 +19,7 @@ class ProductRepository:
     @staticmethod
     def fetch_active(first=False, limit=None, **kwargs):
         """
-        Return active products which either have no keys or have enough keys.
+        Return active products which either have 0 or enough keys.
         """
         no_order = Q(activation_keys__order__isnull=True)
         not_expired = Q(activation_keys__expired_at__gte=timezone.now())
@@ -195,3 +196,24 @@ class ProductFileRepository:
         elif limit:
             return qs[:limit]
         return qs
+
+
+class OneTimeUrlRepository:
+
+    @staticmethod
+    def fetch(first=False, limit=None, **kwargs):
+        qs = OneTimeUrl.objects.filter(**kwargs)
+        if first:
+            return qs.first()
+        elif limit:
+            return qs[:limit]
+        return qs
+
+    @staticmethod
+    def set_as_used(url):
+        url.is_used = True
+        return url.save()
+
+    @staticmethod
+    def create(**kwargs):
+        return OneTimeUrl.objects.create(**kwargs)
