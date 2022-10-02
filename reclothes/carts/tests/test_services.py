@@ -1,13 +1,16 @@
+from datetime import timedelta
+
 from accounts.models import CustomUser
 from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.models import Cart, CartItem
 from carts.services import (CartItemService, CartMiddlewareService,
                             CartService, ChangeQuantityService)
-from catalogue.models import Product, ProductType
+from catalogue.models import ActivationKey, Product, ProductType
 from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.db import SessionStore
 from django.test import RequestFactory, TestCase
+from django.utils import timezone
 from rest_framework.request import Request
 
 
@@ -36,6 +39,12 @@ def create_product(type_id, title='test', regular_price=100.00):
         title=title,
         regular_price=regular_price,
     )
+
+
+def create_activation_key(product_id, key):
+    expiry_date = timezone.now() + timedelta(days=1)
+    return ActivationKey.objects.create(
+        product_id=product_id, key=key, expired_at=expiry_date)
 
 
 def create_session(user):
@@ -196,6 +205,8 @@ class ChangeQuantityServiceTestCase(TestCase):
         # Arrange
         product_type = create_product_type(name="type1")
         product = create_product(product_type.pk)
+        create_activation_key(product.pk, key="1")
+        create_activation_key(product.pk, key="2")
         cart = create_cart()
         cart_item = create_cart_item(cart.pk, product.pk)
 
@@ -208,9 +219,9 @@ class ChangeQuantityServiceTestCase(TestCase):
 
         # Act
         response = ChangeQuantityService(request).execute()
-        data = response.data['data']
 
         # Assert
+        data = response.data['data']
         self.assertEqual(response.status_code, 200)
         self.assertTrue(data.get('value', False))
         self.assertEqual(data['value'], 2)
@@ -241,7 +252,9 @@ class ChangeQuantityServiceTestCase(TestCase):
     def test_new_quantity_more_than_max_possible(self):
         # Arrange
         product_type = create_product_type(name="type1")
-        product = create_product(type_id=product_type.pk, quantity=1)
+        product = create_product(type_id=product_type.pk)
+        create_activation_key(product.pk, key="1")
+
         cart = create_cart()
         cart_item = create_cart_item(cart.pk, product.pk)
 

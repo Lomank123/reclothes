@@ -1,5 +1,6 @@
 from accounts.models import CustomUser
 from carts.models import Cart, CartItem
+from carts.tests.test_services import create_activation_key
 from catalogue.models import (Category, Product, ProductAttribute,
                               ProductAttributeValue, ProductImage,
                               ProductReview, ProductType, Tag)
@@ -15,16 +16,15 @@ def create_product_type(name):
     return ProductType.objects.create(name=name)
 
 
-def create_product(type_id, title='test', quantity=10, regular_price=100.00):
+def create_product(type_id, title='test', regular_price=100):
     return Product.objects.create(
         product_type_id=type_id,
         title=title,
-        quantity=quantity,
         regular_price=regular_price
     )
 
 
-class CatalogueServicesTestCase(TestCase):
+class HomePageTestCase(TestCase):
 
     @staticmethod
     def _create_user(email, password='123123123Aa'):
@@ -77,6 +77,8 @@ class CatalogueServicesTestCase(TestCase):
         attr2 = self._create_product_attr('attr2', type_id=product_type.pk)
         product1 = create_product(type_id=product_type.pk)
         product2 = create_product(type_id=product_type.pk)
+        create_activation_key(product_id=product1.pk, key="1")
+        create_activation_key(product_id=product2.pk, key="2")
         self._create_product_attr_value(
             product_id=product1.pk, attr_id=attr1.pk)
         self._create_product_attr_value(
@@ -213,6 +215,8 @@ class CatalogueServiceTestCase(TestCase):
         product_type = create_product_type(name='type1')
         product1 = create_product(type_id=product_type.pk, title='test1')
         product2 = create_product(type_id=product_type.pk, title='test2')
+        create_activation_key(product_id=product1.pk, key="1")
+        create_activation_key(product_id=product2.pk, key="2")
         tag1 = self._create_tag(name='tag1')
         tag2 = self._create_tag(name='tag2')
         tag3 = self._create_tag(name='tag3')
