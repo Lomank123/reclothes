@@ -13,7 +13,7 @@
   "pk": 1,
   "fields": {
     "password": "pbkdf2_sha256$320000$R90BW9gfmXqPWGtNATKxJS$WLr3e5V90Jv1WCm0+46HLugLhmXdi3mL9gjeYu6aX64=",
-    "last_login": "2022-09-17T02:48:37.028Z",
+    "last_login": "2022-09-29T12:33:34.866Z",
     "is_superuser": true,
     "first_name": "",
     "last_name": "",
@@ -34,18 +34,25 @@
   "pk": 2,
   "fields": {
     "password": "pbkdf2_sha256$320000$yVY9K381rcooXbAAESNAMI$CJ7zavyaDpovRquDlv3Tc/n1fdQft71rHf+JZ4saJm4=",
-    "last_login": null,
+    "last_login": "2022-09-17T07:12:18.512Z",
     "is_superuser": false,
     "first_name": "",
     "last_name": "",
-    "is_staff": false,
+    "is_staff": true,
     "is_active": true,
     "date_joined": "2022-09-14T04:54:08.368Z",
     "username": null,
     "email": "test1@gmail.com",
-    "company": null,
-    "groups": [],
-    "user_permissions": []
+    "company": 1,
+    "groups": [
+      1
+    ],
+    "user_permissions": [
+      121,
+      122,
+      123,
+      124
+    ]
   }
 },
 {
@@ -163,7 +170,293 @@
   "pk": 11,
   "fields": {
     "created_at": "2022-09-17T03:31:41.439Z",
-    "updated_at": "2022-09-17T03:31:41.439Z",
+    "updated_at": "2022-09-17T04:51:39.995Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 12,
+  "fields": {
+    "created_at": "2022-09-17T04:51:39.996Z",
+    "updated_at": "2022-09-17T04:54:16.997Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 13,
+  "fields": {
+    "created_at": "2022-09-17T04:54:16.998Z",
+    "updated_at": "2022-09-18T06:49:59.119Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 14,
+  "fields": {
+    "created_at": "2022-09-17T05:58:59.143Z",
+    "updated_at": "2022-09-17T05:59:06.546Z",
+    "user": 2,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 15,
+  "fields": {
+    "created_at": "2022-09-17T05:59:54.428Z",
+    "updated_at": "2022-09-17T05:59:57.907Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 16,
+  "fields": {
+    "created_at": "2022-09-17T06:50:13.551Z",
+    "updated_at": "2022-09-17T06:50:27.812Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 17,
+  "fields": {
+    "created_at": "2022-09-17T06:52:01.151Z",
+    "updated_at": "2022-09-17T06:52:03.802Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 18,
+  "fields": {
+    "created_at": "2022-09-17T06:59:36.470Z",
+    "updated_at": "2022-09-17T07:00:04.119Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 19,
+  "fields": {
+    "created_at": "2022-09-17T07:00:20.076Z",
+    "updated_at": "2022-09-17T07:00:22.448Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 20,
+  "fields": {
+    "created_at": "2022-09-17T07:01:18.308Z",
+    "updated_at": "2022-09-17T07:01:20.955Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 21,
+  "fields": {
+    "created_at": "2022-09-17T07:05:02.716Z",
+    "updated_at": "2022-09-17T07:05:05.734Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 22,
+  "fields": {
+    "created_at": "2022-09-17T07:11:25.582Z",
+    "updated_at": "2022-09-17T07:11:28.843Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 23,
+  "fields": {
+    "created_at": "2022-09-17T07:11:52.432Z",
+    "updated_at": "2022-09-17T07:11:54.550Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 24,
+  "fields": {
+    "created_at": "2022-09-17T07:12:16.037Z",
+    "updated_at": "2022-09-17T07:12:18.517Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 25,
+  "fields": {
+    "created_at": "2022-09-17T07:20:30.542Z",
+    "updated_at": "2022-09-17T07:20:32.512Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 26,
+  "fields": {
+    "created_at": "2022-09-17T13:05:12.044Z",
+    "updated_at": "2022-09-17T13:05:12.044Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 27,
+  "fields": {
+    "created_at": "2022-09-17T13:06:42.704Z",
+    "updated_at": "2022-09-17T13:06:46.540Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 28,
+  "fields": {
+    "created_at": "2022-09-18T04:33:19.064Z",
+    "updated_at": "2022-09-18T04:33:19.064Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 29,
+  "fields": {
+    "created_at": "2022-09-18T06:49:59.121Z",
+    "updated_at": "2022-09-18T07:18:39.780Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 30,
+  "fields": {
+    "created_at": "2022-09-18T07:18:39.781Z",
+    "updated_at": "2022-09-29T12:36:49.460Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 31,
+  "fields": {
+    "created_at": "2022-09-29T12:33:29.419Z",
+    "updated_at": "2022-09-29T12:33:34.871Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 32,
+  "fields": {
+    "created_at": "2022-09-29T12:33:54.670Z",
+    "updated_at": "2022-09-29T12:33:54.670Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 33,
+  "fields": {
+    "created_at": "2022-09-29T12:36:49.461Z",
+    "updated_at": "2022-09-29T12:43:52.138Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 34,
+  "fields": {
+    "created_at": "2022-09-29T12:43:52.139Z",
+    "updated_at": "2022-09-30T12:01:43.290Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 35,
+  "fields": {
+    "created_at": "2022-09-29T13:01:48.867Z",
+    "updated_at": "2022-09-29T13:01:48.867Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 36,
+  "fields": {
+    "created_at": "2022-09-30T12:01:14.508Z",
+    "updated_at": "2022-09-30T12:01:14.508Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 37,
+  "fields": {
+    "created_at": "2022-09-30T12:01:43.291Z",
+    "updated_at": "2022-09-30T12:01:43.291Z",
     "user": 1,
     "is_deleted": false,
     "is_archived": false
@@ -242,6 +535,114 @@
   }
 },
 {
+  "model": "carts.cartitem",
+  "pk": 9,
+  "fields": {
+    "cart": 12,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 11,
+  "fields": {
+    "cart": 12,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 12,
+  "fields": {
+    "cart": 13,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 13,
+  "fields": {
+    "cart": 13,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 14,
+  "fields": {
+    "cart": 29,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 15,
+  "fields": {
+    "cart": 29,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 16,
+  "fields": {
+    "cart": 30,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 17,
+  "fields": {
+    "cart": 33,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 18,
+  "fields": {
+    "cart": 33,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 19,
+  "fields": {
+    "cart": 33,
+    "product": 2,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 20,
+  "fields": {
+    "cart": 34,
+    "product": 4,
+    "quantity": 2
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 21,
+  "fields": {
+    "cart": 34,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
   "model": "catalogue.category",
   "pk": 1,
   "fields": {
@@ -287,8 +688,6 @@
   "model": "catalogue.tag",
   "pk": 1,
   "fields": {
-    "created_at": "2022-09-14T04:50:12.923Z",
-    "updated_at": "2022-09-14T04:50:12.923Z",
     "name": "tag 1"
   }
 },
@@ -296,8 +695,6 @@
   "model": "catalogue.tag",
   "pk": 2,
   "fields": {
-    "created_at": "2022-09-14T04:50:16.801Z",
-    "updated_at": "2022-09-14T04:50:16.801Z",
     "name": "tag 2"
   }
 },
@@ -305,8 +702,6 @@
   "model": "catalogue.tag",
   "pk": 3,
   "fields": {
-    "created_at": "2022-09-14T04:50:20.063Z",
-    "updated_at": "2022-09-14T04:50:20.063Z",
     "name": "tag 3"
   }
 },
@@ -379,19 +774,19 @@
   "pk": 1,
   "fields": {
     "created_at": "2022-09-14T04:55:33.899Z",
-    "updated_at": "2022-09-17T04:17:42.687Z",
+    "updated_at": "2022-09-29T13:37:26.312Z",
     "product_type": 1,
     "category": 3,
     "title": "prod 1",
     "description": "qweqweqweqwe",
-    "quantity": 1,
     "regular_price": "1234.98",
-    "is_active": true,
-    "is_limited": false,
     "company": 1,
+    "guide": "Install files and activate keys.",
+    "is_active": true,
+    "keys_limit": 1,
     "tags": [
-      2,
-      3
+      3,
+      2
     ]
   }
 },
@@ -400,19 +795,19 @@
   "pk": 2,
   "fields": {
     "created_at": "2022-09-14T04:56:10.192Z",
-    "updated_at": "2022-09-17T04:22:31.198Z",
+    "updated_at": "2022-09-30T10:57:47.830Z",
     "product_type": 2,
     "category": 2,
     "title": "prod 2",
     "description": "qwetrsdfsdf",
-    "quantity": 0,
     "regular_price": "0.05",
+    "company": 1,
+    "guide": "Install files and activate keys.",
     "is_active": true,
-    "is_limited": false,
-    "company": null,
+    "keys_limit": 0,
     "tags": [
-      1,
-      2
+      2,
+      1
     ]
   }
 },
@@ -421,17 +816,38 @@
   "pk": 3,
   "fields": {
     "created_at": "2022-09-14T05:03:13.990Z",
-    "updated_at": "2022-09-14T05:03:13.990Z",
+    "updated_at": "2022-09-30T11:06:56.281Z",
     "product_type": 1,
     "category": 2,
     "title": "prod 3",
     "description": "qweadsasdasdvxc",
-    "quantity": 2,
     "regular_price": "33.55",
-    "is_active": true,
-    "is_limited": true,
     "company": null,
+    "guide": "Install files and activate keys.",
+    "is_active": true,
+    "keys_limit": 0,
     "tags": []
+  }
+},
+{
+  "model": "catalogue.product",
+  "pk": 4,
+  "fields": {
+    "created_at": "2022-09-17T05:59:32.340Z",
+    "updated_at": "2022-09-30T12:03:17.463Z",
+    "product_type": 1,
+    "category": 2,
+    "title": "qweqweqewwe",
+    "description": "tterterter",
+    "regular_price": "41.00",
+    "company": 1,
+    "guide": "Install files and activate keys.",
+    "is_active": true,
+    "keys_limit": 2,
+    "tags": [
+      3,
+      2
+    ]
   }
 },
 {
@@ -537,22 +953,195 @@
   }
 },
 {
-  "model": "orders.order",
+  "model": "catalogue.productfile",
+  "pk": 1,
+  "fields": {
+    "created_at": "2022-09-17T13:11:39Z",
+    "updated_at": "2022-10-01T09:59:30.903Z",
+    "product": 1,
+    "file": "product_1/content/prod1.py",
+    "link": null,
+    "is_main": true
+  }
+},
+{
+  "model": "catalogue.productfile",
   "pk": 2,
   "fields": {
-    "created_at": "2022-09-14T05:51:24.225Z",
-    "updated_at": "2022-09-14T05:51:24.225Z",
-    "user": 1,
-    "status": "In progress",
-    "total_price": "1235.03"
+    "created_at": "2022-09-17T13:49:34Z",
+    "updated_at": "2022-10-01T09:59:24.277Z",
+    "product": 1,
+    "file": "product_1/content/python_and_django_commands.txt",
+    "link": null,
+    "is_main": false
+  }
+},
+{
+  "model": "catalogue.onetimeurl",
+  "pk": 15,
+  "fields": {
+    "url_token": "4491286f-ef77-4d6d-974c-e0e1b39c55fc",
+    "file": 2,
+    "expired_at": "2022-10-01T14:00:03.296Z",
+    "is_used": false
+  }
+},
+{
+  "model": "catalogue.onetimeurl",
+  "pk": 16,
+  "fields": {
+    "url_token": "af588594-595c-4533-88e4-0205c85cd995",
+    "file": 1,
+    "expired_at": "2022-10-01T14:05:05.952Z",
+    "is_used": false
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 1,
+  "fields": {
+    "product": 4,
+    "order": 28,
+    "key": "q12123123123123",
+    "expired_at": "2022-12-01T06:54:58Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 2,
+  "fields": {
+    "product": 3,
+    "order": 21,
+    "key": "1234123",
+    "expired_at": "2022-10-21T06:59:18Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 3,
+  "fields": {
+    "product": 1,
+    "order": 11,
+    "key": "1231231234324",
+    "expired_at": "2022-11-01T13:11:21Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 4,
+  "fields": {
+    "product": 1,
+    "order": 27,
+    "key": "654656545445645",
+    "expired_at": "2022-10-07T13:18:46Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 5,
+  "fields": {
+    "product": 1,
+    "order": 21,
+    "key": "412412412414",
+    "expired_at": "2022-10-21T19:59:07Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 6,
+  "fields": {
+    "product": 3,
+    "order": 23,
+    "key": "4124124124",
+    "expired_at": "2022-11-10T12:36:43Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 7,
+  "fields": {
+    "product": 3,
+    "order": 27,
+    "key": "321241241",
+    "expired_at": "2022-09-30T12:37:50Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 8,
+  "fields": {
+    "product": 1,
+    "order": null,
+    "key": "12412412442",
+    "expired_at": "2022-09-30T12:38:34Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 10,
+  "fields": {
+    "product": 3,
+    "order": null,
+    "key": "4142144114241",
+    "expired_at": "2022-12-08T10:56:32Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 11,
+  "fields": {
+    "product": 4,
+    "order": 28,
+    "key": "3312",
+    "expired_at": "2022-10-12T11:09:03Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 12,
+  "fields": {
+    "product": 4,
+    "order": 28,
+    "key": "523535",
+    "expired_at": "2022-10-06T11:09:31Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 13,
+  "fields": {
+    "product": 4,
+    "order": 28,
+    "key": "543345345",
+    "expired_at": "2022-11-10T11:30:40Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 14,
+  "fields": {
+    "product": 4,
+    "order": null,
+    "key": "12121231212",
+    "expired_at": "2022-10-27T12:02:58Z"
+  }
+},
+{
+  "model": "catalogue.activationkey",
+  "pk": 15,
+  "fields": {
+    "product": 4,
+    "order": null,
+    "key": "5345345345",
+    "expired_at": "2022-10-31T12:03:16Z"
   }
 },
 {
   "model": "orders.order",
-  "pk": 3,
+  "pk": 11,
   "fields": {
-    "created_at": "2022-09-14T08:07:50.188Z",
-    "updated_at": "2022-09-14T08:07:50.188Z",
+    "created_at": "2022-09-18T06:49:59.098Z",
+    "updated_at": "2022-09-18T06:49:59.098Z",
     "user": 1,
     "status": "In progress",
     "total_price": "1268.53"
@@ -560,83 +1149,126 @@
 },
 {
   "model": "orders.order",
-  "pk": 4,
+  "pk": 21,
   "fields": {
-    "created_at": "2022-09-14T17:13:06.735Z",
-    "updated_at": "2022-09-14T17:13:06.735Z",
+    "created_at": "2022-09-18T07:18:39.771Z",
+    "updated_at": "2022-09-18T07:18:39.771Z",
     "user": 1,
     "status": "In progress",
-    "total_price": "1234.98"
+    "total_price": "1268.53"
   }
 },
 {
   "model": "orders.order",
-  "pk": 5,
+  "pk": 23,
   "fields": {
-    "created_at": "2022-09-14T17:37:55.107Z",
-    "updated_at": "2022-09-14T17:37:55.107Z",
-    "user": 2,
-    "status": "In progress",
-    "total_price": "123.00"
-  }
-},
-{
-  "model": "orders.order",
-  "pk": 6,
-  "fields": {
-    "created_at": "2022-09-17T03:31:41.436Z",
-    "updated_at": "2022-09-17T03:31:41.436Z",
+    "created_at": "2022-09-29T12:36:49.456Z",
+    "updated_at": "2022-09-29T12:36:49.456Z",
     "user": 1,
     "status": "In progress",
     "total_price": "33.55"
   }
 },
 {
-  "model": "orders.orderitem",
-  "pk": 1,
+  "model": "orders.order",
+  "pk": 27,
   "fields": {
-    "order": 2,
-    "cart_item": 1
+    "created_at": "2022-09-29T12:43:52.129Z",
+    "updated_at": "2022-09-29T12:43:52.129Z",
+    "user": 1,
+    "status": "In progress",
+    "total_price": "1268.58"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 28,
+  "fields": {
+    "created_at": "2022-09-30T12:01:43.283Z",
+    "updated_at": "2022-09-30T12:01:43.283Z",
+    "user": 1,
+    "status": "IN_PROGRESS",
+    "total_price": "115.55"
   }
 },
 {
   "model": "orders.orderitem",
-  "pk": 2,
+  "pk": 11,
   "fields": {
-    "order": 2,
-    "cart_item": 2
+    "order": 11,
+    "cart_item": 12
   }
 },
 {
   "model": "orders.orderitem",
-  "pk": 3,
+  "pk": 12,
   "fields": {
-    "order": 3,
-    "cart_item": 3
+    "order": 11,
+    "cart_item": 13
   }
 },
 {
   "model": "orders.orderitem",
-  "pk": 4,
+  "pk": 13,
   "fields": {
-    "order": 3,
-    "cart_item": 4
+    "order": 21,
+    "cart_item": 14
   }
 },
 {
   "model": "orders.orderitem",
-  "pk": 5,
+  "pk": 14,
   "fields": {
-    "order": 4,
-    "cart_item": 5
+    "order": 21,
+    "cart_item": 15
   }
 },
 {
   "model": "orders.orderitem",
-  "pk": 6,
+  "pk": 15,
   "fields": {
-    "order": 6,
-    "cart_item": 6
+    "order": 23,
+    "cart_item": 16
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 21,
+  "fields": {
+    "order": 27,
+    "cart_item": 17
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 22,
+  "fields": {
+    "order": 27,
+    "cart_item": 18
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 23,
+  "fields": {
+    "order": 27,
+    "cart_item": 19
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 24,
+  "fields": {
+    "order": 28,
+    "cart_item": 21
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 25,
+  "fields": {
+    "order": 28,
+    "cart_item": 20
   }
 }
 ]
