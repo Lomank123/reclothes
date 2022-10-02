@@ -5,44 +5,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class StatusTypes(models.TextChoices):
-    DECLINED = 'Declined'
-    ACCEPTED = 'Accepted'
-    DONE = 'Done'
-    IN_PROGRESS = 'In progress'
-    REFUNDED = 'Refunded'
-
-
-class City(models.Model):
-    name = models.CharField(
-        max_length=255, verbose_name=_('Name'), unique=True)
-    is_available = models.BooleanField(
-        default=True, verbose_name=_('Available'))
-
-    class Meta:
-        verbose_name = _('City')
-        verbose_name_plural = _('Cities')
-
-    def __str__(self):
-        return f'{self.name} ({self.pk})'
-
-
-class Address(models.Model):
-    city = models.ForeignKey(
-        to=City,
-        on_delete=models.PROTECT,
-        related_name='addresses',
-        verbose_name=_('City'),
-    )
-    name = models.CharField(max_length=255, verbose_name=_('Address'))
-    is_available = models.BooleanField(
-        default=True, verbose_name=_('Available'))
-
-    class Meta:
-        verbose_name = _('Address')
-        verbose_name_plural = _('Addresses')
-
-    def __str__(self):
-        return self.name
+    IN_PROGRESS = 'IN_PROGRESS', _('In progress')
+    COMPLETE = 'COMPLETE', _('Complete')
+    CANCELED = 'CANCELED', _('Canceled')
+    REFUNDED = 'REFUNDED', _('Refunded')
 
 
 class Order(CustomBaseModel):
@@ -51,12 +17,6 @@ class Order(CustomBaseModel):
         on_delete=models.CASCADE,
         verbose_name=_('User'),
         blank=True, null=True,
-        related_name='orders',
-    )
-    address = models.ForeignKey(
-        Address,
-        on_delete=models.DO_NOTHING,
-        verbose_name=_('Address'),
         related_name='orders',
     )
     status = models.CharField(
@@ -75,7 +35,7 @@ class Order(CustomBaseModel):
     )
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-id']
         verbose_name = _('Order')
         verbose_name_plural = _('Orders')
 
@@ -97,8 +57,9 @@ class OrderItem(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _('Order item')
         verbose_name_plural = _('Order items')
 
     def __str__(self):
-        return f'Order item ({self.pk})'
+        return f'Item ({self.pk}) to Order ({self.order.pk})'

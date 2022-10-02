@@ -10,11 +10,11 @@ class CartRepository:
         return Cart.objects.create(*args, **kwargs)
 
     @staticmethod
-    def fetch_active(single=False, limit=None, **kwargs):
+    def fetch_active(first=False, limit=None, **kwargs):
         """
         Return non-deleted and non-archived cart qs with items count.
 
-        Specify single param to return first object from qs.
+        Specify first param to return first object from qs.
         """
         qs = (
             Cart.objects
@@ -23,7 +23,7 @@ class CartRepository:
         )
         if limit:
             return qs[:limit]
-        if single:
+        if first:
             return qs.first()
         return qs
 
@@ -49,11 +49,11 @@ class CartRepository:
 class CartItemRepository:
 
     @staticmethod
-    def fetch(single=False, limit=None, **kwargs):
-        qs = CartItem.objects.filter(**kwargs).order_by('-id')
+    def fetch(first=False, limit=None, **kwargs):
+        qs = CartItem.objects.filter(**kwargs)
         if limit:
             return qs[:limit]
-        elif single:
+        elif first:
             return qs.first()
         return qs
 

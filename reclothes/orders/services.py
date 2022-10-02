@@ -2,15 +2,19 @@ import datetime
 
 from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
+from catalogue.repositories import OneTimeUrlRepository, ProductRepository
+from catalogue.serializers import DownloadProductSerializer
+from catalogue.utils import valid_uuid
 from django.db import transaction
-from payment.models import PaymentTypes
+from django.http.response import (FileResponse, HttpResponseBadRequest,
+                                  HttpResponseNotFound)
 from reclothes.services import APIService
+from rest_framework import status
+from rest_framework.response import Response
 
 from orders import consts
-from orders.repositories import (AddressRepository, OrderItemRepository,
-                                 OrderRepository)
-from orders.serializers import AddressSerializer, OrderDetailSerializer
-from payment.repositories import PaymentRepository
+from orders.repositories import OrderItemRepository, OrderRepository
+from orders.serializers import OrderDetailSerializer
 
 
 class CreateOrderService(APIService):
@@ -23,14 +27,13 @@ class CreateOrderService(APIService):
         self.session_manager = CartSessionManager(request)
 
     def _validate_card_data(self, card):
-        '''Return errors dict or None if valid.'''
+        """Return errors dict or None if valid."""
         name = card.get('name', None)
         date = card.get('expiry_date', None)    # Date format: MM/YY
         card_number = card.get('number', None)
         code = card.get('code', None)
         err = dict()
 
-        # TODO: Use card[name] if not serializer
         # If data is not full
         if date is None:
             err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
@@ -59,80 +62,69 @@ class CreateOrderService(APIService):
             return err
         return None
 
-    def _create_order_with_items(self, cart, address_id):
-        # Order
+    def _create_order(self, cart):
+        """Create order with items and add activation keys to it."""
         order_data = {
             'user': cart.user,
-            'address_id': address_id,
             'total_price': cart.total_price,
         }
         order = OrderRepository.create(**order_data)
+        items = cart.cart_items.select_related('product')
 
-        # Order Items
-        for item in cart.cart_items.all():
+        for item in items:
+            limit = item.product.keys_limit * item.quantity
+            keys = item.product.active_keys[:limit]
+
+            if len(keys) < limit and item.product.is_limited:
+                raise ValueError('Not enough keys.')
+
+            for key in keys:
+                key.order = order
+                key.save()
             OrderItemRepository.create(order=order, cart_item=item)
-
         return order
 
     @transaction.atomic
     def execute(self):
-        address_id = self.request.data.get('address_id', None)
-        payment_type = self.request.data.get('payment_type', None)
+        data = self.request.data
         cart_id = self.session_manager.load_cart_id_from_session()
-
-        # Card validation
-        if payment_type != PaymentTypes.CASH.value:
-            card = self.request.data.get('card', dict())
-            card_errors = self._validate_card_data(card)
-            if card_errors is not None:
-                self.errors['card'] = card_errors
+        card_1 = {
+            'name': data.get('card[name]'),
+            'number': data.get('card[number]'),
+            'code': data.get('card[code]'),
+            'expiry_date': data.get('card[expiry_date]'),
+        }
+        card = data.get('card', card_1)
+        card_errors = self._validate_card_data(card)
 
         # Error handling
-        if payment_type is None:
-            self.errors['payment_type'] = consts.PAYMENT_TYPE_NOT_FOUND_MSG
-        if address_id is None or address_id == 'NaN':
-            self.errors['address_id'] = consts.ADDRESS_NOT_FOUND_MSG
+        if card_errors is not None:
+            self.errors['card'] = card_errors
         if cart_id is None:
             self.errors['cart_id'] = consts.CART_NOT_FOUND_MSG
         if self.errors:
             data = self._build_response_data()
             return self._build_response(data)
 
-        cart = CartRepository.fetch_active(single=True, id=cart_id)
-        order = self._create_order_with_items(cart, address_id)
+        cart = CartRepository.fetch_active(first=True, id=cart_id)
+
+        # https://docs.djangoproject.com/en/4.1/topics/db/transactions/#controlling-transactions-explicitly
+        try:
+            with transaction.atomic():
+                order = self._create_order(cart)
+        except ValueError as e:
+            self.errors['order'] = str(e)
+            data = self._build_response_data()
+            return self._build_response(data)
+
         CartRepository.delete(cart=cart)
         new_cart = CartRepository.create(user=self.request.user)
         self.session_manager.set_cart_id_if_not_exists(
             cart_id=new_cart.pk, forced=True)
-        PaymentRepository.create(
-            type=payment_type,
-            order=order,
-            total_price=order.total_price,
-        )
 
         # Response
         serialized_order_data = OrderDetailSerializer(order).data
         data = self._build_response_data(**serialized_order_data)
-        return self._build_response(data)
-
-
-class LoadAddressesService(APIService):
-
-    __slots__ = 'request',
-
-    def __init__(self, request):
-        super().__init__()
-        self.request = request
-
-    def _build_response_data(self, addresses):
-        data = {'addresses': addresses}
-        return super()._build_response_data(**data)
-
-    def execute(self):
-        city_id = self.request.user.city.pk
-        addresses = AddressRepository.fetch(**{'city_id': city_id})
-        serialized_addresses = AddressSerializer(addresses, many=True).data
-        data = self._build_response_data(serialized_addresses)
         return self._build_response(data)
 
 
@@ -154,7 +146,62 @@ class OrderViewSetService:
         return OrderRepository.fetch(**filters)
 
 
-class AddressViewSetService:
+class OrderFileService(APIService):
+
+    def __init__(self, request):
+        super().__init__()
+        self.request = request
+
+    def _validate_order(self, order):
+        status_code = status.HTTP_200_OK
+        if order is None:
+            self.errors['order'] = consts.ORDER_NOT_FOUND_MSG
+            status_code = status.HTTP_404_NOT_FOUND
+        else:
+            # Check if user owns the order
+            if not order.user == self.request.user:
+                self.errors['order'] = consts.NOT_ORDER_OWNER_MSG
+                status_code = status.HTTP_403_FORBIDDEN
+        return status_code
+
+    def _build_response(self, data, status_code):
+        return Response(data=data, status=status_code)
 
     def execute(self):
-        return AddressRepository.fetch()
+        order_id = self.request.GET.get('order_id', None)
+        order = OrderRepository.fetch(first=True, id=order_id)
+        status_code = self._validate_order(order)
+
+        # Error handling
+        if status_code != status.HTTP_200_OK:
+            data = self._build_response_data()
+            return self._build_response(data, status_code)
+
+        products_ids = OrderRepository.fetch_products_ids(order)
+        products = ProductRepository.fetch_by_ids_with_files_and_keys(
+            products_ids)
+        serializer = DownloadProductSerializer(
+            products, many=True, context={'order_id': order_id})
+        data = self._build_response_data(products=serializer.data)
+        return self._build_response(data, status_code=status_code)
+
+
+class DownloadFileService:
+
+    def __init__(self, url_token):
+        self.url_token = url_token
+
+    def execute(self):
+        if not valid_uuid(self.url_token):
+            return HttpResponseBadRequest(content='Invalid token.')
+
+        url = OneTimeUrlRepository.fetch(url_token=self.url_token).first()
+
+        if url is None:
+            return HttpResponseNotFound(content='Token not found.')
+        if url.is_used:
+            return HttpResponseBadRequest(content='Already in use.')
+
+        OneTimeUrlRepository.delete(url)
+
+        return FileResponse(url.file.file, as_attachment=True)

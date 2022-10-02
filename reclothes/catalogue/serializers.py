@@ -1,9 +1,11 @@
-from accounts.serializers import CustomUserSerializer
+from accounts.serializers import CompanySerializer, CustomUserSerializer
+from django.utils import timezone
 from rest_framework import serializers
 
-from catalogue.models import (Category, Product, ProductAttribute,
-                              ProductAttributeValue, ProductImage,
-                              ProductReview, ProductType, Tag)
+from catalogue.models import (ActivationKey, Category, OneTimeUrl, Product,
+                              ProductAttribute, ProductAttributeValue,
+                              ProductFile, ProductImage, ProductReview,
+                              ProductType, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -91,23 +93,27 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
-    category = CategoryDetailSerializer()
-    product_type = ProductTypeSerializer()
-    tags = TagSerializer(many=True)
+    category = CategoryDetailSerializer(required=False)
+    product_type = ProductTypeSerializer(required=False)
+    tags = TagSerializer(required=False, many=True)
+    ordered_images = ProductImageSerializer(required=False, many=True)
+    attrs_with_values = ProductAttributeValueSerializer(
+        required=False, many=True)
+    reviews_with_users = ProductReviewSerializer(required=False, many=True)
+    company = CompanySerializer(required=False)
     avg_rate = serializers.FloatField(default=0.00)
-    ordered_images = ProductImageSerializer(many=True)
-    attrs_with_values = ProductAttributeValueSerializer(many=True)
-    reviews_with_users = ProductReviewSerializer(many=True)
 
     class Meta:
         model = Product
         fields = (
             'id',
             'category',
+            'company',
             'product_type',
             'tags',
             'avg_rate',
             'in_stock',
+            'is_limited',
             'title',
             'description',
             'regular_price',
@@ -121,15 +127,73 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 
 class ProductCatalogueSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = CategorySerializer(required=False)
+    company = CompanySerializer(required=False)
 
     class Meta:
         model = Product
         fields = (
             'id',
+            'company',
             'title',
             'regular_price',
             'is_active',
-            'quantity',
             'category',
         )
+
+
+class ActivationKeySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ActivationKey
+        fields = ('key', )
+
+
+class OneTimeUrlSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OneTimeUrl
+        fields = ('url_token', 'id')
+
+
+class ProductFileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
+    token = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductFile
+        fields = ('id', 'name', 'size', 'is_main', 'link', 'token')
+
+    def get_token(self, product_file):
+        url = product_file.one_time_urls.filter(
+            is_used=False, expired_at__gte=timezone.now()).first()
+        if url is None:
+            url = OneTimeUrl.objects.create(file=product_file)
+        return url.url_token.hex
+
+    def get_name(self, product_file):
+        file = product_file.file
+        if file is not None:
+            return file.name.split('/')[-1]
+        return ''
+
+    def get_size(self, product_file):
+        file = product_file.file
+        if file is not None:
+            return file.size
+        return 0
+
+
+class DownloadProductSerializer(serializers.ModelSerializer):
+    files = ProductFileSerializer(many=True, required=False)
+    keys = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ('id', 'files', 'keys', 'guide', 'title')
+
+    def get_keys(self, product):
+        order_id = self.context.get('order_id')
+        keys = product.activation_keys.filter(order_id=order_id)
+        return ActivationKeySerializer(keys, many=True).data

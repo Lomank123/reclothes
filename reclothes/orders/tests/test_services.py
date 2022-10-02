@@ -1,19 +1,14 @@
+import uuid
+
 from accounts.models import CustomUser
-from carts.tests.test_services import (create_cart, create_cart_item,
-                                       create_product, create_product_type,
-                                       create_request, create_user)
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from orders.models import Address, City, Order, StatusTypes
-from orders.services import OrderViewSetService
-from payment.models import PaymentTypes
-
-
-def create_city(name):
-    return City.objects.create(name=name)
-
-
-def create_address(name, city):
-    return Address.objects.create(name=name, city=city)
+from orders.services import (DownloadFileService, OrderFileService,
+                             OrderViewSetService)
+from reclothes.tests import factory
+from catalogue.models import OneTimeUrl
+from django.utils import timezone
+from datetime import timedelta
 
 
 class CreateOrderServiceTestCase(TestCase):
@@ -22,16 +17,13 @@ class CreateOrderServiceTestCase(TestCase):
 
     def _create_data(self):
         # User
-        user = create_user(email='test1@gmail.com')
+        user = factory.create_user(email='test1@gmail.com')
         # Product
-        product_type = create_product_type('type1')
-        product = create_product(type_id=product_type.pk)
+        product_type = factory.create_product_type('type1')
+        product = factory.create_product(type_id=product_type.pk)
         # Cart
-        cart = create_cart(user_id=user.pk)
-        create_cart_item(product_id=product.pk, cart_id=cart.pk)
-        # City
-        city = create_city('city1')
-        create_address('addr1', city=city)
+        cart = factory.create_cart(user_id=user.pk)
+        factory.create_cart_item(product_id=product.pk, cart_id=cart.pk)
 
     # End-to-end test
     def test_no_data_provided(self):
@@ -42,20 +34,14 @@ class CreateOrderServiceTestCase(TestCase):
             self.path, data=dict(), content_type=self.content_type)
 
         self.assertEqual(response.status_code, 400)
-        self.assertTrue('payment_type' in response.data['detail'].keys())
-        self.assertTrue('address_id' in response.data['detail'].keys())
 
     # End-to-end test
     def test_no_card_credentials_provided(self):
         self._create_data()
-        data = {
-            'address_id': Address.objects.first().pk,
-            'payment_type': PaymentTypes.CARD.value,
-        }
         self.client.force_login(CustomUser.objects.first())
 
         response = self.client.post(
-            self.path, data=data, content_type=self.content_type)
+            self.path, data=dict(), content_type=self.content_type)
 
         self.assertEqual(response.status_code, 400)
         self.assertTrue('card' in response.data['detail'].keys())
@@ -64,8 +50,6 @@ class CreateOrderServiceTestCase(TestCase):
     def test_wrong_card_credentials_provided(self):
         self._create_data()
         data = {
-            'address_id': Address.objects.first().pk,
-            'payment_type': PaymentTypes.CARD.value,
             'card': {
                 'name': 'qwe',
                 'number': '123213',
@@ -85,25 +69,9 @@ class CreateOrderServiceTestCase(TestCase):
         self.assertTrue('code' in card_errors.keys())
 
     # End-to-end test
-    def test_order_with_cash_payment_created_successfully(self):
+    def test_order_created_successfully(self):
         self._create_data()
         data = {
-            'address_id': Address.objects.first().pk,
-            'payment_type': PaymentTypes.CASH.value,
-        }
-        self.client.force_login(CustomUser.objects.first())
-
-        response = self.client.post(
-            self.path, data=data, content_type=self.content_type)
-
-        self.assertEqual(response.status_code, 200)
-
-    # End-to-end test
-    def test_order_with_card_payment_created_successfully(self):
-        self._create_data()
-        data = {
-            'address_id': Address.objects.first().pk,
-            'payment_type': PaymentTypes.CARD.value,
             'card': {
                 'name': 'Card Holder',
                 'number': '1231231231231231',
@@ -121,23 +89,12 @@ class CreateOrderServiceTestCase(TestCase):
 
 class OrderViewSetServiceTestCase(TestCase):
 
-    @staticmethod
-    def _create_order(user, address):
-        return Order.objects.create(
-            user=user,
-            address=address,
-            status=StatusTypes.IN_PROGRESS.value,
-            total_price=123,
-        )
-
     def test_non_admin_got_own_orders(self):
-        user = create_user(email='test1@gmail.com')
-        user2 = create_user(email='test2@gmail.com')
-        city = create_city('city1')
-        address = create_address('addr1', city=city)
-        order = self._create_order(user=user, address=address)
-        self._create_order(user=user2, address=address)
-        request = create_request(user=user)
+        user = factory.create_user(email='test1@gmail.com')
+        user2 = factory.create_user(email='test2@gmail.com')
+        order = factory.create_order(user=user)
+        factory.create_order(user=user2)
+        request = factory.create_request(user=user)
 
         qs = OrderViewSetService(request).execute()
 
@@ -145,16 +102,98 @@ class OrderViewSetServiceTestCase(TestCase):
         self.assertEqual(order, qs.first())
 
     def test_admin_got_all_orders(self):
-        admin = create_user(email='admin1@gmail.com')
+        admin = factory.create_user(email='admin1@gmail.com')
         admin.is_superuser = True
         admin.save()
-        user2 = create_user(email='test2@gmail.com')
-        city = create_city('city1')
-        address = create_address('addr1', city=city)
-        self._create_order(user=admin, address=address)
-        self._create_order(user=user2, address=address)
-        request = create_request(user=admin)
+        user2 = factory.create_user(email='test2@gmail.com')
+        factory.create_order(user=admin)
+        factory.create_order(user=user2)
+        request = factory.create_request(user=admin)
 
         qs = OrderViewSetService(request).execute()
 
         self.assertEqual(len(qs), 2)
+
+
+class OrderFileServiceTestCase(TestCase):
+
+    def test_order_not_found(self):
+        request = factory.create_request()
+
+        response = OrderFileService(request).execute()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_is_not_order_owner(self):
+        user = factory.create_user(email="test1@gmail.com")
+        order = factory.create_order(user=user)
+        request_data = {'order_id': order.pk}
+        request = factory.create_get_request(data=request_data)
+        request.user = None
+
+        response = OrderFileService(request).execute()
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_order_files_retrieved(self):
+        user = factory.create_user(email="test1@gmail.com")
+        order = factory.create_order(user=user)
+        request_data = {'order_id': order.pk}
+        request = factory.create_get_request(data=request_data)
+        request.user = user
+
+        response = OrderFileService(request).execute()
+
+        self.assertEqual(response.status_code, 200)
+
+
+# TODO: Implement this
+class DownloadFileServiceTestCase(TestCase):
+
+    def test_token_invalid(self):
+        invalid_token = "123"
+
+        response = DownloadFileService(url_token=invalid_token).execute()
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_url_not_found(self):
+        while True:
+            test_uuid4 = uuid.uuid4().hex
+            if not OneTimeUrl.objects.filter(url_token=test_uuid4).exists():
+                break
+
+        response = DownloadFileService(url_token=test_uuid4).execute()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_url_has_been_already_used(self):
+        product_type = factory.create_product_type(name="type1")
+        product = factory.create_product(type_id=product_type.pk)
+        test_file = SimpleUploadedFile(
+            "test.txt", b"test_content", content_type='text/plain')
+        product_file = factory.create_product_file(
+            product=product, file=test_file)
+        expiry_date = timezone.now() + timedelta(days=1)
+        url = factory.create_one_time_url(
+            file=product_file, expired_at=expiry_date, is_used=True)
+
+        response = DownloadFileService(url_token=url.url_token.hex).execute()
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_file_retrieved(self):
+        product_type = factory.create_product_type(name="type1")
+        product = factory.create_product(type_id=product_type.pk)
+        test_file = SimpleUploadedFile(
+            "test.txt", b"test_content", content_type='text/plain')
+        product_file = factory.create_product_file(
+            product=product, file=test_file)
+        expiry_date = timezone.now() + timedelta(days=1)
+        url = factory.create_one_time_url(
+            file=product_file, expired_at=expiry_date)
+
+        response = DownloadFileService(url_token=url.url_token.hex).execute()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(OneTimeUrl.objects.count(), 0)

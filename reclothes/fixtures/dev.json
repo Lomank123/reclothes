@@ -1,0 +1,642 @@
+[
+{
+  "model": "accounts.company",
+  "pk": 1,
+  "fields": {
+    "name": "Company 1",
+    "address": "qweqweqwe",
+    "contact_person": 1
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$320000$R90BW9gfmXqPWGtNATKxJS$WLr3e5V90Jv1WCm0+46HLugLhmXdi3mL9gjeYu6aX64=",
+    "last_login": "2022-09-17T02:48:37.028Z",
+    "is_superuser": true,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2022-09-11T17:33:50.089Z",
+    "username": null,
+    "email": "admin@gmail.com",
+    "company": 1,
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$320000$yVY9K381rcooXbAAESNAMI$CJ7zavyaDpovRquDlv3Tc/n1fdQft71rHf+JZ4saJm4=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-09-14T04:54:08.368Z",
+    "username": null,
+    "email": "test1@gmail.com",
+    "company": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 1,
+  "fields": {
+    "created_at": "2022-09-11T17:35:41.521Z",
+    "updated_at": "2022-09-11T17:35:41.521Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 2,
+  "fields": {
+    "created_at": "2022-09-14T04:49:10.402Z",
+    "updated_at": "2022-09-14T05:51:24.229Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 3,
+  "fields": {
+    "created_at": "2022-09-14T04:59:07.646Z",
+    "updated_at": "2022-09-14T04:59:07.646Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 4,
+  "fields": {
+    "created_at": "2022-09-14T05:51:24.230Z",
+    "updated_at": "2022-09-14T08:07:50.192Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 5,
+  "fields": {
+    "created_at": "2022-09-14T07:36:07.426Z",
+    "updated_at": "2022-09-14T07:36:11.426Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 6,
+  "fields": {
+    "created_at": "2022-09-14T08:07:50.193Z",
+    "updated_at": "2022-09-14T17:13:06.740Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 7,
+  "fields": {
+    "created_at": "2022-09-14T08:14:10.417Z",
+    "updated_at": "2022-09-14T08:14:10.417Z",
+    "user": null,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 8,
+  "fields": {
+    "created_at": "2022-09-14T13:13:28.673Z",
+    "updated_at": "2022-09-14T13:13:34.173Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 9,
+  "fields": {
+    "created_at": "2022-09-14T17:13:06.741Z",
+    "updated_at": "2022-09-17T03:31:41.439Z",
+    "user": 1,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 10,
+  "fields": {
+    "created_at": "2022-09-17T02:48:25.369Z",
+    "updated_at": "2022-09-17T02:48:37.033Z",
+    "user": null,
+    "is_deleted": true,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cart",
+  "pk": 11,
+  "fields": {
+    "created_at": "2022-09-17T03:31:41.439Z",
+    "updated_at": "2022-09-17T03:31:41.439Z",
+    "user": 1,
+    "is_deleted": false,
+    "is_archived": false
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 1,
+  "fields": {
+    "cart": 2,
+    "product": 2,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 2,
+  "fields": {
+    "cart": 2,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 3,
+  "fields": {
+    "cart": 4,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 4,
+  "fields": {
+    "cart": 4,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 5,
+  "fields": {
+    "cart": 6,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 6,
+  "fields": {
+    "cart": 9,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 7,
+  "fields": {
+    "cart": 11,
+    "product": 3,
+    "quantity": 1
+  }
+},
+{
+  "model": "carts.cartitem",
+  "pk": 8,
+  "fields": {
+    "cart": 11,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "catalogue.category",
+  "pk": 1,
+  "fields": {
+    "parent": null,
+    "name": "cat 1",
+    "slug": "cat-1",
+    "is_active": true,
+    "lft": 1,
+    "rght": 4,
+    "tree_id": 1,
+    "level": 0
+  }
+},
+{
+  "model": "catalogue.category",
+  "pk": 2,
+  "fields": {
+    "parent": null,
+    "name": "cat 2",
+    "slug": "cat-2",
+    "is_active": true,
+    "lft": 1,
+    "rght": 2,
+    "tree_id": 2,
+    "level": 0
+  }
+},
+{
+  "model": "catalogue.category",
+  "pk": 3,
+  "fields": {
+    "parent": 1,
+    "name": "cat 3",
+    "slug": "cat-3",
+    "is_active": true,
+    "lft": 2,
+    "rght": 3,
+    "tree_id": 1,
+    "level": 1
+  }
+},
+{
+  "model": "catalogue.tag",
+  "pk": 1,
+  "fields": {
+    "created_at": "2022-09-14T04:50:12.923Z",
+    "updated_at": "2022-09-14T04:50:12.923Z",
+    "name": "tag 1"
+  }
+},
+{
+  "model": "catalogue.tag",
+  "pk": 2,
+  "fields": {
+    "created_at": "2022-09-14T04:50:16.801Z",
+    "updated_at": "2022-09-14T04:50:16.801Z",
+    "name": "tag 2"
+  }
+},
+{
+  "model": "catalogue.tag",
+  "pk": 3,
+  "fields": {
+    "created_at": "2022-09-14T04:50:20.063Z",
+    "updated_at": "2022-09-14T04:50:20.063Z",
+    "name": "tag 3"
+  }
+},
+{
+  "model": "catalogue.producttype",
+  "pk": 1,
+  "fields": {
+    "name": "type 1",
+    "is_active": true
+  }
+},
+{
+  "model": "catalogue.producttype",
+  "pk": 2,
+  "fields": {
+    "name": "type 2",
+    "is_active": true
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 1,
+  "fields": {
+    "product_type": 1,
+    "name": "attr 1"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 2,
+  "fields": {
+    "product_type": 1,
+    "name": "attr 2"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 3,
+  "fields": {
+    "product_type": 1,
+    "name": "attr 3"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 4,
+  "fields": {
+    "product_type": 2,
+    "name": "attr 4"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 5,
+  "fields": {
+    "product_type": 2,
+    "name": "attr 5"
+  }
+},
+{
+  "model": "catalogue.productattribute",
+  "pk": 6,
+  "fields": {
+    "product_type": 2,
+    "name": "attr 6"
+  }
+},
+{
+  "model": "catalogue.product",
+  "pk": 1,
+  "fields": {
+    "created_at": "2022-09-14T04:55:33.899Z",
+    "updated_at": "2022-09-17T04:17:42.687Z",
+    "product_type": 1,
+    "category": 3,
+    "title": "prod 1",
+    "description": "qweqweqweqwe",
+    "quantity": 1,
+    "regular_price": "1234.98",
+    "is_active": true,
+    "is_limited": false,
+    "company": 1,
+    "tags": [
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "catalogue.product",
+  "pk": 2,
+  "fields": {
+    "created_at": "2022-09-14T04:56:10.192Z",
+    "updated_at": "2022-09-17T04:22:31.198Z",
+    "product_type": 2,
+    "category": 2,
+    "title": "prod 2",
+    "description": "qwetrsdfsdf",
+    "quantity": 0,
+    "regular_price": "0.05",
+    "is_active": true,
+    "is_limited": false,
+    "company": null,
+    "tags": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "catalogue.product",
+  "pk": 3,
+  "fields": {
+    "created_at": "2022-09-14T05:03:13.990Z",
+    "updated_at": "2022-09-14T05:03:13.990Z",
+    "product_type": 1,
+    "category": 2,
+    "title": "prod 3",
+    "description": "qweadsasdasdvxc",
+    "quantity": 2,
+    "regular_price": "33.55",
+    "is_active": true,
+    "is_limited": true,
+    "company": null,
+    "tags": []
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 1,
+  "fields": {
+    "product": 1,
+    "attribute": 1,
+    "value": "1"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 2,
+  "fields": {
+    "product": 1,
+    "attribute": 2,
+    "value": "2"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 3,
+  "fields": {
+    "product": 1,
+    "attribute": 3,
+    "value": "3"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 4,
+  "fields": {
+    "product": 2,
+    "attribute": 4,
+    "value": "2"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 5,
+  "fields": {
+    "product": 2,
+    "attribute": 6,
+    "value": "4"
+  }
+},
+{
+  "model": "catalogue.productattributevalue",
+  "pk": 6,
+  "fields": {
+    "product": 3,
+    "attribute": 3,
+    "value": "d"
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 1,
+  "fields": {
+    "created_at": "2022-09-14T04:56:26.223Z",
+    "updated_at": "2022-09-14T04:56:26.223Z",
+    "user": 2,
+    "product": 1,
+    "text": "qweqweqweqweqwe",
+    "rating": 4
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 2,
+  "fields": {
+    "created_at": "2022-09-14T04:56:34.480Z",
+    "updated_at": "2022-09-14T04:56:34.480Z",
+    "user": 1,
+    "product": 1,
+    "text": "qweeqweqwqwqwqeqwe",
+    "rating": 2
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 3,
+  "fields": {
+    "created_at": "2022-09-14T04:56:44.642Z",
+    "updated_at": "2022-09-14T04:56:44.642Z",
+    "user": 2,
+    "product": 2,
+    "text": "qwqwqqwqqw",
+    "rating": 5
+  }
+},
+{
+  "model": "catalogue.productreview",
+  "pk": 4,
+  "fields": {
+    "created_at": "2022-09-14T04:56:52.643Z",
+    "updated_at": "2022-09-14T04:56:52.643Z",
+    "user": 1,
+    "product": 2,
+    "text": "zczxczxcxcc",
+    "rating": 1
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 2,
+  "fields": {
+    "created_at": "2022-09-14T05:51:24.225Z",
+    "updated_at": "2022-09-14T05:51:24.225Z",
+    "user": 1,
+    "status": "In progress",
+    "total_price": "1235.03"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 3,
+  "fields": {
+    "created_at": "2022-09-14T08:07:50.188Z",
+    "updated_at": "2022-09-14T08:07:50.188Z",
+    "user": 1,
+    "status": "In progress",
+    "total_price": "1268.53"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 4,
+  "fields": {
+    "created_at": "2022-09-14T17:13:06.735Z",
+    "updated_at": "2022-09-14T17:13:06.735Z",
+    "user": 1,
+    "status": "In progress",
+    "total_price": "1234.98"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 5,
+  "fields": {
+    "created_at": "2022-09-14T17:37:55.107Z",
+    "updated_at": "2022-09-14T17:37:55.107Z",
+    "user": 2,
+    "status": "In progress",
+    "total_price": "123.00"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 6,
+  "fields": {
+    "created_at": "2022-09-17T03:31:41.436Z",
+    "updated_at": "2022-09-17T03:31:41.436Z",
+    "user": 1,
+    "status": "In progress",
+    "total_price": "33.55"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 1,
+  "fields": {
+    "order": 2,
+    "cart_item": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 2,
+  "fields": {
+    "order": 2,
+    "cart_item": 2
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 3,
+  "fields": {
+    "order": 3,
+    "cart_item": 3
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 4,
+  "fields": {
+    "order": 3,
+    "cart_item": 4
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 5,
+  "fields": {
+    "order": 4,
+    "cart_item": 5
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 6,
+  "fields": {
+    "order": 6,
+    "cart_item": 6
+  }
+}
+]

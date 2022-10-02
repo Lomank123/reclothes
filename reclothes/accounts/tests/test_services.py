@@ -1,29 +1,25 @@
-from django.test import TestCase, RequestFactory, Client
 from accounts.services import LoginViewService
-from accounts.models import CustomUser
 from carts.models import Cart
+from django.test import Client, RequestFactory, TestCase
+from reclothes.tests import factory
 
 
 class LoginViewServiceTestCase(TestCase):
 
     @staticmethod
-    def _create_user(email, password="123123123Aa"):
-        return CustomUser.objects.create(email=email, password=password)
-
-    @staticmethod
-    def _create_cart(user_id, **kwargs):
-        return Cart.objects.create(user_id=user_id, **kwargs)
-
-    def test_login_with_existing_cart_successful(self):
-        # Arrange
-        user = self._create_user("test1@gmail.com")
-        cart = self._create_cart(user.pk)
-        self.assertEqual(Cart.objects.count(), 1)
+    def _create_request(user):
         client = Client()
         client.get("/")
         request = RequestFactory().request()
         request.user = user
         request.session = client.session
+        return request
+
+    def test_login_with_existing_cart_successful(self):
+        # Arrange
+        user = factory.create_user("test1@gmail.com")
+        cart = factory.create_cart(user.pk)
+        request = self._create_request(user)
 
         # Act
         LoginViewService(request).execute()
@@ -35,14 +31,10 @@ class LoginViewServiceTestCase(TestCase):
 
     def test_login_without_valid_user_cart_successful(self):
         # Arrange
-        user = self._create_user("test1@gmail.com")
-        self._create_cart(user.pk, is_deleted=True)
-        self._create_cart(user.pk, is_archived=True)
-        client = Client()
-        client.get("/")
-        request = RequestFactory().request()
-        request.user = user
-        request.session = client.session
+        user = factory.create_user("test1@gmail.com")
+        factory.create_cart(user.pk, is_deleted=True)
+        factory.create_cart(user.pk, is_archived=True)
+        request = self._create_request(user)
 
         # Act
         LoginViewService(request).execute()

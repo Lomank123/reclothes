@@ -1,3 +1,6 @@
+from datetime import timedelta
+import uuid
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -5,7 +8,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
-from catalogue.utils import get_product_media_path
+from catalogue.consts import LINK_EXPIRE_HOURS
+from catalogue.utils import get_product_file_path, get_product_media_path
 
 
 class CustomBaseModel(models.Model):
@@ -56,6 +60,7 @@ class Category(MPTTModel):
         order_insertion_by = ["name"]
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
 
@@ -67,11 +72,12 @@ class Category(MPTTModel):
             "catalogue:category_list", kwargs={"category_slug": self.slug})
 
 
-class Tag(CustomBaseModel):
+class Tag(models.Model):
     """Tags to different products."""
     name = models.CharField(max_length=255, verbose_name=_("Name"))
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Tag")
         verbose_name_plural = _("Tags")
 
@@ -80,7 +86,6 @@ class Tag(CustomBaseModel):
 
 
 class ProductType(models.Model):
-    """Type of product (e.g. boots, T-shirt, jacket)."""
     name = models.CharField(
         max_length=255,
         verbose_name=_("Type"),
@@ -90,16 +95,16 @@ class ProductType(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Type")
         verbose_name_plural = _("Product Types")
-        ordering = ['-is_active']
 
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.pk})'
 
 
 class ProductAttribute(models.Model):
-    """Allows to add properties to certain product types (e.g. shoe size)."""
+    """Allows to add properties to certain product types."""
 
     product_type = models.ForeignKey(
         ProductType,
@@ -110,16 +115,17 @@ class ProductAttribute(models.Model):
     name = models.CharField(
         max_length=255,
         verbose_name=_("Attribute name"),
-        help_text=_("Required and unique"),
+        help_text=_("Required and unique."),
         unique=True,
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Attribute")
         verbose_name_plural = _("Product Attributes")
 
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.pk})'
 
 
 class Product(CustomBaseModel):
@@ -143,11 +149,6 @@ class Product(CustomBaseModel):
         verbose_name=_("Title"), help_text=_("Required"), max_length=255)
     description = models.TextField(
         verbose_name=_("Description"), help_text=_("Not required"), blank=True)
-    quantity = models.IntegerField(
-        default=0,
-        verbose_name=_("Quantity"),
-        help_text=_("How many products have left"),
-    )
     regular_price = models.DecimalField(
         validators=[MinValueValidator(0.01)],
         verbose_name=_("Regular price"),
@@ -155,23 +156,49 @@ class Product(CustomBaseModel):
         max_digits=6,
         decimal_places=2,
     )
+    company = models.ForeignKey(
+        to='accounts.Company',
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name='products',
+        verbose_name=_('Company'),
+    )
+    guide = models.TextField(
+        verbose_name=_('Guide'),
+        help_text=_('Installation/Activation Guide'),
+    )
     is_active = models.BooleanField(
         verbose_name=_("Active"),
         help_text=_("Change product visibility"),
         default=True,
     )
+    keys_limit = models.IntegerField(
+        default=1,
+        verbose_name=_('Keys limit'),
+        help_text=_('How many keys should user get per purchase. If 0, then no keys required.'),
+    )
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['-id']
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
 
     def __str__(self):
-        return self.title
+        return f'{self.title} ({self.pk})'
+
+    @property
+    def is_limited(self):
+        return self.keys_limit == 0
+
+    @property
+    def active_keys(self):
+        """Return unexpired and unused keys."""
+        return self.activation_keys.filter(
+            order__isnull=True, expired_at__gte=timezone.now())
 
     @property
     def in_stock(self):
-        return self.quantity > 0
+        return self.active_keys.count() > 0
 
     @property
     def ordered_images(self):
@@ -214,6 +241,7 @@ class ProductAttributeValue(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Attribute Value")
         verbose_name_plural = _("Product Attribute Values")
         # Product can't have duplicate attributes
@@ -225,7 +253,7 @@ class ProductAttributeValue(models.Model):
         ]
 
     def __str__(self):
-        return self.value
+        return f'Value {self.value} of {self.attribute.name}'
 
 
 class ProductReview(CustomBaseModel):
@@ -252,6 +280,7 @@ class ProductReview(CustomBaseModel):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Review")
         verbose_name_plural = _("Product Reviews")
         # User cannot leave more than 1 comment to each product
@@ -263,7 +292,7 @@ class ProductReview(CustomBaseModel):
         ]
 
     def __str__(self):
-        return f'Review ({self.pk})'
+        return f'Review ({self.pk}) to Product ({self.product.pk})'
 
 
 class ProductImage(CustomBaseModel):
@@ -280,15 +309,117 @@ class ProductImage(CustomBaseModel):
     )
     alt_text = models.CharField(
         max_length=255,
+        default="Alt text",
         verbose_name=_("Alternative text"),
-        help_text=_("Add alternative text"),
+        help_text=_("This displays when image fails to load."),
     )
     is_feature = models.BooleanField(
         default=False, verbose_name=_("Feature image"))
 
     class Meta:
+        ordering = ['-id']
         verbose_name = _("Product Image")
         verbose_name_plural = _("Product Images")
 
     def __str__(self):
-        return f'{self.alt_text} {self.pk}'
+        return f'Image {self.pk} to Product ({self.product.pk})'
+
+
+class ProductFile(CustomBaseModel):
+    product = models.ForeignKey(
+        Product,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name="files",
+        verbose_name=_("Product"),
+    )
+    file = models.FileField(
+        upload_to=get_product_file_path,
+        verbose_name=_("File"),
+        help_text=_('User will be able to download this file after purchase.'),
+    )
+    link = models.URLField(
+        max_length=255,
+        blank=True, null=True,
+        verbose_name=_('Download link'),
+    )
+    is_main = models.BooleanField(
+        default=False, verbose_name=_("Main file"))
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = _("Product File")
+        verbose_name_plural = _("Product Files")
+
+    def __str__(self):
+        return f'File {self.pk} to Product {self.product.pk}'
+
+
+class OneTimeUrl(models.Model):
+    url_token = models.UUIDField(
+        default=uuid.uuid4, editable=False, verbose_name=_('Url token'))
+    file = models.ForeignKey(
+        to=ProductFile,
+        on_delete=models.CASCADE,
+        related_name='one_time_urls',
+        verbose_name=_('File'),
+    )
+    expired_at = models.DateTimeField(
+        editable=False, verbose_name=_('Expiry date'))
+    is_used = models.BooleanField(
+        default=False, verbose_name=_('Already used'))
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = _("One-Time Url")
+        verbose_name_plural = _("One-Time Urls")
+
+    def __str__(self):
+        return f'Url {self.pk} to File {self.file.pk}'
+
+    def save(self, *args, **kwargs):
+        if not self.expired_at:
+            self.expired_at = (
+                timezone.now() + timedelta(hours=LINK_EXPIRE_HOURS))
+        return super().save(*args, **kwargs)
+
+    @property
+    def token_hex(self):
+        """Return token without dashes."""
+        return self.url_token.hex
+
+
+class ActivationKey(models.Model):
+    product = models.ForeignKey(
+        to=Product,
+        on_delete=models.PROTECT,
+        related_name='activation_keys',
+        verbose_name=_('Product'),
+    )
+    order = models.ForeignKey(
+        to='orders.Order',
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name='activation_keys',
+        verbose_name=_('Order'),
+    )
+    key = models.CharField(
+        max_length=512,
+        unique=True,
+        verbose_name=_('Activation key'),
+        help_text=_('Must be unique.'),
+    )
+    expired_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_('Expiry date'))
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = _("Activation key")
+        verbose_name_plural = _("Activation keys")
+
+    def __str__(self):
+        return f'Key ({self.pk}) to Product ({self.product.pk})'
+
+    @property
+    def expired(self):
+        return self.expired_at < timezone.now()

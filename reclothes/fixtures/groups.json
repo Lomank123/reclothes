@@ -1,0 +1,55 @@
+[
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Seller",
+    "permissions": [
+      121,
+      122,
+      123,
+      124,
+      53,
+      54,
+      55,
+      56,
+      77,
+      78,
+      79,
+      80,
+      117,
+      118,
+      119,
+      120,
+      73,
+      74,
+      75,
+      76
+    ]
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "Moderator",
+    "permissions": [
+      69,
+      70,
+      71,
+      72
+    ]
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 3,
+  "fields": {
+    "name": "Assistant",
+    "permissions": [
+      94,
+      96
+    ]
+  }
+}
+]

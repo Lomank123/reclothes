@@ -8,7 +8,6 @@ const defaultCartUrl = `${apiUrl}/cart`;
 const defaultCartItemUrl = `${apiUrl}/cart_item`;
 const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
-const defaultAddressUrl = `${apiUrl}/address`;
 const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
 const defaultCatalogueDataUrl = `${defaultProductUrl}/catalogue`;
 const defaultPaginatedCartItemsUrl = `${defaultCartItemUrl}/all_by_cart`;
@@ -26,14 +25,17 @@ const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
 const changeCartItemQuantityUrl = `${defaultCartItemUrl}/change_quantity`;
 const paginatedCartItemsUrl = getUrlWithSearch(defaultPaginatedCartItemsUrl);
 // Orders
-const addressesByCityUrl = `${defaultAddressUrl}/user_city`;
+const orderFileUrl = `${defaultOrderUrl}/files`;
 
 // Non-api urls
 const cataloguePageUrl = `${baseUrl}/catalogue`;
 const cartPageUrl = `${baseUrl}/cart`;
+const productDetailUrl = `${baseUrl}/product`;
+
 const orderUrl = `${baseUrl}/order`;
 const orderSuccessUrl = `${orderUrl}/success`;
 const myOrdersUrl = `${orderUrl}/my-orders`;
+const downloadFileUrl = `${orderUrl}/download`;
 
 function getUrlWithSearch(defaultUrl) {
     let url = new URL(defaultUrl, baseUrl);

@@ -17,9 +17,9 @@ class Cart(CustomBaseModel):
         default=False, verbose_name=_('Archived'))
 
     class Meta:
-        verbose_name_plural = _('Carts')
+        ordering = ['-id']
         verbose_name = _('Cart')
-        ordering = ['-created_at']
+        verbose_name_plural = _('Carts')
 
     def __str__(self):
         return f'Cart {self.pk}'
@@ -47,9 +47,9 @@ class CartItem(models.Model):
     quantity = models.IntegerField(default=1, verbose_name=_('Quantity'))
 
     class Meta:
-        verbose_name_plural = _('Cart items')
+        ordering = ['-id']
         verbose_name = _('Cart item')
-        # Cart can have only unique cart items
+        verbose_name_plural = _('Cart items')
         constraints = [
             models.UniqueConstraint(
                 fields=['product_id', 'cart_id'],
@@ -58,7 +58,7 @@ class CartItem(models.Model):
         ]
 
     def __str__(self):
-        return f'Cart item ({self.pk})'
+        return f'Item ({self.pk}) to Cart ({self.cart.pk})'
 
     @property
     def total_price(self):

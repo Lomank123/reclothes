@@ -1,12 +1,17 @@
-from orders.serializers import CitySerializer
 from rest_framework import serializers
 
-from accounts.models import CustomUser
+from accounts.models import Company, CustomUser
+
+
+class CompanySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Company
+        fields = '__all__'
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    city = CitySerializer(required=False)
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'city')
+        fields = ('id', 'email')

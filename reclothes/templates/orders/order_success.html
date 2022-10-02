@@ -12,16 +12,23 @@
 <h3 id="order-success-main-label" class="page-label">{% translate "Success!" %}</h3>
 <hr />
 
-<div id="order-success-main-block" class="default-block">
+<div id="order-success-main-block" class="flex-block">
 
-  <div class="success-text-block flex-block">
-    <span class="success-order-id">{% translate "Your order id is: " %}<b>{{ order_id }}</b></span>
-    <span class="success-add-text">{% translate "You will be notified when your order is ready." %}</span>
+  <div class="default-block">
+    <div class="success-text-block flex-block">
+      <span class="success-order-id">{% translate "Your order id is: " %}<b>{{ order_id }}</b></span>
+      <span class="success-add-text">{% translate "Download the files below or copy activation keys." %}</span>
+    </div>
+
+    <div class="success-links-block flex-block">
+      <a href="{% url 'catalogue:home' %}" class="btn btn-primary home-btn">{% translate "Catalogue" %}</a>
+      <a href="{% url 'orders:my-orders' %}" class="btn btn-primary my-orders-btn">{% translate "My orders" %}</a>
+      <div id="order-id-block" data-order-id="{{ order_id }}"></div>
+    </div>
   </div>
 
-  <div class="success-links-block flex-block">
-    <a href="{% url 'catalogue:home' %}" class="btn btn-primary home-btn">{% translate "Catalogue" %}</a>
-    <a href="{% url 'orders:my-orders' %}" class="btn btn-primary my-orders-btn">{% translate "My orders" %}</a>
+  <div class="flex-block">
+    <div id="files-block" class="flex-block"></div>
   </div>
 
 </div>
@@ -29,4 +36,5 @@
 {% endblock content %}
 
 {% block scripts %}
+<script src="{% static 'orders/js/orderSuccess.js' %}"></script>
 {% endblock scripts %}

@@ -18,21 +18,23 @@ function displayProductInfo(result, productsIds) {
     setReviewsInfo(result.reviews_with_users);
 }
 
-function getAvailability(isActive, inStock) {
+function getAvailability(isActive, inStock, isLimited) {
     // 1 - OK
     // 2 - Out of stock
     // 3 - Unavailable
 
     let active = 1;
     let text = "Add to cart";
-    if (isActive) {
-        if (!inStock) {
-            active = 2;
-            text = "Out of stock";
+    if (isLimited) {
+        if (isActive) {
+            if (!inStock) {
+                active = 2;
+                text = "Out of stock";
+            }
+        } else {
+            active = 3;
+            text = "Unavailable";
         }
-    } else {
-        active = 3;
-        text = "Unavailable";
     }
     return {
         active: active,
@@ -78,7 +80,11 @@ function setMainInfo(data, productsIds) {
         rateBlock.append(rateBar);
     }
 
-    const availability = getAvailability(data.is_active, data.in_stock);
+    const availability = getAvailability(
+        data.is_active,
+        data.in_stock,
+        data.is_limited,
+    );
     setAddToCartButton(availability, data.id, productsIds);
     setTopInfo(data.product_type, data.category);
     setTagsInfo(data.tags);

@@ -1,4 +1,4 @@
-from orders.models import Address, Order, OrderItem
+from orders.models import Order, OrderItem
 
 
 class OrderRepository:
@@ -16,6 +16,10 @@ class OrderRepository:
     def create(**kwargs):
         return Order.objects.create(**kwargs)
 
+    @staticmethod
+    def fetch_products_ids(order):
+        return order.order_items.values_list('cart_item__product', flat=True)
+
 
 class OrderItemRepository:
 
@@ -31,15 +35,3 @@ class OrderItemRepository:
     @staticmethod
     def create(**kwargs):
         return OrderItem.objects.create(**kwargs)
-
-
-class AddressRepository:
-
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = Address.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
