@@ -1,10 +1,7 @@
 from accounts.models import CustomUser
-from carts.tests.test_services import (create_cart, create_cart_item,
-                                       create_product, create_product_type,
-                                       create_request, create_user)
 from django.test import TestCase
-from orders.models import Order, StatusTypes
 from orders.services import OrderViewSetService
+from reclothes.tests import factory
 
 
 class CreateOrderServiceTestCase(TestCase):
@@ -13,13 +10,13 @@ class CreateOrderServiceTestCase(TestCase):
 
     def _create_data(self):
         # User
-        user = create_user(email='test1@gmail.com')
+        user = factory.create_user(email='test1@gmail.com')
         # Product
-        product_type = create_product_type('type1')
-        product = create_product(type_id=product_type.pk)
+        product_type = factory.create_product_type('type1')
+        product = factory.create_product(type_id=product_type.pk)
         # Cart
-        cart = create_cart(user_id=user.pk)
-        create_cart_item(product_id=product.pk, cart_id=cart.pk)
+        cart = factory.create_cart(user_id=user.pk)
+        factory.create_cart_item(product_id=product.pk, cart_id=cart.pk)
 
     # End-to-end test
     def test_no_data_provided(self):
@@ -85,20 +82,12 @@ class CreateOrderServiceTestCase(TestCase):
 
 class OrderViewSetServiceTestCase(TestCase):
 
-    @staticmethod
-    def _create_order(user):
-        return Order.objects.create(
-            user=user,
-            status=StatusTypes.IN_PROGRESS.value,
-            total_price=123,
-        )
-
     def test_non_admin_got_own_orders(self):
-        user = create_user(email='test1@gmail.com')
-        user2 = create_user(email='test2@gmail.com')
-        order = self._create_order(user=user)
-        self._create_order(user=user2)
-        request = create_request(user=user)
+        user = factory.create_user(email='test1@gmail.com')
+        user2 = factory.create_user(email='test2@gmail.com')
+        order = factory.create_order(user=user)
+        factory.create_order(user=user2)
+        request = factory.create_request(user=user)
 
         qs = OrderViewSetService(request).execute()
 
@@ -106,13 +95,13 @@ class OrderViewSetServiceTestCase(TestCase):
         self.assertEqual(order, qs.first())
 
     def test_admin_got_all_orders(self):
-        admin = create_user(email='admin1@gmail.com')
+        admin = factory.create_user(email='admin1@gmail.com')
         admin.is_superuser = True
         admin.save()
-        user2 = create_user(email='test2@gmail.com')
-        self._create_order(user=admin)
-        self._create_order(user=user2)
-        request = create_request(user=admin)
+        user2 = factory.create_user(email='test2@gmail.com')
+        factory.create_order(user=admin)
+        factory.create_order(user=user2)
+        request = factory.create_request(user=admin)
 
         qs = OrderViewSetService(request).execute()
 
