@@ -2,9 +2,10 @@ from datetime import timedelta
 
 from accounts.models import CustomUser
 from carts.models import Cart, CartItem
-from catalogue.models import (ActivationKey, Category, Product,
+from catalogue.models import (ActivationKey, Category, OneTimeUrl, Product,
                               ProductAttribute, ProductAttributeValue,
-                              ProductImage, ProductReview, ProductType, Tag)
+                              ProductFile, ProductImage, ProductReview,
+                              ProductType, Tag)
 from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.db import SessionStore
@@ -12,7 +13,6 @@ from django.test import RequestFactory
 from django.utils import timezone
 from orders.models import Order, OrderItem, StatusTypes
 from rest_framework.request import Request
-
 
 """
 Factory methods for most models.
@@ -46,6 +46,10 @@ def create_request(user=None, session=None):
 
 def create_post_request(path='/', data=dict()):
     return RequestFactory().post(path=path, data=data)
+
+
+def create_get_request(path='/', **kwargs):
+    return RequestFactory().get(path, **kwargs)
 
 
 def create_rest_request():
@@ -136,3 +140,11 @@ def create_tag(**kwargs):
 
 def create_category(**kwargs):
     return Category.objects.create(**kwargs)
+
+
+def create_one_time_url(**kwargs):
+    return OneTimeUrl.objects.create(**kwargs)
+
+
+def create_product_file(**kwargs):
+    return ProductFile.objects.create(**kwargs)

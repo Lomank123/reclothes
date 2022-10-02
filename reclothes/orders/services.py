@@ -4,6 +4,7 @@ from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
 from catalogue.repositories import OneTimeUrlRepository, ProductRepository
 from catalogue.serializers import DownloadProductSerializer
+from catalogue.utils import valid_uuid
 from django.db import transaction
 from django.http.response import (FileResponse, HttpResponseBadRequest,
                                   HttpResponseNotFound)
@@ -14,7 +15,6 @@ from rest_framework.response import Response
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
 from orders.serializers import OrderDetailSerializer
-from catalogue.utils import valid_uuid
 
 
 class CreateOrderService(APIService):
