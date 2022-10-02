@@ -33,18 +33,19 @@ def create_product_type(name):
     return ProductType.objects.create(name=name)
 
 
-def create_product(type_id, title='test', regular_price=100.00):
+def create_product(type_id, title='test', regular_price=100.00, **kwargs):
     return Product.objects.create(
         product_type_id=type_id,
         title=title,
         regular_price=regular_price,
+        **kwargs,
     )
 
 
-def create_activation_key(product_id, key):
+def create_activation_key(product_id, key, **kwargs):
     expiry_date = timezone.now() + timedelta(days=1)
     return ActivationKey.objects.create(
-        product_id=product_id, key=key, expired_at=expiry_date)
+        product_id=product_id, key=key, expired_at=expiry_date, **kwargs)
 
 
 def create_session(user):
