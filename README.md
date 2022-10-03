@@ -14,14 +14,14 @@ There are 2 fixture files:
 
 ### Useful commands:
 
-- To **create** dump:
+- To **dump**:
 
 ```
-python3 manage.py dumpdata auth.group --indent 2 > fixtures/groups.json
-python3 manage.py dumpdata accounts carts catalogue orders payment --indent 2 > fixtures/dev.json
+python3 manage.py dumpdata auth --natural-foreign --natural-primary -e auth.Permission --indent 2 > fixtures/groups.json
+python3 manage.py dumpdata accounts carts catalogue orders payment --natural-foreign --natural-primary --indent 2 > fixtures/dev.json
 ```
 
-- To **load** dump:
+- To **load**:
 
 ```
 python3 manage.py loaddata fixtures/groups.json
