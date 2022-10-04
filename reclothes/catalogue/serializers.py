@@ -197,3 +197,10 @@ class DownloadProductSerializer(serializers.ModelSerializer):
         order_id = self.context.get('order_id')
         keys = product.activation_keys.filter(order_id=order_id)
         return ActivationKeySerializer(keys, many=True).data
+
+
+class MyOrdersProductSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = '__all__'

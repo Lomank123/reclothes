@@ -1,3 +1,4 @@
+from catalogue.serializers import MyOrdersProductSerializer
 from rest_framework import serializers
 
 from carts.models import Cart, CartItem
@@ -31,6 +32,14 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class CartItemViewSetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CartItem
+        fields = '__all__'
+
+
+class MyOrdersCartItemSerializer(serializers.ModelSerializer):
+    product = MyOrdersProductSerializer(required=False)
 
     class Meta:
         model = CartItem

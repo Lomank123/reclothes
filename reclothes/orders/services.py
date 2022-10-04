@@ -14,9 +14,10 @@ from rest_framework.response import Response
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
-from orders.serializers import OrderDetailSerializer
+from orders.serializers import MyOrdersSerializer, OrderDetailSerializer
 
 
+# TODO: Should return 201 when create
 class CreateOrderService(APIService):
 
     __slots__ = 'request', 'session_manager'
@@ -135,14 +136,8 @@ class OrderViewSetService:
     def __init__(self, request):
         self.request = request
 
-    def _build_filters(self):
-        filters = dict()
-        if not self.request.user.is_superuser:
-            filters['user'] = self.request.user
-        return filters
-
     def execute(self):
-        filters = self._build_filters()
+        filters = {'user': self.request.user}
         return OrderRepository.fetch(**filters)
 
 
@@ -205,3 +200,15 @@ class DownloadFileService:
         OneTimeUrlRepository.delete(url)
 
         return FileResponse(url.file.file, as_attachment=True)
+
+
+class MyOrdersService(APIService):
+
+    def __init__(self, request):
+        self.request = request
+
+    def execute(self):
+        # TODO: Fetch orders
+        serializer = MyOrdersSerializer()
+        data = self._build_response_data(serializer.data)
+        return self._build_response(data)

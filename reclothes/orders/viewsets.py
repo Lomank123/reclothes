@@ -3,8 +3,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from orders.serializers import OrderDetailSerializer, OrderSerializer
-from orders.services import (CreateOrderService, OrderFileService,
-                             OrderViewSetService)
+from orders.services import (CreateOrderService, MyOrdersService,
+                             OrderFileService, OrderViewSetService)
 
 
 class OrderViewSet(ModelViewSet):
@@ -24,3 +24,7 @@ class OrderViewSet(ModelViewSet):
     @action(methods=['get'], detail=False)
     def files(self, request):
         return OrderFileService(request).execute()
+
+    @action(methods=['get'], detail=False)
+    def my_orders(self, request):
+        return MyOrdersService(request).execute()
