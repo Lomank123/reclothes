@@ -26,6 +26,7 @@ const changeCartItemQuantityUrl = `${defaultCartItemUrl}/change_quantity`;
 const paginatedCartItemsUrl = getUrlWithSearch(defaultPaginatedCartItemsUrl);
 // Orders
 const orderFileUrl = `${defaultOrderUrl}/files`;
+const myOrdersUrl = getUrlWithSearch(defaultOrderUrl);
 
 // Non-api urls
 const cataloguePageUrl = `${baseUrl}/catalogue`;
@@ -33,7 +34,6 @@ const cartPageUrl = `${baseUrl}/cart`;
 const productDetailUrl = `${baseUrl}/product`;
 
 const orderUrl = `${baseUrl}/order`;
-const myOrdersUrl = `${orderUrl}/my-orders`;
 const downloadFileUrl = `${orderUrl}/download`;
 
 function getUrlWithSearch(defaultUrl) {

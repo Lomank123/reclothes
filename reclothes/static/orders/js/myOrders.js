@@ -1,4 +1,4 @@
-const mainBlock = $('#my-orders-main-block');
+const mainBlock = $('#my-orders-block');
 
 
 function setMyOrders(orders) {
@@ -9,38 +9,26 @@ function setMyOrders(orders) {
         const orderInfoBlock = $(`
             <div class="order-info-block flex-block">
                 <span><b><a href="${orderUrl}/${order.id}/">Order ${order.id}</a></b></span>
-                <span>Created: ${order.created_at}</span>
-                <span>Last update: ${order.updated_at}</span>
                 <span>Status: ${order.status}</span>
                 <span>Total price: ${order.total_price}</span>
+
+                <span>Created: ${order.created_at}</span>
+                <span>Last update: ${order.updated_at}</span>
             </div>
         `);
 
-        // Order items
-        const itemsBlock = $(`<div class="items-block flex-block"></div>`);
-        order.order_items.forEach(item => {
-            const itemBlock = $(`
-                <div class="item-block flex-block">
-                    <span>Order item ID: ${item.id}</span>
-                </div>
-            `);
-            itemsBlock.append(itemBlock);
-        });
-
         orderBlock.append(orderInfoBlock);
-        orderBlock.append($(`<hr />`));
-        orderBlock.append(itemsBlock);
-        orderBlock.append($(`<hr />`));
         mainBlock.append(orderBlock);
     });
 }
 
 
 $(window).on('load', async () => {
-    const orders = await ajaxCall(defaultOrderUrl);
+    const orders = await ajaxCall(myOrdersUrl);
     if ('detail' in orders) {
         console.log('Error occured!');
         return;
     };
-    setMyOrders(orders);
+    setMyOrders(orders.results);
+    setPagination(orders);
 });

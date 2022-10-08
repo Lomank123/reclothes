@@ -2,6 +2,7 @@
 {% load i18n static %}
 
 {% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'utils/css/pagination.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'orders/css/my-orders.css' %}">
 {% endblock styles %}
 
@@ -12,10 +13,14 @@
 <h3 id="my-orders-main-label" class="page-label">{% translate "My orders" %}</h3>
 <hr />
 
-<div id="my-orders-main-block" class="flex-block"></div>
+<div id="my-orders-main-block" class="flex-block">
+  <div id="my-orders-block"></div>
+  {% include 'utils/pagination.html' %}
+</div>
 
 {% endblock content %}
 
 {% block scripts %}
+<script src="{% static 'utils/js/pagination.js' %}"></script>
 <script src="{% static 'orders/js/myOrders.js' %}"></script>
 {% endblock scripts %}

@@ -1,3 +1,4 @@
+from catalogue.pagination import DefaultCustomPagination
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
@@ -9,6 +10,7 @@ from orders.services import (CreateOrderService, MyOrdersService,
 
 class OrderViewSet(ModelViewSet):
     permission_classes = (AllowAny, )
+    pagination_class = DefaultCustomPagination
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
