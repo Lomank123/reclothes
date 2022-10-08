@@ -1,10 +1,10 @@
 from django.test import TestCase
 from reclothes.tests import factory
 
-from orders.views import OrderSuccessView
+from orders.views import OrderDetailView
 
 
-class OrderSuccessViewTestCase(TestCase):
+class OrderDetailViewTestCase(TestCase):
 
     def test_user_is_not_owner(self):
         user = factory.create_user(email="test1@gmail.com")
@@ -14,14 +14,7 @@ class OrderSuccessViewTestCase(TestCase):
         request = factory.create_get_request(data=request_data)
         request.user = user
 
-        response = OrderSuccessView(request=request).get(request)
-
-        self.assertEqual(response.status_code, 403)
-
-    def test_order_not_found(self):
-        request = factory.create_get_request()
-
-        response = OrderSuccessView(request=request).get(request)
+        response = OrderDetailView(request=request).get(request, pk=order.pk)
 
         self.assertEqual(response.status_code, 403)
 
@@ -32,6 +25,6 @@ class OrderSuccessViewTestCase(TestCase):
         request = factory.create_get_request(data=request_data)
         request.user = user
 
-        response = OrderSuccessView(request=request).get(request)
+        response = OrderDetailView(request=request).get(request, pk=order.pk)
 
         self.assertEqual(response.status_code, 200)

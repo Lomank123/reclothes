@@ -1,0 +1,23 @@
+{% extends 'layout/base.html' %}
+{% load i18n static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'orders/css/order-detail.css' %}">
+{% endblock styles %}
+
+{% block title %}{% translate "Order " %}{{ order_id }}{% endblock title %}
+
+{% block content %}
+
+<h3 id="order-detail-main-label" class="page-label">{% translate "Order " %}{{ order_id }}</h3>
+<hr />
+
+<div id="order-detail-main-block" class="flex-block">
+    <div id="files-block" class="flex-block" data-order-id="{{ order_id }}"></div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'orders/js/orderDetail.js' %}"></script>
+{% endblock scripts %}

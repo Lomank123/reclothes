@@ -1,5 +1,5 @@
-const orderId = $('#order-id-block').data("order-id");
 const filesBlock = $('#files-block');
+const orderId = filesBlock.data("order-id");
 
 
 function setFiles(products) {
@@ -46,9 +46,8 @@ function setFiles(products) {
 }
 
 
-
 $(window).on('load', async () => {
-    const url = `${orderFileUrl}?order_id=${orderId}`;
+    const url = `${orderFileUrl}/${orderId}/`;
     const fileData = await ajaxCall(url);
 
     if ('detail' in fileData) {

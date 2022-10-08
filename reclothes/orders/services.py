@@ -143,9 +143,10 @@ class OrderViewSetService:
 
 class OrderFileService(APIService):
 
-    def __init__(self, request):
+    def __init__(self, request, order_id):
         super().__init__()
         self.request = request
+        self.order_id = order_id
 
     def _validate_order(self, order):
         status_code = status.HTTP_200_OK
@@ -163,8 +164,7 @@ class OrderFileService(APIService):
         return Response(data=data, status=status_code)
 
     def execute(self):
-        order_id = self.request.GET.get('order_id', None)
-        order = OrderRepository.fetch(first=True, id=order_id)
+        order = OrderRepository.fetch(first=True, id=self.order_id)
         status_code = self._validate_order(order)
 
         # Error handling
@@ -176,7 +176,7 @@ class OrderFileService(APIService):
         products = ProductRepository.fetch_by_ids_with_files_and_keys(
             products_ids)
         serializer = DownloadProductSerializer(
-            products, many=True, context={'order_id': order_id})
+            products, many=True, context={'order_id': self.order_id})
         data = self._build_response_data(products=serializer.data)
         return self._build_response(data, status_code=status_code)
 

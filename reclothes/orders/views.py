@@ -1,8 +1,9 @@
 from django.http.response import HttpResponseForbidden
+from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView, View
 
-from orders.permissions import is_order_owner
 from orders.services import DownloadFileService
+from orders.models import Order
 
 
 class OrderView(TemplateView):
@@ -13,21 +14,15 @@ class MyOrdersView(TemplateView):
     template_name = 'orders/my_orders.html'
 
 
-class OrderSuccessView(TemplateView):
-    template_name = 'orders/order_success.html'
+class OrderDetailView(TemplateView):
+    template_name = 'orders/order_detail.html'
 
-    def get(self, request):
-        order_id = request.GET.get('order_id', None)
-        is_owner = is_order_owner(request, order_id)
+    def get(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+        is_owner = order.user == request.user
         if not is_owner:
             return HttpResponseForbidden()
-        return super().get(request)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        order_id = self.request.GET.get('order_id', None)
-        context.update({'order_id': order_id})
-        return context
+        return super().get(request, order_id=pk)
 
 
 class DownloadFileView(View):

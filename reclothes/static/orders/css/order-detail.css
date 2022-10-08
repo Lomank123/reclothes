@@ -1,15 +1,15 @@
-.success-links-block {
+.detail-links-block {
   flex-direction: row !important;
   align-items: center;
   justify-content: center;
 }
 
-.success-text-block {
+.detail-text-block {
   align-items: center;
   justify-content: center;
 }
 
-.success-order-id {
+.detail-order-id {
   font-size: larger;
 }
 

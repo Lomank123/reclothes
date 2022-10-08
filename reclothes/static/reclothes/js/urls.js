@@ -33,7 +33,6 @@ const cartPageUrl = `${baseUrl}/cart`;
 const productDetailUrl = `${baseUrl}/product`;
 
 const orderUrl = `${baseUrl}/order`;
-const orderSuccessUrl = `${orderUrl}/success`;
 const myOrdersUrl = `${orderUrl}/my-orders`;
 const downloadFileUrl = `${orderUrl}/download`;
 

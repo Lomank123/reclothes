@@ -21,9 +21,9 @@ class OrderViewSet(ModelViewSet):
     def create(self, request):
         return CreateOrderService(request).execute()
 
-    @action(methods=['get'], detail=False)
-    def files(self, request):
-        return OrderFileService(request).execute()
+    @action(methods=['get'], detail=False, url_path=r'files/(?P<pk>[0-9]+)')
+    def files(self, request, pk):
+        return OrderFileService(request, order_id=pk).execute()
 
     @action(methods=['get'], detail=False)
     def my_orders(self, request):

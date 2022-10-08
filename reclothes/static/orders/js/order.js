@@ -23,7 +23,7 @@ createOrderBtn.click(async () => {
         return;
     }
 
-    window.location.href = `${orderSuccessUrl}?order_id=${result.data.id}`;
+    window.location.href = `${orderUrl}/${result.data.id}/`;
 });
 
 

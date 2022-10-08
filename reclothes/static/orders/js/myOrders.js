@@ -8,7 +8,7 @@ function setMyOrders(orders) {
         // Order main info
         const orderInfoBlock = $(`
             <div class="order-info-block flex-block">
-                <span>ID: ${order.id}</span>
+                <span><b><a href="${orderUrl}/${order.id}/">Order ${order.id}</a></b></span>
                 <span>Created: ${order.created_at}</span>
                 <span>Last update: ${order.updated_at}</span>
                 <span>Status: ${order.status}</span>

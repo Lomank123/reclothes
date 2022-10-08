@@ -101,26 +101,13 @@ class OrderViewSetServiceTestCase(TestCase):
         self.assertEqual(len(qs), 1)
         self.assertEqual(order, qs.first())
 
-    def test_admin_got_all_orders(self):
-        admin = factory.create_user(email='admin1@gmail.com')
-        admin.is_superuser = True
-        admin.save()
-        user2 = factory.create_user(email='test2@gmail.com')
-        factory.create_order(user=admin)
-        factory.create_order(user=user2)
-        request = factory.create_request(user=admin)
-
-        qs = OrderViewSetService(request).execute()
-
-        self.assertEqual(len(qs), 2)
-
 
 class OrderFileServiceTestCase(TestCase):
 
     def test_order_not_found(self):
         request = factory.create_request()
 
-        response = OrderFileService(request).execute()
+        response = OrderFileService(request, order_id=421).execute()
 
         self.assertEqual(response.status_code, 404)
 
@@ -131,7 +118,7 @@ class OrderFileServiceTestCase(TestCase):
         request = factory.create_get_request(data=request_data)
         request.user = None
 
-        response = OrderFileService(request).execute()
+        response = OrderFileService(request, order_id=order.pk).execute()
 
         self.assertEqual(response.status_code, 403)
 
@@ -142,7 +129,7 @@ class OrderFileServiceTestCase(TestCase):
         request = factory.create_get_request(data=request_data)
         request.user = user
 
-        response = OrderFileService(request).execute()
+        response = OrderFileService(request, order_id=order.pk).execute()
 
         self.assertEqual(response.status_code, 200)
 
