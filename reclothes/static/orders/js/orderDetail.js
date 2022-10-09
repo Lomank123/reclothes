@@ -1,4 +1,5 @@
 const filesBlock = $('#files-block');
+const orderBlock = $('#order-detail-info-block');
 const orderId = filesBlock.data("order-id");
 
 
@@ -46,14 +47,31 @@ function setFiles(products) {
 }
 
 
+function setOrderInfo(order) {
+    // Order main info
+    const infoBlock = $(`
+        <div class="order-info-block flex-block">
+            <span><b><a href="${orderUrl}/${order.id}/">Order ${order.id}</a></b></span>
+            <span>Status: ${order.status}</span>
+            <span>Total price: ${order.total_price}</span>
+
+            <span>Created: ${order.created_at}</span>
+            <span>Last update: ${order.updated_at}</span>
+        </div>
+    `);
+    orderBlock.append(infoBlock);
+}
+
+
 $(window).on('load', async () => {
     const url = `${orderFileUrl}/${orderId}/`;
-    const fileData = await ajaxCall(url);
+    const orderData = await ajaxCall(url);
 
-    if ('detail' in fileData) {
+    if ('detail' in orderData) {
         console.log('Error occured!');
         return;
     };
 
-    setFiles(fileData.data.products);
+    setFiles(orderData.data.products);
+    setOrderInfo(orderData.data.order);
 });

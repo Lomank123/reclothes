@@ -14,7 +14,7 @@ from rest_framework.response import Response
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
-from orders.serializers import MyOrdersSerializer, OrderDetailSerializer
+from orders.serializers import OrderDetailSerializer
 
 
 # TODO: Should return 201 when create
@@ -177,7 +177,9 @@ class OrderFileService(APIService):
             products_ids)
         serializer = DownloadProductSerializer(
             products, many=True, context={'order_id': self.order_id})
-        data = self._build_response_data(products=serializer.data)
+        order_serializer = OrderDetailSerializer(order)
+        data = self._build_response_data(
+            products=serializer.data, order=order_serializer.data)
         return self._build_response(data, status_code=status_code)
 
 
@@ -200,15 +202,3 @@ class DownloadFileService:
         OneTimeUrlRepository.delete(url)
 
         return FileResponse(url.file.file, as_attachment=True)
-
-
-class MyOrdersService(APIService):
-
-    def __init__(self, request):
-        self.request = request
-
-    def execute(self):
-        # TODO: Fetch orders
-        serializer = MyOrdersSerializer()
-        data = self._build_response_data(serializer.data)
-        return self._build_response(data)
