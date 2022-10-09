@@ -49,5 +49,9 @@ class LoginViewService:
 
 class CustomUserViewSetService:
 
+    def __init__(self, request):
+        self.request = request
+
     def execute(self):
-        return CustomUserRepository.fetch()
+        user = self.request.user
+        return CustomUserRepository.fetch(id=user.pk)

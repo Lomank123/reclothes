@@ -12,10 +12,16 @@
 <h3 id="profile-main-label" class="page-label">{% translate "Profile" %}</h3>
 <hr />
 
-<div id="profile-main-block" class="default-block">
-  <div>
+<div id="profile-main-block" class="flex-block">
+
+  <h3 class="in-block-label">{% translate "Navigation" %}</h3>
+  <div class="default-block">
     <a href="{% url 'orders:my-orders' %}">{% translate "My orders" %}</a>
   </div>
+
+  <h3 class="in-block-label">{% translate "User info" %}</h3>
+  <div id="user-profile-block" class="default-block" data-user-id="{{ user.pk }}"></div>
+
 </div>
 
 {% endblock content %}

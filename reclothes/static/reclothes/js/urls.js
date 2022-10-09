@@ -3,6 +3,7 @@ const apiUrl = "/api";
 
 // Default api urls
 const defaultOrderUrl = `${apiUrl}/order`;
+const defaultUserUrl = `${apiUrl}/user`;
 const defaultProductUrl = `${apiUrl}/product`;
 const defaultCartUrl = `${apiUrl}/cart`;
 const defaultCartItemUrl = `${apiUrl}/cart_item`;

@@ -130,3 +130,7 @@ a.logo, a.logo:hover, a.logo:active, a.logo:visited, a.logo:focus {
   padding: 5px;
   color: black;
 }
+
+.in-block-label {
+  margin-top: 20px;
+}
