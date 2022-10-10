@@ -53,10 +53,6 @@ async function addToCart(id) {
         'quantity': 1,
     }
     const result = await ajaxCall(`${defaultCartItemUrl}/`, 'POST', data);
-    if ('detail' in result) {
-        console.log(result);
-        return;
-    }
     window.location.reload();
 }
 

@@ -62,10 +62,6 @@ async function changeQuantity(newQuantity, id, productId) {
     };
     const url = `${changeCartItemQuantityUrl}/`;
     const result = await ajaxCall(url, 'PATCH', data);
-    if ('detail' in result) {
-        console.log('Cannot change quantity.');
-        return;
-    };
     window.location.reload();
 }
 

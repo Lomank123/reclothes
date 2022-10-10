@@ -5,7 +5,7 @@ function handlePaginationClick(url) {
 
 
 function setPagination(data) {
-    if (data.results.length == 0) {
+    if (data.results.length == 0 || data.num_pages < 2) {
         paginationBlock.hide();
         return;
     }

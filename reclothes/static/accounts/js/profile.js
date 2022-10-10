@@ -13,16 +13,6 @@ function setUserInfo(user) {
         </div>
     `);
 
-    // Company info
-    if (user.company !== null) {
-        const companyBlock = $(`
-            <div class="flex-block">
-                <span>Company ${user.company}</span>
-            </div>
-        `)
-        infoBlock.append(companyBlock);
-    }
-
     userProfileBlock.append(infoBlock);
 }
 

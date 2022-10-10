@@ -1,36 +1,42 @@
-<div class="payment-form flex-block">
+<form id="payment-form" class="payment-form flex-block" novalidate>
   <h5>Payment credentials</h5>
 
   <!-- Card holder name -->
-  <div class="form-group flex-block">
+  <div id="card-holder-block" class="form-group flex-block">
     <label for="card-holder"><b>Cart holder name</b></label>
-    <input type="text" class="form-control" id="card-holder" placeholder="Enter card holder name">
+    <input type="text" class="form-control" id="card-holder" placeholder="Enter card holder name" required>
+    <div id="card-holder-error-block"></div>
   </div>
 
   <!-- Card number -->
-  <div class="form-group flex-block">
+  <div id="card-number-block" class="form-group flex-block">
     <label for="card-number"><b>Card number</b></label>
-    <input type="text" class="form-control" id="card-number" placeholder="Enter 16-digit card number" minlength="16" maxlength="16">
+    <input type="text" class="form-control" id="card-number" placeholder="Enter 16-digit card number" minlength="16" maxlength="16" required>
+    <div id="card-number-error-block"></div>
   </div>
 
   <!-- Valid thru -->
-  <div class="flex-block">
+  <div id="card-expiry-date-block" class="flex-block">
     <span><b>Valid Thru</b></span>
 
     <div class="card-date-block">
       <div class="form-group date-field">
-        <input type="number" class="form-control" id="card-month" placeholder="Month">
+        <input type="number" class="form-control" id="card-month" placeholder="Month" required>
       </div>
       <div class="form-group">
-        <input type="number" class="form-control" id="card-year" placeholder="Year">
+        <input type="number" class="form-control" id="card-year" placeholder="Year" required>
       </div>
     </div>
+    <div id="card-expiry-date-error-block"></div>
   </div>
 
   <!-- CVV/CVC -->
-  <div class="form-group flex-block">
+  <div id="card-code-block" class="form-group flex-block">
     <label for="card-code"><b>CVV/CVC</b></label>
-    <input type="password" class="form-control" id="card-code" placeholder="Enter 3-digit code" minlength="3" maxlength="3">
+    <input type="password" class="form-control" id="card-code" placeholder="Enter 3-digit code" minlength="3" maxlength="3" required>
+    <div id="card-code-error-block"></div>
   </div>
 
-</div>
+  <button id="submit-payment-btn" class="btn btn-primary" type="submit">Done</button>
+
+</form>

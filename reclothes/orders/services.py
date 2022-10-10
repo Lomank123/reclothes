@@ -38,7 +38,7 @@ class CreateOrderService(APIService):
         # If data is not full
         if date is None:
             err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
-        if name is None:
+        if name is None or name == '':
             err['name'] = consts.NAME_NOT_FOUND_MSG
         if card_number is None:
             err['number'] = consts.CART_NOT_FOUND_MSG

@@ -15,15 +15,12 @@
 
 <div id="order-main-block" class="default-block">
 
+  <div id="order-total-block" class="flex-block"></div>
   <div id="payment-block" class="flex-block">
     <div id="payment-form-block">
       {% include 'utils/payment-form.html' %}
     </div>
   </div>
-
-  <div id="order-total-block" class="flex-block"></div>
-
-  <button id="create-order-btn" class="btn btn-primary" type="button">{% translate "Order" %}</button>
 </div>
 
 {% endblock content %}
