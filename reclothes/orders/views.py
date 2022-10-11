@@ -1,16 +1,17 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView, View
 
-from orders.services import DownloadFileService
 from orders.models import Order
+from orders.services import DownloadFileService
 
 
 class OrderView(TemplateView):
     template_name = 'orders/order.html'
 
 
-class MyOrdersView(TemplateView):
+class MyOrdersView(LoginRequiredMixin, TemplateView):
     template_name = 'orders/my_orders.html'
 
 

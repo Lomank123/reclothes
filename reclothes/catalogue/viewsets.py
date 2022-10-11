@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from catalogue.filters import CatalogueFilter
@@ -16,11 +16,19 @@ from catalogue.services import (CatalogueService, CategoryService,
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductCatalogueSerializer
-    permission_classes = (AllowAny, )
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = CatalogueFilter
     search_fields = ('title', 'tags__name')
     pagination_class = DefaultCustomPagination
+
+    def get_permissions(self):
+        UNSAFE_ACTIONS = ['create', 'destroy', 'update', 'partial_update']
+
+        if self.action in UNSAFE_ACTIONS:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         return ProductViewSetService().execute()
@@ -39,7 +47,15 @@ class ProductViewSet(ModelViewSet):
 
 class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
-    permission_classes = (AllowAny, )
+
+    def get_permissions(self):
+        UNSAFE_ACTIONS = ['create', 'destroy', 'update', 'partial_update']
+
+        if self.action in UNSAFE_ACTIONS:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         return CategoryViewSetService().execute()
@@ -55,7 +71,15 @@ class CategoryViewSet(ModelViewSet):
 
 class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
-    permission_classes = (AllowAny, )
+
+    def get_permissions(self):
+        UNSAFE_ACTIONS = ['create', 'destroy', 'update', 'partial_update']
+
+        if self.action in UNSAFE_ACTIONS:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         return TagViewSetService().execute()

@@ -15,9 +15,6 @@ from catalogue.serializers import (CategorySerializer, ProductDetailSerializer,
 
 class HomeViewService(APIService):
 
-    def __init__(self):
-        super().__init__()
-
     def _build_response_data(self, best, hot, newest, **kwargs):
         data = {
             'best_products': list(best[:BEST_PRODUCT_IN_PAGE_LIMIT]),
@@ -37,9 +34,6 @@ class HomeViewService(APIService):
 
 
 class ProductDetailService(APIService):
-
-    def __init__(self):
-        super().__init__()
 
     def _validate_data(self, product):
         if product is None:
@@ -66,9 +60,6 @@ class ProductDetailService(APIService):
 
 
 class CategoryService(APIService):
-
-    def __init__(self):
-        super().__init__()
 
     @staticmethod
     def _get_serializer_class(is_root=False):

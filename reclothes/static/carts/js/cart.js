@@ -67,7 +67,7 @@ async function changeQuantity(newQuantity, id, productId) {
 
 
 async function deleteCartItem(id) {
-    const url = `${defaultCartItemUrl}/${id}`;
+    const url = `${defaultCartItemUrl}/${id}/`;
     await ajaxCall(url, 'DELETE');
     window.location.reload();
 }

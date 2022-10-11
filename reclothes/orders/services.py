@@ -149,6 +149,8 @@ class OrderFileService(APIService):
         self.order_id = order_id
 
     def _validate_order(self, order):
+        # TODO: Maybe better to create IsOrderOwner permission
+        # TODO: If user is not authenticated they cannot access files
         status_code = status.HTTP_200_OK
         if order is None:
             self.errors['order'] = consts.ORDER_NOT_FOUND_MSG

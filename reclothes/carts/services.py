@@ -127,7 +127,8 @@ class CartItemService(APIService):
         }
         return CartItemRepository.annotate(qs, **annotate_data)
 
-    def execute(self, cart_id=None, paginate=False, limit=None):
+    def execute(self, paginate=False, limit=None):
+        cart_id = self.request.GET.get('cart_id', None)
         qs = CartItemRepository.fetch(limit=limit, cart_id=cart_id)
         annotated_qs = self._annotate_product_with_image(qs=qs)
         serialized_data = self._serialize_data(annotated_qs, paginate=paginate)
