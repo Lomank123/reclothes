@@ -1,6 +1,6 @@
 from catalogue.pagination import DefaultCustomPagination
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from orders.serializers import OrderDetailSerializer, OrderSerializer
@@ -9,7 +9,6 @@ from orders.services import (CreateOrderService, OrderFileService,
 
 
 class OrderViewSet(ModelViewSet):
-    permission_classes = (AllowAny, )
     pagination_class = DefaultCustomPagination
 
     def get_permissions(self):
@@ -19,7 +18,7 @@ class OrderViewSet(ModelViewSet):
         if self.action in UNSAFE_ACTIONS:
             permission_classes = [IsAdminUser]
         else:
-            permission_classes = [AllowAny]
+            permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
@@ -28,6 +27,7 @@ class OrderViewSet(ModelViewSet):
         return OrderSerializer
 
     def get_queryset(self):
+        # Only user related orders
         return OrderViewSetService(self.request).execute()
 
     def create(self, request):

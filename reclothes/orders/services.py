@@ -6,15 +6,15 @@ from catalogue.repositories import OneTimeUrlRepository, ProductRepository
 from catalogue.serializers import DownloadProductSerializer
 from catalogue.utils import valid_uuid
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.http.response import (FileResponse, HttpResponseBadRequest,
                                   HttpResponseNotFound)
 from reclothes.services import APIService
-from rest_framework import status
-from rest_framework.response import Response
 
 from orders import consts
 from orders.repositories import OrderItemRepository, OrderRepository
 from orders.serializers import OrderDetailSerializer
+from orders.models import Order
 
 
 # TODO: Should return 201 when create
@@ -148,32 +148,8 @@ class OrderFileService(APIService):
         self.request = request
         self.order_id = order_id
 
-    def _validate_order(self, order):
-        # TODO: Maybe better to create IsOrderOwner permission
-        # TODO: If user is not authenticated they cannot access files
-        status_code = status.HTTP_200_OK
-        if order is None:
-            self.errors['order'] = consts.ORDER_NOT_FOUND_MSG
-            status_code = status.HTTP_404_NOT_FOUND
-        else:
-            # Check if user owns the order
-            if not order.user == self.request.user:
-                self.errors['order'] = consts.NOT_ORDER_OWNER_MSG
-                status_code = status.HTTP_403_FORBIDDEN
-        return status_code
-
-    def _build_response(self, data, status_code):
-        return Response(data=data, status=status_code)
-
     def execute(self):
-        order = OrderRepository.fetch(first=True, id=self.order_id)
-        status_code = self._validate_order(order)
-
-        # Error handling
-        if status_code != status.HTTP_200_OK:
-            data = self._build_response_data()
-            return self._build_response(data, status_code)
-
+        order = get_object_or_404(Order, id=self.order_id)
         products_ids = OrderRepository.fetch_products_ids(order)
         products = ProductRepository.fetch_by_ids_with_files_and_keys(
             products_ids)
@@ -182,7 +158,7 @@ class OrderFileService(APIService):
         order_serializer = OrderDetailSerializer(order)
         data = self._build_response_data(
             products=serializer.data, order=order_serializer.data)
-        return self._build_response(data, status_code=status_code)
+        return self._build_response(data=data)
 
 
 class DownloadFileService:
