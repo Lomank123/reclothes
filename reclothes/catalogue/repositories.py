@@ -177,11 +177,11 @@ class TagRepository:
 class ProductImageRepository:
 
     @staticmethod
-    def prepare_feature_image_subquery(outer_ref_value='id'):
+    def prepare_feature_image_subquery(outer_ref='id'):
         '''Return first feature image subquery.'''
         return Subquery(
             ProductImage.objects
-            .filter(product_id=OuterRef(outer_ref_value), is_feature=True)
+            .filter(product_id=OuterRef(outer_ref), is_feature=True)
             .values('image')[:1]
         )
 

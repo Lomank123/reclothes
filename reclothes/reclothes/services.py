@@ -25,8 +25,8 @@ class APIService(AbstractAPIService):
             return {'detail': self.errors}
         return {'data': kwargs}
 
-    def _build_response(self, data: dict) -> Response:
-        response = Response(data=data, status=status.HTTP_200_OK)
+    def _build_response(self, data=dict(), status_code=status.HTTP_200_OK):
+        response = Response(data=data, status=status_code)
         if self.errors:
             response.status_code = status.HTTP_400_BAD_REQUEST
         return response

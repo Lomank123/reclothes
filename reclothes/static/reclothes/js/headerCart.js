@@ -13,20 +13,12 @@ function calculateItemsCount(count) {
 function setCartData(data) {
     const count = calculateItemsCount(data.items_count);
     const cartButton = $(`
-        <button type="button" class="btn btn-lg transparent-btn" id="cart-btn">
+        <a href="${cartPageUrl}/" class="btn btn-lg transparent-btn" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
             ${count}
-        </button>
+        </a>
     `);
-    cartButton.click(() => {handleCartBtnClick(data.id)});
     cartBlock.append(cartButton);
-}
-
-
-function handleCartBtnClick(id) {
-    const pageUrl = new URL(cartPageUrl);
-    pageUrl.searchParams.set('cart_id', id);
-    window.location.replace(pageUrl.href);
 }
 
 
@@ -58,21 +50,11 @@ async function addToCart(id) {
 
 
 async function getProductsIds() {
-    const cartData = await ajaxCall(sessionCartUrl);
-    if ('detail' in cartData) {
-        console.log('Error occured with cart.');
-        return;
-    }
-
-    cartId = parseInt(cartData.data.id);
-    cartItemsData = await ajaxCall(headerCartItemsUrl, 'GET', {cart_id: cartId});
-    if ('detail' in cartItemsData) {
-        console.log('Error occured with cart items.');
-        return;
-    }
-
+    const url = `${currentCartUrl}/?items=true`;
+    const cartData = await ajaxCall(url);
+    cartId = parseInt(cartData.data.cart.id);
     const productsIds = [];
-    cartItemsData.data.cart_items.forEach(cartItem => {
+    cartData.data.cart_items.forEach(cartItem => {
         productsIds.push(cartItem.product_id);
     });
     return productsIds;
@@ -80,10 +62,6 @@ async function getProductsIds() {
 
 
 $(window).on('load', async () => {
-    const cartData = await ajaxCall(sessionCartUrl);
-    if ('detail' in cartData) {
-        console.log('Error occured with cart');
-        return;
-    }
-    setCartData(cartData.data);
+    const cartData = await ajaxCall(currentCartUrl);
+    setCartData(cartData.data.cart);
 });

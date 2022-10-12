@@ -15,8 +15,8 @@ class MyOrdersView(LoginRequiredMixin, TemplateView):
 class OrderDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'orders/order_detail.html'
 
-    def get(self, request, pk):
-        return super().get(request, order_id=pk)
+    def get(self, request, pk, **kwargs):
+        return super().get(request, order_id=pk, **kwargs)
 
 
 class DownloadFileView(View):

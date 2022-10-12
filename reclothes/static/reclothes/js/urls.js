@@ -11,7 +11,6 @@ const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
 const defaultCatalogueDataUrl = `${defaultProductUrl}/catalogue`;
-const defaultPaginatedCartItemsUrl = `${defaultCartItemUrl}/all_by_cart`;
 
 // Products
 const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
@@ -21,10 +20,8 @@ const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
 const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
 const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
 // Cart and cart items
-const sessionCartUrl = `${defaultCartUrl}/session_cart`;
-const headerCartItemsUrl = `${defaultCartItemUrl}/header`;
+const currentCartUrl = `${defaultCartUrl}/current`;
 const changeCartItemQuantityUrl = `${defaultCartItemUrl}/change_quantity`;
-const paginatedCartItemsUrl = getUrlWithSearch(defaultPaginatedCartItemsUrl);
 // Orders
 const orderFileUrl = `${defaultOrderUrl}/files`;
 const myOrdersUrl = getUrlWithSearch(defaultOrderUrl);

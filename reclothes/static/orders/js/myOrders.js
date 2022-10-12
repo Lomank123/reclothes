@@ -25,10 +25,6 @@ function setMyOrders(orders) {
 
 $(window).on('load', async () => {
     const orders = await ajaxCall(myOrdersUrl);
-    if ('detail' in orders) {
-        console.log('Error occured!');
-        return;
-    };
     setMyOrders(orders.results);
     setPagination(orders);
 });

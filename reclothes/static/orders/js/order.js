@@ -29,10 +29,6 @@ paymentForm.submit(async (e) => {
 
 $(window).on('load', async () => {
     // Total price
-    const cartData = await ajaxCall(sessionCartUrl);
-    if ('detail' in cartData) {
-        console.log('Error occured!');
-        return;
-    };
-    setTotalPrice(cartData.data);
+    const cartData = await ajaxCall(currentCartUrl);
+    setTotalPrice(cartData.data.cart);
 });

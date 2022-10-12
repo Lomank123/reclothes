@@ -309,9 +309,5 @@ $(window).on('load', async () => {
     const productsIds = await getProductsIds();
     const productDataUrl = `${defaultProductUrl}/${productId}`;
     const productData = await ajaxCall(productDataUrl);
-    if ('detail' in productData) {
-        console.log("Error occured!");
-        return;
-    };
     displayProductInfo(productData.data, productsIds);
 });

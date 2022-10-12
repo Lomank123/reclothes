@@ -66,12 +66,6 @@ function setOrderInfo(order) {
 $(window).on('load', async () => {
     const url = `${orderFileUrl}/${orderId}/`;
     const orderData = await ajaxCall(url);
-
-    if ('detail' in orderData) {
-        console.log('Error occured!');
-        return;
-    };
-
     setFiles(orderData.data.products);
     setOrderInfo(orderData.data.order);
 });

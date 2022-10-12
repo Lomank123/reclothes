@@ -95,19 +95,8 @@ function setTotalPrice(totalPrice) {
 
 
 $(window).on('load', async () => {
-    // Cart
-    const cartData = await ajaxCall(sessionCartUrl);
-    if ('detail' in cartData) {
-        console.log('Error occured!');
-        return;
-    }
-    setTotalPrice(cartData.data.total_price);
-
-    // Cart Items
-    const paginatedData = await ajaxCall(paginatedCartItemsUrl);
-    if ('detail' in paginatedData) {
-        console.log('Error occured!');
-        return;
-    }
-    setCartItemsData(paginatedData.data);
+    // Here we need to get paginated cart items as well
+    const cartData = await ajaxCall(`${currentCartUrl}/?items=true&paginate=true`);
+    setTotalPrice(cartData.data.cart.total_price);
+    setCartItemsData(cartData.data);
 });

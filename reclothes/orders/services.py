@@ -6,15 +6,15 @@ from catalogue.repositories import OneTimeUrlRepository, ProductRepository
 from catalogue.serializers import DownloadProductSerializer
 from catalogue.utils import valid_uuid
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from django.http.response import (FileResponse, HttpResponseBadRequest,
                                   HttpResponseNotFound)
+from django.shortcuts import get_object_or_404
 from reclothes.services import APIService
 
 from orders import consts
+from orders.models import Order
 from orders.repositories import OrderItemRepository, OrderRepository
 from orders.serializers import OrderDetailSerializer
-from orders.models import Order
 
 
 # TODO: Should return 201 when create

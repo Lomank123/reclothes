@@ -1,5 +1,3 @@
-from django.db.models import Count
-
 from carts.models import Cart, CartItem
 
 
@@ -16,11 +14,7 @@ class CartRepository:
 
         Specify first param to return first object from qs.
         """
-        qs = (
-            Cart.objects
-            .filter(is_archived=False, is_deleted=False, **kwargs)
-            .annotate(items_count=Count('cart_items__id'))
-        )
+        qs = Cart.objects.filter(is_archived=False, is_deleted=False, **kwargs)
         if limit:
             return qs[:limit]
         if first:
@@ -60,10 +54,6 @@ class CartItemRepository:
     @staticmethod
     def empty():
         return CartItem.objects.none()
-
-    @staticmethod
-    def annotate(qs, **kwargs):
-        return qs.annotate(**kwargs)
 
     @staticmethod
     def change_quantity(item, value):

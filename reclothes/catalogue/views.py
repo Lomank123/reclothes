@@ -8,10 +8,8 @@ class HomeView(TemplateView):
 class ProductDetailView(TemplateView):
     template_name = 'catalogue/product-detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["product_id"] = kwargs.get("pk")
-        return context
+    def get(self, request, pk, **kwargs):
+        return super().get(request, product_id=pk, **kwargs)
 
 
 class CatalogueView(TemplateView):

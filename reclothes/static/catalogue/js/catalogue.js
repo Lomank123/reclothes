@@ -138,10 +138,6 @@ $(window).on('load', async () => {
     // Product ids and catalogue data
     const productsIds = await getProductsIds();
     const catalogueData = await ajaxCall(catalogueDataUrl.href);
-    if ('detail' in catalogueData) {
-        console.log('Error occured!');
-        return;
-    }
     setData(catalogueData.data, productsIds);
 
     // Current category
@@ -149,10 +145,6 @@ $(window).on('load', async () => {
     if (categoryId !== null) {
         const currentCategoryUrl = `${defaultCategoriesUrl}/${categoryId}`;
         const currentCategory = await ajaxCall(currentCategoryUrl);
-        if ('detail' in currentCategory) {
-            console.log('Error occured!');
-        } else {
-            mainLabel.text(currentCategory.name);
-        };
+        mainLabel.text(currentCategory.name);
     };
 });

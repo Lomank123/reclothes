@@ -25,6 +25,10 @@ class Cart(CustomBaseModel):
         return f'Cart {self.pk}'
 
     @property
+    def items_count(self):
+        return self.cart_items.count()
+
+    @property
     def total_price(self):
         result = self.cart_items.aggregate(
             total=Sum(F('product__regular_price') * F('quantity')))

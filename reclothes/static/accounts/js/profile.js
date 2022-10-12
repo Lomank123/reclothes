@@ -20,11 +20,5 @@ function setUserInfo(user) {
 $(window).on('load', async () => {
     const url = `${defaultUserUrl}/${userId}/`;
     const userData = await ajaxCall(url);
-
-    if ('detail' in userData) {
-        console.log('Error occured!');
-        return;
-    }
-
     setUserInfo(userData);
 });

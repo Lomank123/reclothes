@@ -1,6 +1,5 @@
-from carts.consts import RECENT_CART_ITEMS_LIMIT
 from carts.models import Cart, CartItem
-from carts.services import (CartItemService, CartMiddlewareService,
+from carts.services import (CartMiddlewareService,
                             CartService, ChangeQuantityService)
 from django.test import TestCase
 from reclothes.tests import factory
@@ -72,57 +71,6 @@ class CartServiceTestCase(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertTrue('detail' in response.data.keys())
-
-
-class CartItemServiceTestCase(TestCase):
-
-    def test_empty_cart_received(self):
-        cart = factory.create_cart()
-        request = factory.create_rest_request()
-
-        response = CartItemService(request).execute(cart_id=cart.pk)
-        data = response.data['data']
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['cart_items']), 0)
-
-    def test_paginated_cart_items_received(self):
-        cart = factory.create_cart()
-        product_type = factory.create_product_type('test1')
-        product = factory.create_product(type_id=product_type.pk)
-        factory.create_cart_item(cart.pk, product.pk)
-        request = factory.create_rest_request()
-
-        response = CartItemService(request).execute(
-            cart_id=cart.pk, paginate=True)
-        data = response.data['data']
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['cart_items']['results']), 1)
-        self.assertTrue('image' in data['cart_items']['results'][0])
-        self.assertTrue('product_title' in data['cart_items']['results'][0])
-
-    def test_limited_cart_items_received(self):
-        cart = factory.create_cart()
-        product_type = factory.create_product_type('test1')
-        product = factory.create_product(type_id=product_type.pk)
-        product2 = factory.create_product(type_id=product_type.pk)
-        product3 = factory.create_product(type_id=product_type.pk)
-        product4 = factory.create_product(type_id=product_type.pk)
-        product5 = factory.create_product(type_id=product_type.pk)
-        factory.create_cart_item(cart.pk, product.pk)
-        factory.create_cart_item(cart.pk, product2.pk)
-        factory.create_cart_item(cart.pk, product3.pk)
-        factory.create_cart_item(cart.pk, product4.pk)
-        factory.create_cart_item(cart.pk, product5.pk)
-        request = factory.create_rest_request()
-
-        response = CartItemService(request).execute(
-            cart_id=cart.pk, limit=RECENT_CART_ITEMS_LIMIT)
-        data = response.data['data']
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['cart_items']), RECENT_CART_ITEMS_LIMIT)
 
 
 class ChangeQuantityServiceTestCase(TestCase):
