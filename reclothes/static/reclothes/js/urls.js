@@ -15,10 +15,6 @@ const defaultCatalogueDataUrl = `${defaultProductUrl}/catalogue`;
 // Products
 const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
 const homeProductsUrl = `${defaultProductUrl}/home`;
-// Categories
-const categoriesUrl = getUrlWithSearch(defaultCategoriesUrl);
-const rootCategoriesUrl = getUrlWithSearch(defaultRootCategoriesUrl);
-const subCategoriesUrl = `${defaultCategoriesUrl}/sub`;
 // Cart and cart items
 const currentCartUrl = `${defaultCartUrl}/current`;
 const changeCartItemQuantityUrl = `${defaultCartItemUrl}/change_quantity`;

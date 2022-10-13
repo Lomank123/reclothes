@@ -1,4 +1,4 @@
-const productId = $("#productId").attr("data-id");
+const productId = $('#productId').data('product-id');
 const mainInfoBlock = $('#product-main-info-block');
 const addInfoBlock = $('#product-add-info-block');
 const topInfoBlock = $('#top-info-block');

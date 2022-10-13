@@ -57,16 +57,11 @@ class CategoryViewSet(ModelViewSet):
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
+    def list(self, request):
+        return CategoryService(request).execute()
+
     def get_queryset(self):
         return CategoryViewSetService().execute()
-
-    @action(methods=['get'], detail=False, url_path=r'sub/(?P<pk>\w+)')
-    def fetch_sub_categories(self, request, pk):
-        return CategoryService().execute(pk)
-
-    @action(methods=['get'], detail=False, url_path='root')
-    def fetch_root_categories(self, request):
-        return CategoryService().execute()
 
 
 class TagViewSet(ModelViewSet):

@@ -1,25 +1,30 @@
 const subCategoriesBlock = $('#subcategories-block');
-let isSubCategories = false;
+const params = new URLSearchParams(window.location.search);
 
 
 function handleCategoryClick(id) {
-    const params = new URLSearchParams(window.location.search);
     params.set('category_id', id);
+    // This will reload the page
     window.location.search = params.toString();
 }
 
 
-function setCategories(data) {
-    if (isSubCategories) {
-        const subCategories = data.items[0].category_tree;
+function isRootCategories() {
+    const categoryId = params.get('category_id');
+    return categoryId === null;
+}
+
+
+function setCategories(categories) {
+    if (isRootCategories()) {
+        displayCategories(categories);
+    } else {
+        // Display sub categories or redirect to catalogue page
+        const subCategories = categories[0].category_tree;
         if (subCategories.length == 0) {
             window.location.replace(`${cataloguePageUrl}${window.location.search}`);
-            return;
         }
         displayCategories(subCategories);
-    } else {
-        // display root categories
-        displayCategories(data.items);
     }
 }
 
@@ -35,20 +40,8 @@ function displayCategories(categories) {
 }
 
 
-function getURL() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('category_id');
-    let url = rootCategoriesUrl.href;
-    if (id !== '' && id !== null) {
-        url = `${subCategoriesUrl}/${id}`;
-        isSubCategories = true;
-    }
-    return url;
-}
-
-
 $(window).on('load', async () => {
-    const apiCallURL = getURL();
-    const categories = await ajaxCall(apiCallURL);
-    setCategories(categories.data);
+    const url = `${defaultCategoriesUrl}${window.location.search}`;
+    const response = await ajaxCall(url);
+    setCategories(response.data.categories);
 });
