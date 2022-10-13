@@ -12,6 +12,7 @@ INVALID_CARD_NUMBER_MSG = 'Card number must have exactly 16 digits.'
 CODE_NOT_FOUND_MSG = 'Code not found.'
 INVALID_CODE_MSG = 'Code must have exactly 3 digits.'
 NOT_ORDER_OWNER_MSG = 'Not your order.'
+NOT_ENOUGH_KEYS_MSG = 'Not enough keys.'
 
 # Card
 CARD_NUMBER_SIZE = 16

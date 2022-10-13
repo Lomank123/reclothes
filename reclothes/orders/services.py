@@ -1,23 +1,25 @@
-import datetime
+import json
 
+from carts.models import Cart
 from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
 from catalogue.repositories import OneTimeUrlRepository, ProductRepository
 from catalogue.serializers import DownloadProductSerializer
 from catalogue.utils import valid_uuid
 from django.db import transaction
+from rest_framework import status
 from django.http.response import (FileResponse, HttpResponseBadRequest,
                                   HttpResponseNotFound)
 from django.shortcuts import get_object_or_404
 from reclothes.services import APIService
+from carts.exceptions import BadRequest
 
-from orders import consts
 from orders.models import Order
 from orders.repositories import OrderItemRepository, OrderRepository
-from orders.serializers import OrderDetailSerializer
+from orders.serializers import CardSerializer, OrderDetailSerializer
+from orders.consts import NOT_ENOUGH_KEYS_MSG
 
 
-# TODO: Should return 201 when create
 class CreateOrderService(APIService):
 
     __slots__ = 'request', 'session_manager'
@@ -27,96 +29,38 @@ class CreateOrderService(APIService):
         self.request = request
         self.session_manager = CartSessionManager(request)
 
-    def _validate_card_data(self, card):
-        """Return errors dict or None if valid."""
-        name = card.get('name', None)
-        date = card.get('expiry_date', None)    # Date format: MM/YY
-        card_number = card.get('number', None)
-        code = card.get('code', None)
-        err = dict()
-
-        # If data is not full
-        if date is None:
-            err['expiry_date'] = consts.EXPIRY_DATE_NOT_FOUND_MSG
-        if name is None or name == '':
-            err['name'] = consts.NAME_NOT_FOUND_MSG
-        if card_number is None:
-            err['number'] = consts.CART_NOT_FOUND_MSG
-        if code is None:
-            err['code'] = consts.CODE_NOT_FOUND_MSG
-        if err:
-            return err
-
-        # Additional validation
-        try:
-            date_list = date.split('/')
-            date = datetime.date(
-                year=int(date_list[1]), month=int(date_list[0]), day=1)
-        except Exception:
-            err['expiry_date'] = consts.INVALID_DATE_MSG
-        if len(card_number) != consts.CARD_NUMBER_SIZE:
-            err['number'] = consts.INVALID_CARD_NUMBER_MSG
-        if len(code) != consts.CODE_SIZE:
-            err['code'] = consts.INVALID_CODE_MSG
-
-        if err:
-            return err
-        return None
-
-    def _create_order(self, cart):
-        """Create order with items and add activation keys to it."""
-        order_data = {
-            'user': cart.user,
-            'total_price': cart.total_price,
-        }
-        order = OrderRepository.create(**order_data)
-        items = cart.cart_items.select_related('product')
-
-        for item in items:
+    def _create_order_items(self, cart, order):
+        cart_items = cart.cart_items.select_related('product')
+        for item in cart_items:
             limit = item.product.keys_limit * item.quantity
             keys = item.product.active_keys[:limit]
 
-            if len(keys) < limit and item.product.is_limited:
-                raise ValueError('Not enough keys.')
+            # TODO: Test this
+            if len(keys) < limit:
+                raise BadRequest(detail=NOT_ENOUGH_KEYS_MSG)
 
             for key in keys:
                 key.order = order
                 key.save()
             OrderItemRepository.create(order=order, cart_item=item)
-        return order
 
     @transaction.atomic
     def execute(self):
         data = self.request.data
+
+        # Credit card validation
+        card_data = json.loads(data.get('card'))
+        card_serializer = CardSerializer(data=card_data)
+        card_serializer.is_valid(raise_exception=True)
+
+        # Cart validation
         cart_id = self.session_manager.load_cart_id_from_session()
-        card_1 = {
-            'name': data.get('card[name]'),
-            'number': data.get('card[number]'),
-            'code': data.get('card[code]'),
-            'expiry_date': data.get('card[expiry_date]'),
-        }
-        card = data.get('card', card_1)
-        card_errors = self._validate_card_data(card)
+        cart = get_object_or_404(Cart, id=cart_id)
 
-        # Error handling
-        if card_errors is not None:
-            self.errors['card'] = card_errors
-        if cart_id is None:
-            self.errors['cart_id'] = consts.CART_NOT_FOUND_MSG
-        if self.errors:
-            data = self._build_response_data()
-            return self._build_response(data)
-
-        cart = CartRepository.fetch_active(first=True, id=cart_id)
-
-        # https://docs.djangoproject.com/en/4.1/topics/db/transactions/#controlling-transactions-explicitly
-        try:
-            with transaction.atomic():
-                order = self._create_order(cart)
-        except ValueError as e:
-            self.errors['order'] = str(e)
-            data = self._build_response_data()
-            return self._build_response(data)
+        # Order with keys and items
+        order = OrderRepository.create(
+            user=cart.user, total_price=cart.total_price)
+        self._create_order_items(cart, order)
 
         CartRepository.delete(cart=cart)
         new_cart = CartRepository.create(user=self.request.user)
@@ -124,21 +68,9 @@ class CreateOrderService(APIService):
             cart_id=new_cart.pk, forced=True)
 
         # Response
-        serialized_order_data = OrderDetailSerializer(order).data
-        data = self._build_response_data(**serialized_order_data)
-        return self._build_response(data)
-
-
-class OrderViewSetService:
-
-    __slots__ = 'request',
-
-    def __init__(self, request):
-        self.request = request
-
-    def execute(self):
-        filters = {'user': self.request.user}
-        return OrderRepository.fetch(**filters)
+        serializer = OrderDetailSerializer(order)
+        data = self._build_response_data(**serializer.data)
+        return self._build_response(data, status_code=status.HTTP_201_CREATED)
 
 
 class OrderFileService(APIService):
@@ -180,3 +112,14 @@ class DownloadFileService:
         OneTimeUrlRepository.delete(url)
 
         return FileResponse(url.file.file, as_attachment=True)
+
+
+class OrderViewSetService:
+
+    __slots__ = 'request',
+
+    def __init__(self, request):
+        self.request = request
+
+    def execute(self):
+        return OrderRepository.fetch(user=self.request.user)

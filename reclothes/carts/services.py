@@ -6,10 +6,10 @@ from catalogue.repositories import ProductImageRepository
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from reclothes.services import APIService
-from rest_framework.exceptions import ValidationError
 
 from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG,
                           QUANTITY_MAX_ERROR_MSG, QUANTITY_MIN_ERROR_MSG)
+from carts.exceptions import BadRequest
 from carts.models import Cart, CartItem
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartItemSerializer, CartSerializer
@@ -131,9 +131,9 @@ class ChangeQuantityService(APIService):
     @staticmethod
     def _validate(required_count, current_count):
         if required_count > current_count:
-            raise ValidationError(detail={'detail': QUANTITY_MAX_ERROR_MSG})
+            raise BadRequest(detail=QUANTITY_MAX_ERROR_MSG)
         elif required_count <= 0:
-            raise ValidationError(detail={'detail': QUANTITY_MIN_ERROR_MSG})
+            raise BadRequest(detail=QUANTITY_MIN_ERROR_MSG)
         return True
 
     def execute(self):
