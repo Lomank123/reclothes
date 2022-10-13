@@ -7,9 +7,12 @@ from catalogue.consts import (BEST_PRODUCT_IN_PAGE_LIMIT,
                               HOT_PRODUCT_IN_PAGE_LIMIT,
                               MOST_POPULAR_TAGS_LIMIT,
                               NEWEST_PRODUCT_IN_PAGE_LIMIT)
+from catalogue.pagination import DefaultCustomPagination
 from catalogue.repositories import (CategoryRepository, ProductImageRepository,
                                     ProductRepository, TagRepository)
-from catalogue.serializers import (CategorySerializer, ProductDetailSerializer,
+from catalogue.serializers import (CategorySerializer,
+                                   ProductCatalogueSerializer,
+                                   ProductDetailSerializer,
                                    SubCategorySerializer, TagSerializer)
 
 
@@ -80,43 +83,40 @@ class CategoryService(APIService):
         return self._build_response(data)
 
 
-# TODO: Refactor this
 class CatalogueService(APIService):
+    """
+    Return popular tags with filtered and paginated products.
 
-    __slots__ = 'viewset',
+    Pagination enabled by default. Add query param 'paginate=false' to disable.
+    """
 
-    def __init__(self, viewset):
+    def __init__(self, request):
         super().__init__()
-        self.viewset = viewset
+        self.request = request
 
     def _fetch_popular_tags(self, products, limit=MOST_POPULAR_TAGS_LIMIT):
-        '''Fetch most popular tags based on products queryset.'''
+        """Fetch most popular tags based on products queryset."""
         tags_ids = ProductRepository.fetch_tags_ids(products)
         counter = collections.Counter(tags_ids)
         popular_ids = [key for key, _ in counter.most_common(limit)]
-        filters = {'id__in': popular_ids}
-        popular_tags = TagRepository.fetch(**filters)
+        popular_tags = TagRepository.fetch(id__in=popular_ids)
         return popular_tags
 
-    def _serialize_products(self, products, paginate=False):
-        serializer_class = self.viewset.get_serializer_class()
-        if paginate:
-            page = self.viewset.paginate_queryset(products)
+    def _serialize_products(self, products):
+        is_paginate = self.request.GET.get('paginate', True)
+        if is_paginate:
+            paginator = DefaultCustomPagination()
+            page = paginator.paginate_queryset(products, request=self.request)
             if page is not None:
-                serializer = serializer_class(page, many=True)
-                return self.viewset.paginator.get_paginated_data(
-                    serializer.data)
-        serializer = serializer_class(products, many=True)
+                serializer = ProductCatalogueSerializer(page, many=True)
+                return paginator.get_paginated_data(serializer.data)
+        serializer = ProductCatalogueSerializer(products, many=True)
         return serializer.data
 
-    def execute(self, paginate=False):
-        '''Return popular tags with filtered and paginated products.'''
-        products = self.viewset.get_queryset()
-        filtered_products = self.viewset.filter_queryset(products)
-        popular_tags = self._fetch_popular_tags(filtered_products)
+    def execute(self, products):
+        popular_tags = self._fetch_popular_tags(products)
         serialized_tags = TagSerializer(popular_tags, many=True).data
-        serialized_products = self._serialize_products(
-            filtered_products, paginate=paginate)
+        serialized_products = self._serialize_products(products)
         data = self._build_response_data(
             popular_tags=serialized_tags, products=serialized_products)
         return self._build_response(data)

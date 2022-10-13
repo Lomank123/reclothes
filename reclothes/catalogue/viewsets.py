@@ -36,13 +36,14 @@ class ProductViewSet(ModelViewSet):
     def retrieve(self, request, pk):
         return ProductDetailService().execute(pk)
 
-    @action(methods=['get'], detail=False, url_path='home')
-    def fetch_home_products(self, request):
+    @action(methods=['get'], detail=False)
+    def home(self, request):
         return HomeViewService().execute()
 
-    @action(methods=['get'], detail=False, url_path='catalogue')
-    def fetch_products_with_popular_tags(self, request):
-        return CatalogueService(self).execute(paginate=True)
+    @action(methods=['get'], detail=False)
+    def catalogue(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        return CatalogueService(request).execute(queryset)
 
 
 class CategoryViewSet(ModelViewSet):
