@@ -77,5 +77,5 @@ function setNewestProducts(data, ids) {
 $(window).on('load', async () => {
     const productsIds = await getProductsIds();
     const homeData = await ajaxCall(homeProductsUrl);
-    displayHomeData(homeData.data, productsIds);
+    displayHomeData(homeData.detail, productsIds);
 });

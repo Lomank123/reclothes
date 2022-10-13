@@ -20,7 +20,7 @@ paymentForm.submit(async (e) => {
 
     try {
         const result = await ajaxCall(`${defaultOrderUrl}/`, 'POST', formData);
-        window.location.href = `${orderUrl}/${result.data.id}/`;
+        window.location.href = `${orderUrl}/${result.detail.id}/`;
     } catch(err) {
         setErrors(err.responseJSON);
     }
@@ -30,5 +30,5 @@ paymentForm.submit(async (e) => {
 $(window).on('load', async () => {
     // Total price
     const cartData = await ajaxCall(currentCartUrl);
-    setTotalPrice(cartData.data.cart);
+    setTotalPrice(cartData.detail.cart);
 });

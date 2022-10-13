@@ -309,5 +309,5 @@ $(window).on('load', async () => {
     const productsIds = await getProductsIds();
     const productDataUrl = `${defaultProductUrl}/${productId}`;
     const productData = await ajaxCall(productDataUrl);
-    displayProductInfo(productData.data, productsIds);
+    displayProductInfo(productData.detail, productsIds);
 });

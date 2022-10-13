@@ -138,7 +138,7 @@ $(window).on('load', async () => {
     // Product ids and catalogue data
     const productsIds = await getProductsIds();
     const catalogueData = await ajaxCall(catalogueDataUrl.href);
-    setData(catalogueData.data, productsIds);
+    setData(catalogueData.detail, productsIds);
 
     // Current category
     const categoryId = searchParams.get('category_id');

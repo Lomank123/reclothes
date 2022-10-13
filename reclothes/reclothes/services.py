@@ -18,7 +18,7 @@ class APIService(AbstractAPIService):
     '''Base implementation of service. Use it when create new services.'''
 
     def _build_response_data(self, **kwargs) -> dict:
-        return {'data': kwargs}
+        return {'detail': kwargs}
 
     def _build_response(self, data=dict(), status_code=status.HTTP_200_OK):
         return Response(data=data, status=status_code)

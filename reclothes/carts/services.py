@@ -69,7 +69,6 @@ class CartService(APIService):
     __slots__ = 'request', 'session_manager'
 
     def __init__(self, request):
-        super().__init__()
         self.request = request
         self.session_manager = CartSessionManager(request)
 
@@ -125,7 +124,6 @@ class ChangeQuantityService(APIService):
     __slots__ = 'request'
 
     def __init__(self, request):
-        super().__init__()
         self.request = request
 
     @staticmethod

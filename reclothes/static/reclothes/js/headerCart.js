@@ -52,9 +52,9 @@ async function addToCart(id) {
 async function getProductsIds() {
     const url = `${currentCartUrl}/?items=true`;
     const cartData = await ajaxCall(url);
-    cartId = parseInt(cartData.data.cart.id);
+    cartId = parseInt(cartData.detail.cart.id);
     const productsIds = [];
-    cartData.data.cart_items.forEach(cartItem => {
+    cartData.detail.cart_items.forEach(cartItem => {
         productsIds.push(cartItem.product_id);
     });
     return productsIds;
@@ -63,5 +63,5 @@ async function getProductsIds() {
 
 $(window).on('load', async () => {
     const cartData = await ajaxCall(currentCartUrl);
-    setCartData(cartData.data.cart);
+    setCartData(cartData.detail.cart);
 });

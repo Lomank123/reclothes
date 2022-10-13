@@ -97,6 +97,6 @@ function setTotalPrice(totalPrice) {
 $(window).on('load', async () => {
     // Here we need to get paginated cart items as well
     const cartData = await ajaxCall(`${currentCartUrl}/?items=true&paginate=true`);
-    setTotalPrice(cartData.data.cart.total_price);
-    setCartItemsData(cartData.data);
+    setTotalPrice(cartData.detail.cart.total_price);
+    setCartItemsData(cartData.detail);
 });

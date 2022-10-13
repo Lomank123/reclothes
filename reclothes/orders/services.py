@@ -25,7 +25,6 @@ class CreateOrderService(APIService):
     __slots__ = 'request', 'session_manager'
 
     def __init__(self, request):
-        super().__init__()
         self.request = request
         self.session_manager = CartSessionManager(request)
 
@@ -76,7 +75,6 @@ class CreateOrderService(APIService):
 class OrderFileService(APIService):
 
     def __init__(self, request, order_id):
-        super().__init__()
         self.request = request
         self.order_id = order_id
 

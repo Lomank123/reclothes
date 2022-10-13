@@ -55,7 +55,6 @@ class CategoryService(APIService):
     """Return root or sub categories based on provided category_id."""
 
     def __init__(self, request):
-        super().__init__()
         self.request = request
 
     @staticmethod
@@ -91,7 +90,6 @@ class CatalogueService(APIService):
     """
 
     def __init__(self, request):
-        super().__init__()
         self.request = request
 
     def _fetch_popular_tags(self, products, limit=MOST_POPULAR_TAGS_LIMIT):
