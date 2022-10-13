@@ -53,5 +53,4 @@ class CustomUserViewSetService:
         self.request = request
 
     def execute(self):
-        user = self.request.user
-        return CustomUserRepository.fetch(id=user.pk)
+        return CustomUserRepository.fetch(id=self.request.user.pk)

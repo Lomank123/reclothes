@@ -1,14 +1,16 @@
 import logging
 
+from catalogue.models import Product
 from catalogue.pagination import DefaultCustomPagination
-from catalogue.repositories import ProductImageRepository, ProductRepository
+from catalogue.repositories import ProductImageRepository
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from reclothes.services import APIService
+from rest_framework.exceptions import ValidationError
 
 from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG,
                           QUANTITY_MAX_ERROR_MSG, QUANTITY_MIN_ERROR_MSG)
-from carts.models import Cart
+from carts.models import Cart, CartItem
 from carts.repositories import CartItemRepository, CartRepository
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
@@ -71,7 +73,8 @@ class CartService(APIService):
         self.request = request
         self.session_manager = CartSessionManager(request)
 
-    def _serialize_cart_items(self, items, is_paginate):
+    def _serialize_cart_items(self, items):
+        is_paginate = self.request.GET.get('paginate', False)
         if is_paginate:
             paginator = DefaultCustomPagination()
             page = paginator.paginate_queryset(items, request=self.request)
@@ -100,25 +103,23 @@ class CartService(APIService):
         return cart_items.annotate(**annotate_data)
 
     def execute(self):
-        # Get cart from session and serialize it
+        # Serialize cart
         cart_id = self.session_manager.load_cart_id_from_session()
         cart = get_object_or_404(Cart, id=cart_id)
         raw_data = {'cart': CartSerializer(cart).data}
-
         # Cart items are optional
         is_items = self.request.GET.get('items', False)
         if is_items:
-            is_paginate = self.request.GET.get('paginate', False)
             cart_items = self._annotate_product_with_image(
                 cart.cart_items.all())
-            serialized_items = self._serialize_cart_items(
-                cart_items, is_paginate)
+            serialized_items = self._serialize_cart_items(cart_items)
             raw_data['cart_items'] = serialized_items
-
+        # Build response
         data = self._build_response_data(**raw_data)
         return self._build_response(data=data)
 
 
+# TODO: This can be rewritten as a Serializer with custom validation
 class ChangeQuantityService(APIService):
 
     __slots__ = 'request'
@@ -127,30 +128,28 @@ class ChangeQuantityService(APIService):
         super().__init__()
         self.request = request
 
-    def _change_quantity(self, cart_item, product):
-        new_quantity = int(self.request.POST['value'])
-        keys_count = product.active_keys.count()
-        required_keys_count = new_quantity * product.keys_limit
-        if required_keys_count > keys_count:
-            self.errors['value'] = QUANTITY_MAX_ERROR_MSG
-            return -1
-        elif required_keys_count <= 0:
-            self.errors['value'] = QUANTITY_MIN_ERROR_MSG
-            return -1
-        CartItemRepository.change_quantity(cart_item, new_quantity)
-        return new_quantity
-
-    def _build_response_data(self, quantity):
-        data = {'value': quantity}
-        return super()._build_response_data(**data)
+    @staticmethod
+    def _validate(required_count, current_count):
+        if required_count > current_count:
+            raise ValidationError(detail={'detail': QUANTITY_MAX_ERROR_MSG})
+        elif required_count <= 0:
+            raise ValidationError(detail={'detail': QUANTITY_MIN_ERROR_MSG})
+        return True
 
     def execute(self):
+        # Initial data
         product_id = self.request.POST['product_id']
-        product = ProductRepository.fetch(first=True, id=product_id)
         cart_item_id = self.request.POST['cart_item_id']
-        cart_item = CartItemRepository.fetch(first=True, id=cart_item_id)
-        result = self._change_quantity(cart_item, product)
-        data = self._build_response_data(result)
+        product = get_object_or_404(Product, id=product_id)
+        cart_item = get_object_or_404(CartItem, id=cart_item_id)
+        # Change quantity
+        new_quantity = int(self.request.POST['value'])
+        current_count = product.active_keys.count()
+        required_count = new_quantity * product.keys_limit
+        self._validate(required_count, current_count)
+        CartItemRepository.change_quantity(cart_item, new_quantity)
+        # Build response
+        data = self._build_response_data(value=new_quantity)
         return self._build_response(data)
 
 
