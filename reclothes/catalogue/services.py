@@ -3,10 +3,7 @@ import collections
 from reclothes.services import APIService
 from rest_framework.exceptions import NotFound
 
-from catalogue.consts import (BEST_PRODUCT_IN_PAGE_LIMIT,
-                              HOT_PRODUCT_IN_PAGE_LIMIT,
-                              MOST_POPULAR_TAGS_LIMIT,
-                              NEWEST_PRODUCT_IN_PAGE_LIMIT)
+from catalogue.consts import HOME_PAGE_PRODUCTS_LIMIT, MOST_POPULAR_TAGS_LIMIT
 from catalogue.pagination import DefaultCustomPagination
 from catalogue.repositories import (CategoryRepository, ProductImageRepository,
                                     ProductRepository, TagRepository)
@@ -20,9 +17,9 @@ class HomeViewService(APIService):
 
     def _build_response_data(self, best, hot, newest, **kwargs):
         data = {
-            'best_products': list(best[:BEST_PRODUCT_IN_PAGE_LIMIT]),
-            'hot_products': list(hot[:HOT_PRODUCT_IN_PAGE_LIMIT]),
-            'newest_products': list(newest[:NEWEST_PRODUCT_IN_PAGE_LIMIT]),
+            'best_products': list(best[:HOME_PAGE_PRODUCTS_LIMIT]),
+            'hot_products': list(hot[:HOME_PAGE_PRODUCTS_LIMIT]),
+            'newest_products': list(newest[:HOME_PAGE_PRODUCTS_LIMIT]),
         }
         data.update(kwargs)
         return super()._build_response_data(**data)
