@@ -19,19 +19,12 @@ function setPaginatedCartItems(cartItems) {
                 <span class="item-total-price">Price: ${item.total_price}$</span>
             </div>
         `);
-        const deleteItemButton = $(`
-            <button type="button" class="btn btn-primary delete-cart-item-btn">
-                <i class="bi bi-trash d-flex justify-content-center align-items-center"></i>
-            </button>
-        `);
-        deleteItemButton.click(async () => {await deleteCartItem(item.id)});
 
         newItem.append(infoBlock);
         if (item.product_is_limited > 0) {
             const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
             newItem.append(quantityBlock);
         }
-        newItem.append(deleteItemButton);
         cartItemsBlock.append(newItem);
     });
 }
@@ -41,28 +34,55 @@ function buildQuantityBlock(quantity, id, productId) {
     const addBtn = $(`<button type="button" class="btn btn-primary quantity-btn">+</button>`);
     const subBtn = $(`<button type="button" class="btn btn-primary quantity-btn">-</button>`);
     const quantityField = $(`<span class="quantity-field">${quantity}</span>`);
+    const quantityInfoBlock = $(`<div class="quantity-info-block"></div>`);
     const quantityBlock = $(`<div class="quantity-block"></div>`);
+    const errorBlock = $(`<div class="quantity-error-block"></div>`);
     const currentQuantity = parseInt(quantity);
 
-    addBtn.click(async () => {await changeQuantity(currentQuantity + 1, id, productId)});
-    subBtn.click(async () => {await changeQuantity(currentQuantity - 1, id, productId)});
+    const deleteItemButton = $(`
+        <button type="button" class="btn btn-primary delete-cart-item-btn">
+            <i class="bi bi-trash d-flex justify-content-center align-items-center"></i>
+        </button>
+    `);
 
-    quantityBlock.append(addBtn);
-    quantityBlock.append(quantityField);
-    quantityBlock.append(subBtn);
+    deleteItemButton.click(async () => {await deleteCartItem(item.id)});
+    addBtn.click(async () => {await changeQuantity(currentQuantity + 1, id, productId, errorBlock)});
+    subBtn.click(async () => {await changeQuantity(currentQuantity - 1, id, productId, errorBlock)});
+
+    quantityInfoBlock.append(addBtn);
+    quantityInfoBlock.append(quantityField);
+    quantityInfoBlock.append(subBtn);
+    quantityInfoBlock.append(deleteItemButton);
+    quantityBlock.append(quantityInfoBlock);
+    quantityBlock.append(errorBlock);
     return quantityBlock;
 }
 
 
-async function changeQuantity(newQuantity, id, productId) {
+async function changeQuantity(newQuantity, id, productId, block) {
     const data = {
         value: newQuantity,
         cart_item_id: id,
         product_id: productId,
     };
     const url = `${changeCartItemQuantityUrl}/`;
-    const result = await ajaxCall(url, 'PATCH', data);
-    window.location.reload();
+    try {
+        const result = await ajaxCall(url, 'PATCH', data);
+        window.location.reload();
+    } catch(err) {
+        setQuantityErrors(err.responseJSON, block);
+    }
+}
+
+
+function setQuantityErrors(error, block) {
+    block.empty();
+    const errorMessageBlock = $(`
+        <div class="error-msg-block flex-block">
+            <span>${error.detail}</span>
+        </div>
+    `);
+    block.append(errorMessageBlock);
 }
 
 

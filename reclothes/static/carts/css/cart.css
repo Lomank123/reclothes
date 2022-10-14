@@ -31,9 +31,15 @@
   border-color: red;
 }
 
-.quantity-block {
+.quantity-info-block {
   display: flex;
   flex-direction: row;
+  align-self: center;
+}
+
+.quantity-block {
+  display: flex;
+  flex-direction: column;
   align-self: center;
 }
 
