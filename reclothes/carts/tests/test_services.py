@@ -3,6 +3,7 @@ from carts.services import (CartMiddlewareService,
                             CartService, ChangeQuantityService)
 from django.test import TestCase
 from reclothes.tests import factory
+from carts.exceptions import BadRequest
 
 
 class CartMiddlewareServiceTestCase(TestCase):
@@ -54,23 +55,10 @@ class CartServiceTestCase(TestCase):
         request = factory.create_request(user, session)
 
         response = CartService(request).execute()
-        data = response.data['data']
 
         self.assertEqual(response.status_code, 200)
+        data = response.data['detail']['cart']
         self.assertTrue(data.get('id', False))
-
-    def test_cart_not_found(self):
-        user = factory.create_user()
-        session = factory.create_session(user)
-        cart = factory.create_cart()
-        session['cart_id'] = cart.pk
-        request = factory.create_request(user, session)
-        self._delete_cart_by_id(cart.pk)
-
-        response = CartService(request).execute()
-
-        self.assertEqual(response.status_code, 400)
-        self.assertTrue('detail' in response.data.keys())
 
 
 class ChangeQuantityServiceTestCase(TestCase):
@@ -95,7 +83,7 @@ class ChangeQuantityServiceTestCase(TestCase):
         response = ChangeQuantityService(request).execute()
 
         # Assert
-        data = response.data['data']
+        data = response.data['detail']
         self.assertEqual(response.status_code, 200)
         self.assertTrue(data.get('value', False))
         self.assertEqual(data['value'], 2)
@@ -116,12 +104,13 @@ class ChangeQuantityServiceTestCase(TestCase):
         request = factory.create_post_request(data=post_data)
 
         # Act
-        response = ChangeQuantityService(request).execute()
-
-        # Assert
-        self.assertEqual(response.status_code, 400)
-        self.assertTrue('detail' in response.data.keys())
-        self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)
+        try:
+            ChangeQuantityService(request).execute()
+        except BadRequest as e:
+            # Assert
+            self.assertEqual(e.status_code, 400)
+        finally:
+            self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)
 
     def test_new_quantity_more_than_max_possible(self):
         # Arrange
@@ -140,9 +129,10 @@ class ChangeQuantityServiceTestCase(TestCase):
         request = factory.create_post_request(data=post_data)
 
         # Act
-        response = ChangeQuantityService(request).execute()
-
-        # Assert
-        self.assertEqual(response.status_code, 400)
-        self.assertTrue('detail' in response.data.keys())
-        self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)
+        try:
+            ChangeQuantityService(request).execute()
+        except BadRequest as e:
+            # Assert
+            self.assertEqual(e.status_code, 400)
+        finally:
+            self.assertEqual(CartItem.objects.get(id=cart_item.pk).quantity, 1)

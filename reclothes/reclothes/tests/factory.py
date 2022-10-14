@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 from accounts.models import CustomUser
@@ -17,6 +18,25 @@ from rest_framework.request import Request
 """
 Factory methods for most models.
 """
+
+
+VALID_CARD_CREDENTIALS = {
+    'card': json.dumps({
+        'name': 'Card Holder',
+        'number': '1231231231231231',
+        'code': '123',
+        'expiry_date': '4/22',
+    }),
+}
+
+INVALID_CARD_CREDENTIALS = {
+    'card': json.dumps({
+        'name': '',
+        'number': '123213',
+        'code': '12',
+        'expiry_date': '15-22',
+    }),
+}
 
 
 def create_session(user):
@@ -52,8 +72,8 @@ def create_get_request(path='/', **kwargs):
     return RequestFactory().get(path, **kwargs)
 
 
-def create_rest_request():
-    return Request(request=RequestFactory().request())
+def create_rest_request(request=RequestFactory().request()):
+    return Request(request=request)
 
 
 def create_user(email=None, password='123123123Aa', **kwargs):

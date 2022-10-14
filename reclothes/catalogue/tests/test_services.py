@@ -1,7 +1,6 @@
-from catalogue.models import Category
+from catalogue.models import Category, Product
 from catalogue.services import (CatalogueService, CategoryService,
                                 HomeViewService, ProductDetailService)
-from catalogue.viewsets import ProductViewSet
 from django.test import TestCase
 from reclothes.tests import factory
 
@@ -63,7 +62,7 @@ class HomePageTestCase(TestCase):
         self._create_data()
 
         response = HomeViewService().execute()
-        data = response.data['data']
+        data = response.data['detail']
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['best_products']), 2)
@@ -83,20 +82,12 @@ class HomePageTestCase(TestCase):
 
 class ProductDetailServiceTestCase(TestCase):
 
-    def test_product_not_found(self):
-        product_id = 123123
-
-        response = ProductDetailService().execute(product_id)
-
-        self.assertEqual(response.status_code, 400)
-        self.assertTrue('detail' in response.data.keys())
-
     def test_product_detail_received(self):
         product_type = factory.create_product_type('type1')
         product = factory.create_product(product_type.pk)
 
         response = ProductDetailService().execute(product.pk)
-        data = response.data['data']
+        data = response.data['detail']
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('reviews_with_users' in data.keys())
@@ -110,43 +101,41 @@ class CategoryServiceTestCase(TestCase):
         root_category = factory.create_category(name='root1', slug='root1')
         factory.create_category(name='root2', slug='root2')
         factory.create_category(parent=root_category, name='s1', slug='s1')
+        request = factory.create_request()
 
-        response = CategoryService().execute()
-        data = response.data['data']
+        response = CategoryService(request).execute()
+        data = response.data['detail']
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Category.objects.count(), 3)
-        self.assertEqual(len(data['items']), 2)
+        self.assertEqual(len(data['categories']), 2)
 
     def test_sub_categories_received(self):
-        root_category = factory.create_category(name='root1', slug='root1')
+        root = factory.create_category(name='root1', slug='root1')
+        sub = factory.create_category(
+            parent=root, name='s1', slug='s1')
         factory.create_category(name='root2', slug='root2')
-        sub_category = factory.create_category(
-            parent=root_category, name='s1', slug='s1')
+        request_data = {'category_id': root.pk}
+        request = factory.create_get_request(data=request_data)
 
-        response = CategoryService().execute(root_category.pk)
-        data = response.data['data']
+        response = CategoryService(request).execute()
 
+        data = response.data['detail']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Category.objects.count(), 3)
-        self.assertEqual(len(data['items']), 1)
+        self.assertEqual(len(data['categories']), 1)
         self.assertEqual(
-            data['items'][0]['category_tree'][0]['id'], sub_category.pk)
+            data['categories'][0]['category_tree'][0]['id'], sub.pk)
 
 
 class CatalogueServiceTestCase(TestCase):
 
-    @staticmethod
-    def _create_viewset(request):
-        viewset = ProductViewSet(request=request)
-        viewset.format_kwarg = None
-        return viewset
-
     def test_products_with_tags_received(self):
-        # Test data
         product_type = factory.create_product_type(name='type1')
-        product1 = factory.create_product(type_id=product_type.pk, title='test1')
-        product2 = factory.create_product(type_id=product_type.pk, title='test2')
+        product1 = factory.create_product(
+            type_id=product_type.pk, title='test1')
+        product2 = factory.create_product(
+            type_id=product_type.pk, title='test2')
         factory.create_activation_key(product_id=product1.pk, key="1")
         factory.create_activation_key(product_id=product2.pk, key="2")
         tag1 = factory.create_tag(name='tag1')
@@ -155,13 +144,14 @@ class CatalogueServiceTestCase(TestCase):
         product1.tags.add(tag1)
         product1.tags.add(tag2)
         product2.tags.add(tag3)
-        # Viewset
-        request = factory.create_rest_request()
-        viewset = self._create_viewset(request)
+        request_data = {'paginate': True}
+        request = factory.create_get_request(data=request_data)
+        rest_request = factory.create_rest_request(request)
 
-        response = CatalogueService(viewset).execute(paginate=True)
-        data = response.data['data']
+        response = CatalogueService(rest_request).execute(
+            Product.objects.all())
 
+        data = response.data['detail']
         self.assertEqual(response.status_code, 200)
         self.assertTrue(data.get('products', False))
         self.assertTrue(data.get('popular_tags', False))
