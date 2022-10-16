@@ -21,20 +21,24 @@ function setPaginatedCartItems(cartItems) {
         `);
 
         newItem.append(infoBlock);
-        if (item.product_is_limited > 0) {
-            const quantityBlock = buildQuantityBlock(item.quantity, item.id, item.product_id);
-            newItem.append(quantityBlock);
-        }
+        const quantityBlock = buildQuantityBlock(
+            item.quantity,
+            item.id,
+            item.product_id,
+            item.product_is_limited,
+        );
+        newItem.append(quantityBlock);
         cartItemsBlock.append(newItem);
     });
 }
 
 
-function buildQuantityBlock(quantity, id, productId) {
+function buildQuantityBlock(quantity, id, productId, is_limited) {
     const addBtn = $(`<button type="button" class="btn btn-primary quantity-btn">+</button>`);
     const subBtn = $(`<button type="button" class="btn btn-primary quantity-btn">-</button>`);
     const quantityField = $(`<span class="quantity-field">${quantity}</span>`);
     const quantityInfoBlock = $(`<div class="quantity-info-block"></div>`);
+    const quantityInfoBlock1 = $(`<div class="quantity-info-block"></div>`);
     const quantityBlock = $(`<div class="quantity-block"></div>`);
     const errorBlock = $(`<div class="quantity-error-block"></div>`);
     const currentQuantity = parseInt(quantity);
@@ -45,15 +49,21 @@ function buildQuantityBlock(quantity, id, productId) {
         </button>
     `);
 
-    deleteItemButton.click(async () => {await deleteCartItem(item.id)});
+    deleteItemButton.click(async () => {await deleteCartItem(id)});
     addBtn.click(async () => {await changeQuantity(currentQuantity + 1, id, productId, errorBlock)});
     subBtn.click(async () => {await changeQuantity(currentQuantity - 1, id, productId, errorBlock)});
 
     quantityInfoBlock.append(addBtn);
     quantityInfoBlock.append(quantityField);
     quantityInfoBlock.append(subBtn);
-    quantityInfoBlock.append(deleteItemButton);
-    quantityBlock.append(quantityInfoBlock);
+    quantityInfoBlock1.append(quantityInfoBlock);
+    quantityInfoBlock1.append(deleteItemButton);
+    quantityBlock.append(quantityInfoBlock1);
+
+    if (is_limited === 0) {
+        quantityInfoBlock.hide();
+    }
+
     quantityBlock.append(errorBlock);
     return quantityBlock;
 }
