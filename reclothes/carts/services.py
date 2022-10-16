@@ -20,14 +20,9 @@ logger = logging.getLogger('django')
 
 class CartMiddlewareService:
 
-    __slots__ = 'session_manager',
-
     def __init__(self, request):
         self.session_manager = CartSessionManager(request)
-
-    def _fetch_session_cart(self):
-        cart_id = self.session_manager.load_cart_id_from_session()
-        return CartRepository.fetch_active(first=True, id=cart_id)
+        self.repository = CartRepository()
 
     def _check_or_create_cart(self, session_cart):
         forced = False
@@ -35,16 +30,16 @@ class CartMiddlewareService:
             forced = True
             user = self.session_manager.request.user
             if user.is_authenticated:
-                user_cart = CartRepository.fetch_active(
+                user_cart = self.repository.fetch_active(
                     first=True, user_id=user.pk)
                 if user_cart is None:
-                    new_user_cart = CartRepository.create(user_id=user.pk)
+                    new_user_cart = self.repository.create(user_id=user.pk)
                     cart = new_user_cart
                     logger.info(NEW_CART_ATTACHED_MSG)
                 else:
                     cart = user_cart
             else:
-                new_cart = CartRepository.create()
+                new_cart = self.repository.create()
                 cart = new_cart
                 logger.info(NEW_CART_CREATED_MSG)
         else:
@@ -52,7 +47,9 @@ class CartMiddlewareService:
         return cart, forced
 
     def execute(self):
-        session_cart = self._fetch_session_cart()
+        session_cart_id = self.session_manager.load_cart_id_from_session()
+        session_cart = self.repository.fetch_active(
+            first=True, id=session_cart_id)
         cart, forced = self._check_or_create_cart(session_cart)
         self.session_manager.set_cart_id_if_not_exists(cart.pk, forced=forced)
 
@@ -91,7 +88,7 @@ class CartService(APIService):
             return cart_items
 
         img_subquery = (
-            ProductImageRepository
+            ProductImageRepository()
             .prepare_feature_image_subquery(outer_ref='product_id')
         )
         annotate_data = {

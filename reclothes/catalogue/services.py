@@ -15,6 +15,9 @@ from catalogue.serializers import (CategorySerializer,
 
 class HomeViewService(APIService):
 
+    def __init__(self):
+        self.repository = ProductRepository()
+
     def _build_response_data(self, best, hot, newest, **kwargs):
         data = {
             'best_products': list(best[:HOME_PAGE_PRODUCTS_LIMIT]),
@@ -25,10 +28,13 @@ class HomeViewService(APIService):
         return super()._build_response_data(**data)
 
     def execute(self):
-        img_subquery = ProductImageRepository.prepare_feature_image_subquery()
-        best = ProductRepository.fetch_best_products(img_subquery)
-        hot = ProductRepository.fetch_hot_products(img_subquery)
-        newest = ProductRepository.fetch_newest_products(img_subquery)
+        img_subquery = (
+            ProductImageRepository()
+            .prepare_feature_image_subquery()
+        )
+        best = self.repository.fetch_best_products(img_subquery)
+        hot = self.repository.fetch_hot_products(img_subquery)
+        newest = self.repository.fetch_newest_products(img_subquery)
         data = self._build_response_data(best, hot, newest)
         return self._build_response(data)
 
@@ -37,6 +43,7 @@ class ProductDetailService(APIService):
 
     def __init__(self, request):
         self.request = request
+        self.repository = ProductRepository()
 
     @staticmethod
     def _validate(product):
@@ -44,7 +51,7 @@ class ProductDetailService(APIService):
             raise NotFound()
 
     def execute(self, product_id):
-        product = ProductRepository.fetch_single_detailed(id=product_id)
+        product = self.repository.fetch_single_detailed(id=product_id)
         self._validate(product)
         serializer = ProductDetailSerializer(
             product, context={'exclude_user': self.request.user})
@@ -57,6 +64,7 @@ class CategoryService(APIService):
 
     def __init__(self, request):
         self.request = request
+        self.repository = CategoryRepository()
 
     @staticmethod
     def _get_serializer_class(is_root=False):
@@ -76,7 +84,7 @@ class CategoryService(APIService):
     def execute(self):
         category_id = self.request.GET.get('category_id', None)
         filters = self._prepare_filters(category_id)
-        categories = CategoryRepository.fetch(**filters)
+        categories = self.repository.fetch(**filters)
         serializer_class = self._get_serializer_class(category_id is None)
         serializer = serializer_class(categories, many=True)
         data = self._build_response_data(categories=serializer.data)
@@ -95,10 +103,11 @@ class CatalogueService(APIService):
 
     def _fetch_popular_tags(self, products, limit=MOST_POPULAR_TAGS_LIMIT):
         """Fetch most popular tags based on products queryset."""
-        tags_ids = ProductRepository.fetch_tags_ids(products)
+        tags_ids = products.filter(tags__isnull=False).values_list(
+            'tags__id', flat=True)
         counter = collections.Counter(tags_ids)
         popular_ids = [key for key, _ in counter.most_common(limit)]
-        popular_tags = TagRepository.fetch(id__in=popular_ids)
+        popular_tags = TagRepository().fetch(id__in=popular_ids)
         return popular_tags
 
     def _serialize_products(self, products):

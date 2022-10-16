@@ -1,11 +1,11 @@
 class BaseRepository:
     """Base class representing repository."""
 
-    def __init__(self, klass):
-        self.klass = klass
+    def __init__(self, model):
+        self.model = model
 
     def fetch(self, first=False, limit=None, **kwargs):
-        qs = self.klass.objects.filter(**kwargs)
+        qs = self.model.objects.filter(**kwargs)
         if first:
             return qs.first()
         elif limit:
@@ -13,4 +13,4 @@ class BaseRepository:
         return qs
 
     def create(self, **kwargs):
-        return self.klass.objects.create(**kwargs)
+        return self.model.objects.create(**kwargs)

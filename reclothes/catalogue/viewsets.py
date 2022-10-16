@@ -32,7 +32,7 @@ class ProductViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return ProductRepository.fetch_active().select_related(
+        return ProductRepository().fetch_active().select_related(
             'category', 'company')
 
     def retrieve(self, request, pk):

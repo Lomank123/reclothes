@@ -2,8 +2,8 @@ from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 from django.utils import timezone
 from reclothes.repositories import BaseRepository
 
-from catalogue.models import (Category, OneTimeUrl, Product, ProductFile,
-                              ProductImage, ProductReview, Tag)
+from catalogue.models import (Category, OneTimeUrl, Product, ProductImage,
+                              ProductReview, Tag)
 
 
 class ProductRepository(BaseRepository):
@@ -11,8 +11,7 @@ class ProductRepository(BaseRepository):
     def __init__(self):
         super().__init__(Product)
 
-    @staticmethod
-    def fetch_active(first=False, limit=None, **kwargs):
+    def fetch_active(self, first=False, limit=None, **kwargs):
         """
         Return active products which either have 0 or enough keys.
         """
@@ -24,7 +23,7 @@ class ProductRepository(BaseRepository):
             Q(keys_limit=0) | Q(keys_diff__gte=0))
 
         qs = (
-            Product.objects
+            self.model.objects
             .annotate(keys_diff=active_keys_count - F('keys_limit'))
             .filter(active_products)
             .order_by('-id')
@@ -35,28 +34,20 @@ class ProductRepository(BaseRepository):
             return qs[:limit]
         return qs
 
-    @staticmethod
-    def fetch_single_detailed(**kwargs):
+    def fetch_single_detailed(self, **kwargs):
         """Return product with average rating and related category and type."""
         return (
-            Product.objects
+            self.model.objects
             .select_related('category', 'product_type')
             .filter(**kwargs)
             .annotate(avg_rate=Avg('reviews__rating'))
             .first()
         )
 
-    @staticmethod
-    def fetch_tags_ids(products):
-        """Return list of tags ids without nulls."""
-        return products.filter(tags__isnull=False).values_list(
-            'tags__id', flat=True)
-
-    @staticmethod
-    def fetch_newest_products(img_subquery, limit=None):
+    def fetch_newest_products(self, img_subquery, limit=None):
         """Return newest active products."""
         qs = (
-            ProductRepository.fetch_active()
+            self.fetch_active()
             .annotate(
                 type=F('product_type__name'), feature_image=img_subquery)
             .values(
@@ -74,15 +65,14 @@ class ProductRepository(BaseRepository):
             return qs[:limit]
         return qs
 
-    @staticmethod
-    def fetch_hot_products(img_subquery, limit=None):
+    def fetch_hot_products(self, img_subquery, limit=None):
         """
         Get active products with most number of purchases.
 
         Number of purchases means count of order items.
         """
         qs = (
-            ProductRepository.fetch_active()
+            self.fetch_active()
             .annotate(
                 purchases=Count('cart_items__orderitem'),
                 type=F('product_type__name'),
@@ -103,11 +93,10 @@ class ProductRepository(BaseRepository):
             return qs[:limit]
         return qs
 
-    @staticmethod
-    def fetch_best_products(img_subquery, limit=None):
+    def fetch_best_products(self, img_subquery, limit=None):
         """Get active products with best reviews rating ratio."""
         qs = (
-            ProductRepository.fetch_active()
+            self.fetch_active()
             .annotate(
                 avg_rate=Avg('reviews__rating'),
                 type=F('product_type__name'),
@@ -128,10 +117,9 @@ class ProductRepository(BaseRepository):
             return qs[:limit]
         return qs
 
-    @staticmethod
-    def fetch_by_ids_with_files_and_keys(ids):
+    def fetch_by_ids_with_files_and_keys(self, ids):
         return (
-            Product.objects
+            self.model.objects
             .prefetch_related('files', 'activation_keys')
             .filter(id__in=ids)
         )
@@ -154,21 +142,13 @@ class ProductImageRepository(BaseRepository):
     def __init__(self):
         super().__init__(ProductImage)
 
-    @staticmethod
-    def prepare_feature_image_subquery(outer_ref='id'):
+    def prepare_feature_image_subquery(self, outer_ref='id'):
         """Return first feature image subquery."""
-        # TODO: Use self.klass
         return Subquery(
-            ProductImage.objects
+            self.model.objects
             .filter(product_id=OuterRef(outer_ref), is_feature=True)
             .values('image')[:1]
         )
-
-
-class ProductFileRepository(BaseRepository):
-
-    def __init__(self):
-        super().__init__(ProductFile)
 
 
 class OneTimeUrlRepository(BaseRepository):
