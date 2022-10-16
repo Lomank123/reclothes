@@ -34,7 +34,6 @@ class CreateOrderService(APIService):
             limit = item.product.keys_limit * item.quantity
             keys = item.product.active_keys[:limit]
 
-            # TODO: Test this
             if len(keys) < limit:
                 raise BadRequest(detail=NOT_ENOUGH_KEYS_MSG)
 
@@ -107,17 +106,6 @@ class DownloadFileService:
         if url.is_used:
             return HttpResponseBadRequest(content='Already in use.')
 
-        OneTimeUrlRepository.delete(url)
+        url.delete()
 
         return FileResponse(url.file.file, as_attachment=True)
-
-
-class OrderViewSetService:
-
-    __slots__ = 'request',
-
-    def __init__(self, request):
-        self.request = request
-
-    def execute(self):
-        return OrderRepository.fetch(user=self.request.user)

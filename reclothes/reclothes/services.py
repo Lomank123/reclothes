@@ -5,17 +5,17 @@ from rest_framework.response import Response
 class AbstractAPIService:
 
     def _build_response_data(self):
-        '''Construct response data and return it as dict.'''
+        """Construct response data and return it as dict."""
 
     def _build_response(self):
-        '''Construct Response and return it.'''
+        """Construct Response and return it."""
 
     def execute(self):
-        '''Entrypoint of every service.'''
+        """Entrypoint of every service."""
 
 
 class APIService(AbstractAPIService):
-    '''Base implementation of service. Use it when create new services.'''
+    """Base implementation of service. Use it when create new services."""
 
     def _build_response_data(self, **kwargs) -> dict:
         return {'detail': kwargs}

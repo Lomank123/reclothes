@@ -3,13 +3,14 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
+from carts.models import Cart, CartItem
 from carts.permissions import IsCartInSession
 from carts.serializers import CartItemViewSetSerializer, CartSerializer
-from carts.services import (CartItemViewSetService, CartService,
-                            CartViewSetService, ChangeQuantityService)
+from carts.services import CartService, ChangeQuantityService
 
 
 class CartViewSet(ModelViewSet):
+    queryset = Cart.objects.all()
     serializer_class = CartSerializer
 
     def get_permissions(self):
@@ -19,21 +20,16 @@ class CartViewSet(ModelViewSet):
             permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
-    def get_queryset(self):
-        return CartViewSetService().execute()
-
     @action(methods=['get'], detail=False)
     def current(self, request):
         return CartService(request).execute()
 
 
 class CartItemViewSet(ModelViewSet):
+    queryset = CartItem.objects.all()
     serializer_class = CartItemViewSetSerializer
     permission_classes = (IsCartInSession, )
     pagination_class = DefaultCustomPagination
-
-    def get_queryset(self):
-        return CartItemViewSetService().execute()
 
     @action(methods=['patch'], detail=False)
     def change_quantity(self, request):

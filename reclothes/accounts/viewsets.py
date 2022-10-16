@@ -1,13 +1,12 @@
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
+from accounts.models import CustomUser
 from accounts.serializers import (CustomUserDetailSerializer,
                                   CustomUserSerializer)
-from accounts.services import CustomUserViewSetService
 
 
 class CustomUserViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated, )
 
     def get_permissions(self):
         if self.action == 'destroy':
@@ -23,5 +22,5 @@ class CustomUserViewSet(ModelViewSet):
         return CustomUserSerializer
 
     def get_queryset(self):
-        # By default it returns only current user
-        return CustomUserViewSetService(self.request).execute()
+        # Limit to only current user
+        return CustomUser.objects.filter(id=self.request.user.pk)

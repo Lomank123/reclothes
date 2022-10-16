@@ -1,20 +1,15 @@
 from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 from django.utils import timezone
+from reclothes.repositories import BaseRepository
 
 from catalogue.models import (Category, OneTimeUrl, Product, ProductFile,
                               ProductImage, ProductReview, Tag)
 
 
-class ProductRepository:
+class ProductRepository(BaseRepository):
 
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = Product.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
+    def __init__(self):
+        super().__init__(Product)
 
     @staticmethod
     def fetch_active(first=False, limit=None, **kwargs):
@@ -41,16 +36,8 @@ class ProductRepository:
         return qs
 
     @staticmethod
-    def fetch_active_with_category():
-        return (
-            ProductRepository
-            .fetch_active()
-            .select_related('category')
-        )
-
-    @staticmethod
     def fetch_single_detailed(**kwargs):
-        '''Return product with average rating and related category and type.'''
+        """Return product with average rating and related category and type."""
         return (
             Product.objects
             .select_related('category', 'product_type')
@@ -61,13 +48,13 @@ class ProductRepository:
 
     @staticmethod
     def fetch_tags_ids(products):
-        '''Return list of tags ids without nulls.'''
+        """Return list of tags ids without nulls."""
         return products.filter(tags__isnull=False).values_list(
             'tags__id', flat=True)
 
     @staticmethod
     def fetch_newest_products(img_subquery, limit=None):
-        '''Return newest active products.'''
+        """Return newest active products."""
         qs = (
             ProductRepository.fetch_active()
             .annotate(
@@ -89,11 +76,11 @@ class ProductRepository:
 
     @staticmethod
     def fetch_hot_products(img_subquery, limit=None):
-        '''
+        """
         Get active products with most number of purchases.
 
         Number of purchases means count of order items.
-        '''
+        """
         qs = (
             ProductRepository.fetch_active()
             .annotate(
@@ -118,7 +105,7 @@ class ProductRepository:
 
     @staticmethod
     def fetch_best_products(img_subquery, limit=None):
-        '''Get active products with best reviews rating ratio.'''
+        """Get active products with best reviews rating ratio."""
         qs = (
             ProductRepository.fetch_active()
             .annotate(
@@ -150,35 +137,27 @@ class ProductRepository:
         )
 
 
-class CategoryRepository:
+class CategoryRepository(BaseRepository):
 
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = Category.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
+    def __init__(self):
+        super().__init__(Category)
 
 
-class TagRepository:
+class TagRepository(BaseRepository):
 
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = Tag.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
+    def __init__(self):
+        super().__init__(Tag)
 
 
-class ProductImageRepository:
+class ProductImageRepository(BaseRepository):
+
+    def __init__(self):
+        super().__init__(ProductImage)
 
     @staticmethod
     def prepare_feature_image_subquery(outer_ref='id'):
-        '''Return first feature image subquery.'''
+        """Return first feature image subquery."""
+        # TODO: Use self.klass
         return Subquery(
             ProductImage.objects
             .filter(product_id=OuterRef(outer_ref), is_feature=True)
@@ -186,45 +165,19 @@ class ProductImageRepository:
         )
 
 
-class ProductFileRepository:
+class ProductFileRepository(BaseRepository):
 
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = ProductFile.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
+    def __init__(self):
+        super().__init__(ProductFile)
 
 
-class OneTimeUrlRepository:
+class OneTimeUrlRepository(BaseRepository):
 
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = OneTimeUrl.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
-
-    @staticmethod
-    def delete(url):
-        url.delete()
-
-    @staticmethod
-    def create(**kwargs):
-        return OneTimeUrl.objects.create(**kwargs)
+    def __init__(self):
+        super().__init__(OneTimeUrl)
 
 
-class ProductReviewRepository:
+class ProductReviewRepository(BaseRepository):
 
-    @staticmethod
-    def fetch(first=False, limit=None, **kwargs):
-        qs = ProductReview.objects.filter(**kwargs)
-        if first:
-            return qs.first()
-        elif limit:
-            return qs[:limit]
-        return qs
+    def __init__(self):
+        super().__init__(ProductReview)

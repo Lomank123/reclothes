@@ -5,15 +5,14 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from catalogue.filters import CatalogueFilter
+from catalogue.models import Category, ProductReview, Tag
 from catalogue.pagination import DefaultCustomPagination
 from catalogue.serializers import (CategorySerializer,
                                    ProductCatalogueSerializer,
                                    ProductReviewSerializer, TagSerializer)
 from catalogue.services import (CatalogueService, CategoryService,
-                                CategoryViewSetService, HomeViewService,
-                                ProductDetailService,
-                                ProductReviewViewSetService,
-                                ProductViewSetService, TagViewSetService)
+                                HomeViewService, ProductDetailService)
+from catalogue.repositories import ProductRepository
 
 
 class ProductViewSet(ModelViewSet):
@@ -33,7 +32,8 @@ class ProductViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return ProductViewSetService().execute()
+        return ProductRepository.fetch_active().select_related(
+            'category', 'company')
 
     def retrieve(self, request, pk):
         return ProductDetailService(request).execute(pk)
@@ -60,14 +60,15 @@ class CategoryViewSet(ModelViewSet):
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        return Category.objects.filter(is_active=True)
+
     def list(self, request):
         return CategoryService(request).execute()
 
-    def get_queryset(self):
-        return CategoryViewSetService().execute()
-
 
 class TagViewSet(ModelViewSet):
+    queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
     def get_permissions(self):
@@ -78,9 +79,6 @@ class TagViewSet(ModelViewSet):
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
-
-    def get_queryset(self):
-        return TagViewSetService().execute()
 
 
 class ProductReviewViewSet(ModelViewSet):
@@ -96,4 +94,7 @@ class ProductReviewViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return ProductReviewViewSetService(self.request).execute(self.action)
+        filters = dict()
+        if action == 'retrieve':
+            filters['user'] = self.request.user
+        return ProductReview.objects.filter(**filters)

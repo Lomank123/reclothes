@@ -11,7 +11,7 @@ from carts.consts import (NEW_CART_ATTACHED_MSG, NEW_CART_CREATED_MSG,
                           QUANTITY_MAX_ERROR_MSG, QUANTITY_MIN_ERROR_MSG)
 from carts.exceptions import BadRequest
 from carts.models import Cart, CartItem
-from carts.repositories import CartItemRepository, CartRepository
+from carts.repositories import CartRepository
 from carts.serializers import CartItemSerializer, CartSerializer
 from carts.utils import CartSessionManager
 
@@ -145,19 +145,8 @@ class ChangeQuantityService(APIService):
         current_count = product.active_keys.count()
         required_count = new_quantity * product.keys_limit
         self._validate(required_count, current_count)
-        CartItemRepository.change_quantity(cart_item, new_quantity)
+        cart_item.quantity = new_quantity
+        cart_item.save()
         # Build response
         data = self._build_response_data(value=new_quantity)
         return self._build_response(data)
-
-
-class CartViewSetService:
-
-    def execute(self):
-        return CartRepository.fetch_active()
-
-
-class CartItemViewSetService:
-
-    def execute(self):
-        return CartItemRepository.fetch()

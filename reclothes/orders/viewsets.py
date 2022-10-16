@@ -1,11 +1,11 @@
 from catalogue.pagination import DefaultCustomPagination
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from orders.serializers import OrderDetailSerializer, OrderSerializer
-from orders.services import (CreateOrderService, OrderFileService,
-                             OrderViewSetService)
+from orders.services import CreateOrderService, OrderFileService
+from orders.models import Order
 
 
 class OrderViewSet(ModelViewSet):
@@ -28,7 +28,7 @@ class OrderViewSet(ModelViewSet):
 
     def get_queryset(self):
         # Only user related orders
-        return OrderViewSetService(self.request).execute()
+        return Order.objects.filter(user=self.request.user)
 
     def create(self, request):
         return CreateOrderService(request).execute()

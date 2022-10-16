@@ -6,8 +6,7 @@ from rest_framework.exceptions import NotFound
 from catalogue.consts import HOME_PAGE_PRODUCTS_LIMIT, MOST_POPULAR_TAGS_LIMIT
 from catalogue.pagination import DefaultCustomPagination
 from catalogue.repositories import (CategoryRepository, ProductImageRepository,
-                                    ProductRepository, ProductReviewRepository,
-                                    TagRepository)
+                                    ProductRepository, TagRepository)
 from catalogue.serializers import (CategorySerializer,
                                    ProductCatalogueSerializer,
                                    ProductDetailSerializer,
@@ -120,33 +119,3 @@ class CatalogueService(APIService):
         data = self._build_response_data(
             popular_tags=serialized_tags, products=serialized_products)
         return self._build_response(data)
-
-
-class ProductViewSetService:
-
-    def execute(self):
-        return ProductRepository.fetch_active_with_category()
-
-
-class CategoryViewSetService:
-
-    def execute(self):
-        return CategoryRepository.fetch(is_active=True)
-
-
-class TagViewSetService:
-
-    def execute(self):
-        return TagRepository.fetch()
-
-
-class ProductReviewViewSetService:
-
-    def __init__(self, request):
-        self.request = request
-
-    def execute(self, action):
-        filters = dict()
-        if action == 'retrieve':
-            filters['user'] = self.request.user
-        return ProductReviewRepository.fetch(**filters)
