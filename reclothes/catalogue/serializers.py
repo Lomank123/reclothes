@@ -99,7 +99,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     ordered_images = ProductImageSerializer(required=False, many=True)
     attrs_with_values = ProductAttributeValueSerializer(
         required=False, many=True)
-    reviews_with_users = ProductReviewSerializer(required=False, many=True)
+    reviews_with_users = serializers.SerializerMethodField()
     company = CompanySerializer(required=False)
     avg_rate = serializers.FloatField(default=0.00)
 
@@ -124,6 +124,14 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'attrs_with_values',
             'reviews_with_users',
         )
+
+    def get_reviews_with_users(self, instance):
+        """Return qs without current user's review if context was specified."""
+        qs = instance.reviews.select_related('user')
+        user = self.context.get('exclude_user', None)
+        if not user.is_authenticated:
+            user = None
+        return ProductReviewSerializer(qs.exclude(user=user), many=True).data
 
 
 class ProductCatalogueSerializer(serializers.ModelSerializer):

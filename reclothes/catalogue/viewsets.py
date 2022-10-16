@@ -1,17 +1,19 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from catalogue.filters import CatalogueFilter
 from catalogue.pagination import DefaultCustomPagination
 from catalogue.serializers import (CategorySerializer,
-                                   ProductCatalogueSerializer, TagSerializer)
+                                   ProductCatalogueSerializer,
+                                   ProductReviewSerializer, TagSerializer)
 from catalogue.services import (CatalogueService, CategoryService,
                                 CategoryViewSetService, HomeViewService,
-                                ProductDetailService, ProductViewSetService,
-                                TagViewSetService)
+                                ProductDetailService,
+                                ProductReviewViewSetService,
+                                ProductViewSetService, TagViewSetService)
 
 
 class ProductViewSet(ModelViewSet):
@@ -34,7 +36,7 @@ class ProductViewSet(ModelViewSet):
         return ProductViewSetService().execute()
 
     def retrieve(self, request, pk):
-        return ProductDetailService().execute(pk)
+        return ProductDetailService(request).execute(pk)
 
     @action(methods=['get'], detail=False)
     def home(self, request):
@@ -79,3 +81,19 @@ class TagViewSet(ModelViewSet):
 
     def get_queryset(self):
         return TagViewSetService().execute()
+
+
+class ProductReviewViewSet(ModelViewSet):
+    serializer_class = ProductReviewSerializer
+
+    def get_permissions(self):
+        AUTH_REQUIRED_ACTIONS = ['retrieve', 'create']
+
+        if self.action in AUTH_REQUIRED_ACTIONS:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        return ProductReviewViewSetService(self.request).execute(self.action)

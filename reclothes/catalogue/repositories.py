@@ -2,7 +2,7 @@ from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 from django.utils import timezone
 
 from catalogue.models import (Category, OneTimeUrl, Product, ProductFile,
-                              ProductImage, Tag)
+                              ProductImage, ProductReview, Tag)
 
 
 class ProductRepository:
@@ -216,3 +216,15 @@ class OneTimeUrlRepository:
     @staticmethod
     def create(**kwargs):
         return OneTimeUrl.objects.create(**kwargs)
+
+
+class ProductReviewRepository:
+
+    @staticmethod
+    def fetch(first=False, limit=None, **kwargs):
+        qs = ProductReview.objects.filter(**kwargs)
+        if first:
+            return qs.first()
+        elif limit:
+            return qs[:limit]
+        return qs

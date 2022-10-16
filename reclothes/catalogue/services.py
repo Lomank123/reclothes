@@ -6,7 +6,8 @@ from rest_framework.exceptions import NotFound
 from catalogue.consts import HOME_PAGE_PRODUCTS_LIMIT, MOST_POPULAR_TAGS_LIMIT
 from catalogue.pagination import DefaultCustomPagination
 from catalogue.repositories import (CategoryRepository, ProductImageRepository,
-                                    ProductRepository, TagRepository)
+                                    ProductRepository, ProductReviewRepository,
+                                    TagRepository)
 from catalogue.serializers import (CategorySerializer,
                                    ProductCatalogueSerializer,
                                    ProductDetailSerializer,
@@ -35,6 +36,9 @@ class HomeViewService(APIService):
 
 class ProductDetailService(APIService):
 
+    def __init__(self, request):
+        self.request = request
+
     @staticmethod
     def _validate(product):
         if product is None:
@@ -43,7 +47,8 @@ class ProductDetailService(APIService):
     def execute(self, product_id):
         product = ProductRepository.fetch_single_detailed(id=product_id)
         self._validate(product)
-        serializer = ProductDetailSerializer(product)
+        serializer = ProductDetailSerializer(
+            product, context={'exclude_user': self.request.user})
         data = self._build_response_data(**serializer.data)
         return self._build_response(data)
 
@@ -133,3 +138,15 @@ class TagViewSetService:
 
     def execute(self):
         return TagRepository.fetch()
+
+
+class ProductReviewViewSetService:
+
+    def __init__(self, request):
+        self.request = request
+
+    def execute(self, action):
+        filters = dict()
+        if action == 'retrieve':
+            filters['user'] = self.request.user
+        return ProductReviewRepository.fetch(**filters)
