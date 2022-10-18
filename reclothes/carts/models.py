@@ -1,7 +1,10 @@
 from catalogue.models import CustomBaseModel
 from django.db import models
-from django.db.models import Sum, F
+from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
+
+from carts.querysets import CartQuerySet
+from carts.managers import ActiveCartManager
 
 
 class Cart(CustomBaseModel):
@@ -15,6 +18,9 @@ class Cart(CustomBaseModel):
     is_deleted = models.BooleanField(default=False, verbose_name=_('Deleted'))
     is_archived = models.BooleanField(
         default=False, verbose_name=_('Archived'))
+
+    objects = models.Manager()
+    active = ActiveCartManager.from_queryset(CartQuerySet)()
 
     class Meta:
         ordering = ['-id']
@@ -33,6 +39,10 @@ class Cart(CustomBaseModel):
         result = self.cart_items.aggregate(
             total=Sum(F('product__regular_price') * F('quantity')))
         return result['total']
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
 
 
 class CartItem(models.Model):

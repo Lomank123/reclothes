@@ -1,13 +1,18 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from accounts.forms import CustomUserCreationForm
 from accounts.models import CustomUser
-from accounts.services import LoginViewService
+from accounts.serializers import CustomUserDetailSerializer
+from accounts.services import CartToSessionService
 
 
 class AccountsLoginView(LoginView):
@@ -15,7 +20,8 @@ class AccountsLoginView(LoginView):
 
     def form_valid(self, form):
         login(self.request, form.get_user())
-        LoginViewService(self.request).execute()
+        # Update cart id in session
+        CartToSessionService(self.request).execute()
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -39,5 +45,18 @@ class AccountsSignupView(CreateView):
         return valid
 
 
-class UserProfileView(LoginRequiredMixin, TemplateView):
+class CustomUserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/profile.html'
+
+
+class CustomUserDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        return CustomUser.objects.filter(id=self.request.user.pk)
+
+    def get(self, request, pk):
+        user = CustomUser.objects.filter(id=pk).first()
+        serializer = CustomUserDetailSerializer(user)
+        serializer.is_valid(raise_exception=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

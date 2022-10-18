@@ -1,10 +1,10 @@
-from accounts.services import LoginViewService
+from accounts.services import CartToSessionService
 from carts.models import Cart
 from django.test import Client, RequestFactory, TestCase
 from reclothes.tests import factory
 
 
-class LoginViewServiceTestCase(TestCase):
+class CartToSessionServiceTestCase(TestCase):
 
     @staticmethod
     def _create_request(user):
@@ -22,7 +22,7 @@ class LoginViewServiceTestCase(TestCase):
         request = self._create_request(user)
 
         # Act
-        LoginViewService(request).execute()
+        CartToSessionService(request).execute()
 
         # Assert
         self.assertEqual(Cart.objects.count(), 2)
@@ -37,7 +37,7 @@ class LoginViewServiceTestCase(TestCase):
         request = self._create_request(user)
 
         # Act
-        LoginViewService(request).execute()
+        CartToSessionService(request).execute()
 
         # Assert
         self.assertEqual(Cart.objects.filter(user=user).count(), 3)

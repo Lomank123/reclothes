@@ -1,17 +1,18 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
 
 from accounts.views import (AccountsLoginView, AccountsLogoutView,
-                            AccountsSignupView, UserProfileView)
-from accounts.viewsets import CustomUserViewSet
+                            AccountsSignupView, CustomUserDetailView,
+                            CustomUserProfileView)
 
 
-router = DefaultRouter()
-router.register("user", CustomUserViewSet, basename="user")
+# 2-tuple contains list of patterns and app namespace
+api_urlpatterns = ([
+    path('<int:pk>/', CustomUserDetailView.as_view(), name='detail'),
+], 'user')
 
 urlpatterns = [
     path('login/', AccountsLoginView.as_view(), name='login'),
     path('logout/', AccountsLogoutView.as_view(), name='logout'),
     path('signup/', AccountsSignupView.as_view(), name='signup'),
-    path('profile/', UserProfileView.as_view(), name='profile'),
+    path('profile/', CustomUserProfileView.as_view(), name='profile'),
 ]

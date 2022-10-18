@@ -22,11 +22,6 @@ class CartRepository:
         return qs
 
     @staticmethod
-    def attach_user_to_cart(cart, user_id):
-        cart.user_id = user_id
-        cart.save()
-
-    @staticmethod
     def delete(cart, full_delete=False):
         """
         Mark cart as deleted.
