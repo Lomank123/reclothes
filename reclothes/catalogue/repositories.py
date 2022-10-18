@@ -174,6 +174,7 @@ class TagRepository:
         return qs
 
 
+# TODO: Remove this
 class ProductImageRepository:
 
     @staticmethod

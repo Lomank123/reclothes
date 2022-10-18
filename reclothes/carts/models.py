@@ -3,8 +3,8 @@ from django.db import models
 from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
 
-from carts.querysets import CartQuerySet
 from carts.managers import ActiveCartManager
+from carts.querysets import CartItemQuerySet
 
 
 class Cart(CustomBaseModel):
@@ -20,7 +20,7 @@ class Cart(CustomBaseModel):
         default=False, verbose_name=_('Archived'))
 
     objects = models.Manager()
-    active = ActiveCartManager.from_queryset(CartQuerySet)()
+    active = ActiveCartManager()
 
     class Meta:
         ordering = ['-id']
@@ -59,6 +59,8 @@ class CartItem(models.Model):
         related_name='cart_items',
     )
     quantity = models.IntegerField(default=1, verbose_name=_('Quantity'))
+
+    objects = CartItemQuerySet.as_manager()
 
     class Meta:
         ordering = ['-id']

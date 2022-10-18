@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from catalogue.filters import CatalogueFilter
-from catalogue.pagination import DefaultCustomPagination
+from reclothes.pagination import DefaultCustomPagination
 from catalogue.serializers import (CategorySerializer,
                                    ProductCatalogueSerializer, TagSerializer)
 from catalogue.services import (CatalogueService, CategoryService,

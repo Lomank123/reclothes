@@ -34,7 +34,6 @@ class CreateOrderService(APIService):
             limit = item.product.keys_limit * item.quantity
             keys = item.product.active_keys[:limit]
 
-            # TODO: Test this
             if len(keys) < limit:
                 raise BadRequest(detail=NOT_ENOUGH_KEYS_MSG)
 

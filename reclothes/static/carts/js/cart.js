@@ -50,8 +50,8 @@ function buildQuantityBlock(quantity, id, productId, is_limited) {
     `);
 
     deleteItemButton.click(async () => {await deleteCartItem(id)});
-    addBtn.click(async () => {await changeQuantity(currentQuantity + 1, id, productId, errorBlock)});
-    subBtn.click(async () => {await changeQuantity(currentQuantity - 1, id, productId, errorBlock)});
+    addBtn.click(async () => {await changeQuantity(currentQuantity + 1, id, errorBlock)});
+    subBtn.click(async () => {await changeQuantity(currentQuantity - 1, id, errorBlock)});
 
     quantityInfoBlock.append(addBtn);
     quantityInfoBlock.append(quantityField);
@@ -69,15 +69,11 @@ function buildQuantityBlock(quantity, id, productId, is_limited) {
 }
 
 
-async function changeQuantity(newQuantity, id, productId, block) {
-    const data = {
-        value: newQuantity,
-        cart_item_id: id,
-        product_id: productId,
-    };
-    const url = `${changeCartItemQuantityUrl}/`;
+async function changeQuantity(newQuantity, id, block) {
+    const data = {quantity: newQuantity};
+    const url = `${cartItemUrl}/${id}/`;
     try {
-        const result = await ajaxCall(url, 'PATCH', data);
+        await ajaxCall(url, 'PATCH', data);
         window.location.reload();
     } catch(err) {
         setQuantityErrors(err.responseJSON, block);
@@ -89,7 +85,7 @@ function setQuantityErrors(error, block) {
     block.empty();
     const errorMessageBlock = $(`
         <div class="error-msg-block flex-block">
-            <span>${error.detail}</span>
+            <span>${error.quantity}</span>
         </div>
     `);
     block.append(errorMessageBlock);
@@ -103,9 +99,9 @@ async function deleteCartItem(id) {
 }
 
 
-function setCartItemsData(data) {
-    setPaginatedCartItems(data.cart_items.results);
-    setPagination(data.cart_items);
+function setCartItemsData(cartItems) {
+    setPaginatedCartItems(cartItems.results);
+    setPagination(cartItems);
 }
 
 
@@ -126,7 +122,9 @@ function setTotalPrice(totalPrice) {
 
 $(window).on('load', async () => {
     // Here we need to get paginated cart items as well
-    const cartData = await ajaxCall(`${currentCartUrl}/?items=true&paginate=true`);
-    setTotalPrice(cartData.detail.cart.total_price);
-    setCartItemsData(cartData.detail);
+    const cartData = await ajaxCall(currentCartUrl);
+    const url = `${cartItemUrl}/?cart=${cartData.id}&paginate=true`;
+    const cartItemsData = await ajaxCall(url);
+    setTotalPrice(cartData.total_price);
+    setCartItemsData(cartItemsData);
 });

@@ -30,5 +30,5 @@ paymentForm.submit(async (e) => {
 $(window).on('load', async () => {
     // Total price
     const cartData = await ajaxCall(currentCartUrl);
-    setTotalPrice(cartData.detail.cart);
+    setTotalPrice(cartData);
 });

@@ -1,10 +1,10 @@
+from carts.services import CartToSessionService
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +12,6 @@ from rest_framework.views import APIView
 from accounts.forms import CustomUserCreationForm
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserDetailSerializer
-from accounts.services import CartToSessionService
 
 
 class AccountsLoginView(LoginView):
@@ -52,11 +51,7 @@ class CustomUserProfileView(LoginRequiredMixin, TemplateView):
 class CustomUserDetailView(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get_queryset(self):
-        return CustomUser.objects.filter(id=self.request.user.pk)
-
     def get(self, request, pk):
         user = CustomUser.objects.filter(id=pk).first()
         serializer = CustomUserDetailSerializer(user)
-        serializer.is_valid(raise_exception=True)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(data=serializer.data)

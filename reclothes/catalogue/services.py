@@ -4,7 +4,7 @@ from reclothes.services import APIService
 from rest_framework.exceptions import NotFound
 
 from catalogue.consts import HOME_PAGE_PRODUCTS_LIMIT, MOST_POPULAR_TAGS_LIMIT
-from catalogue.pagination import DefaultCustomPagination
+from reclothes.pagination import DefaultCustomPagination
 from catalogue.repositories import (CategoryRepository, ProductImageRepository,
                                     ProductRepository, TagRepository)
 from catalogue.serializers import (CategorySerializer,

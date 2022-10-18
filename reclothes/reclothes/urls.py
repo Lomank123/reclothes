@@ -1,24 +1,24 @@
+from accounts.urls import api_urlpatterns as accounts_api
 from accounts.views import AccountsLoginView
-from carts.urls import router as carts_router
+from carts.urls import api_urlpatterns as carts_api
 from catalogue.urls import router as catalogue_router
-from orders.urls import router as orders_router
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from orders.urls import router as orders_router
 from rest_framework.routers import DefaultRouter
-from accounts.urls import api_urlpatterns as accounts_api
 
 
+# TODO: Remove this
 # Main API router
 router = DefaultRouter()
 router.registry.extend(catalogue_router.registry)
-router.registry.extend(carts_router.registry)
 router.registry.extend(orders_router.registry)
 
-# TODO: Replace router with this
 api_urlpatterns = [
-    path('user/', include((accounts_api, 'user'), namespace='user')),
+    path('user/', include(accounts_api, namespace='user-api')),
+    path('cart/', include(carts_api, namespace='cart-api')),
 ]
 
 urlpatterns = [
@@ -27,7 +27,7 @@ urlpatterns = [
     path('lomank/', admin.site.urls),
 
     # API
-    path('api/', include(router.urls)),
+    path('api/', include((api_urlpatterns, 'api'), namespace='api')),
 
     # App urls
     path('', include(('catalogue.urls', 'catalogue'), namespace='catalogue')),

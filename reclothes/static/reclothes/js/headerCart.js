@@ -10,8 +10,8 @@ function calculateItemsCount(count) {
     return countString;
 }
 
-function setCartData(data) {
-    const count = calculateItemsCount(data.items_count);
+function setCartData(cart) {
+    const count = calculateItemsCount(cart.items_count);
     const cartButton = $(`
         <a href="${cartPageUrl}/" class="btn btn-lg transparent-btn" id="cart-btn">
             <i class="cart-icon bi bi-bag d-flex justify-content-center align-items-center"></i>
@@ -50,11 +50,12 @@ async function addToCart(id) {
 
 
 async function getProductsIds() {
-    const url = `${currentCartUrl}/?items=true`;
-    const cartData = await ajaxCall(url);
-    cartId = parseInt(cartData.detail.cart.id);
+    const cartData = await ajaxCall(currentCartUrl);
+    const url = `${cartItemUrl}/?cart=${cartData.id}`;
+    const cartItemsData = await ajaxCall(url);
+    cartId = parseInt(cartData.id);
     const productsIds = [];
-    cartData.detail.cart_items.forEach(cartItem => {
+    cartItemsData.forEach(cartItem => {
         productsIds.push(cartItem.product_id);
     });
     return productsIds;
@@ -63,5 +64,5 @@ async function getProductsIds() {
 
 $(window).on('load', async () => {
     const cartData = await ajaxCall(currentCartUrl);
-    setCartData(cartData.detail.cart);
+    setCartData(cartData);
 });
