@@ -26,4 +26,4 @@ class CartItemQuerySet(models.QuerySet):
             return self.filter(cart__user=user)
         # Anonymous users can access only their current cart
         current_cart_id = request.session.get('cart_id', None)
-        return self.filter(id=current_cart_id)
+        return self.filter(cart__id=current_cart_id)

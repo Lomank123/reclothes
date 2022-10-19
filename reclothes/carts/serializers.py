@@ -1,7 +1,8 @@
 from catalogue.serializers import MyOrdersProductSerializer
 from rest_framework import serializers
 
-from carts.consts import QUANTITY_MAX_ERROR_MSG, QUANTITY_MIN_ERROR_MSG
+from carts.consts import (CURRENT_CART_ERROR_MSG, QUANTITY_MAX_ERROR_MSG,
+                          QUANTITY_MIN_ERROR_MSG)
 from carts.models import Cart, CartItem
 
 
@@ -47,11 +48,18 @@ class CartItemDetailSerializer(serializers.ModelSerializer):
         return quantity
 
 
-class CartItemViewSetSerializer(serializers.ModelSerializer):
+class CartItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = '__all__'
+        fields = ('cart', 'product', 'quantity')
+
+    def validate_cart(self, cart):
+        session_cart_id = self.context.get('session_cart_id')
+        # User can add item only to current active cart
+        if session_cart_id != cart.pk:
+            raise serializers.ValidationError(CURRENT_CART_ERROR_MSG)
+        return cart
 
 
 class MyOrdersCartItemSerializer(serializers.ModelSerializer):

@@ -1,8 +1,10 @@
 from django.views.generic.base import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from reclothes.pagination import DefaultCustomPagination
+from rest_framework import status
 from rest_framework.generics import GenericAPIView
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   UpdateModelMixin)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,7 +12,8 @@ from rest_framework.views import APIView
 from carts.filters import CartItemListFilter
 from carts.models import CartItem
 from carts.selectors import CurrentCartSelector
-from carts.serializers import (CartItemDetailSerializer,
+from carts.serializers import (CartItemCreateSerializer,
+                               CartItemDetailSerializer,
                                CartItemListSerializer, CartSerializer)
 
 
@@ -30,12 +33,16 @@ class CurrentCartView(APIView):
         return Response(data=serializer.data)
 
 
-class CartItemListView(GenericAPIView):
+class CartItemListView(CreateModelMixin, GenericAPIView):
     permission_classes = (AllowAny, )
-    serializer_class = CartItemListSerializer
     pagination_class = DefaultCustomPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = CartItemListFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CartItemCreateSerializer
+        return CartItemListSerializer
 
     def get_queryset(self):
         return CartItem.objects.available(self.request)
@@ -56,10 +63,19 @@ class CartItemListView(GenericAPIView):
         data = self._prepare_data(ready_queryset)
         return Response(data)
 
-    # TODO: Add post method (When adding new item to cart)
+    def post(self, request, *args, **kwargs):
+        session_cart_id = request.session.get('cart_id')
+        serializer = self.get_serializer(
+            data=request.data, context={'session_cart_id': session_cart_id})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class CartItemDetailView(UpdateModelMixin, GenericAPIView):
+class CartItemDetailView(DestroyModelMixin, UpdateModelMixin, GenericAPIView):
+    permission_classes = (AllowAny, )
     serializer_class = CartItemDetailSerializer
 
     def get_queryset(self):
@@ -68,4 +84,5 @@ class CartItemDetailView(UpdateModelMixin, GenericAPIView):
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
 
-    # TODO: Add delete method (when removing items from cart)
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)

@@ -44,7 +44,7 @@ async function addToCart(id) {
         'product': id,
         'quantity': 1,
     }
-    const result = await ajaxCall(`${defaultCartItemUrl}/`, 'POST', data);
+    const result = await ajaxCall(`${cartItemUrl}/`, 'POST', data);
     window.location.reload();
 }
 

@@ -93,7 +93,7 @@ function setQuantityErrors(error, block) {
 
 
 async function deleteCartItem(id) {
-    const url = `${defaultCartItemUrl}/${id}/`;
+    const url = `${cartItemUrl}/${id}/`;
     await ajaxCall(url, 'DELETE');
     window.location.reload();
 }
