@@ -1,24 +1,18 @@
 from accounts.urls import api_urlpatterns as accounts_api
 from accounts.views import AccountsLoginView
 from carts.urls import api_urlpatterns as carts_api
-from catalogue.urls import router as catalogue_router
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from orders.urls import router as orders_router
-from rest_framework.routers import DefaultRouter
+from catalogue.urls import product_api, category_api
 
-
-# TODO: Remove this
-# Main API router
-router = DefaultRouter()
-router.registry.extend(catalogue_router.registry)
-router.registry.extend(orders_router.registry)
 
 api_urlpatterns = [
     path('user/', include(accounts_api, namespace='user-api')),
     path('cart/', include(carts_api, namespace='cart-api')),
+    path('product/', include(product_api, namespace='product-api')),
+    path('category/', include(category_api, namespace='category-api')),
 ]
 
 urlpatterns = [

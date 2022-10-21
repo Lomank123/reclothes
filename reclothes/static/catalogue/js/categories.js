@@ -41,7 +41,7 @@ function displayCategories(categories) {
 
 
 $(window).on('load', async () => {
-    const url = `${defaultCategoriesUrl}${window.location.search}`;
-    const response = await ajaxCall(url);
-    setCategories(response.detail.categories);
+    const url = `${defaultCategoriesUrl}/${window.location.search}`;
+    const categoriesData = await ajaxCall(url);
+    setCategories(categoriesData);
 });

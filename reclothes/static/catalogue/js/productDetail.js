@@ -307,7 +307,7 @@ function buildRating(starsNum) {
 
 $(window).on('load', async () => {
     const productsIds = await getProductsIds();
-    const productDataUrl = `${defaultProductUrl}/${productId}`;
+    const productDataUrl = `${defaultProductUrl}/${productId}/`;
     const productData = await ajaxCall(productDataUrl);
-    displayProductInfo(productData.detail, productsIds);
+    displayProductInfo(productData, productsIds);
 });

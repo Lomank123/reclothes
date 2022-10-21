@@ -1,23 +1,22 @@
 import json
 
+from carts.exceptions import BadRequest
 from carts.models import Cart
-from carts.repositories import CartRepository
 from carts.utils import CartSessionManager
 from catalogue.repositories import OneTimeUrlRepository, ProductRepository
 from catalogue.serializers import DownloadProductSerializer
 from catalogue.utils import valid_uuid
 from django.db import transaction
-from rest_framework import status
 from django.http.response import (FileResponse, HttpResponseBadRequest,
                                   HttpResponseNotFound)
 from django.shortcuts import get_object_or_404
 from reclothes.services import APIService
-from carts.exceptions import BadRequest
+from rest_framework import status
 
+from orders.consts import NOT_ENOUGH_KEYS_MSG
 from orders.models import Order
 from orders.repositories import OrderItemRepository, OrderRepository
 from orders.serializers import CardSerializer, OrderDetailSerializer
-from orders.consts import NOT_ENOUGH_KEYS_MSG
 
 
 class CreateOrderService(APIService):
@@ -60,8 +59,8 @@ class CreateOrderService(APIService):
             user=cart.user, total_price=cart.total_price)
         self._create_order_items(cart, order)
 
-        CartRepository.delete(cart=cart)
-        new_cart = CartRepository.create(user=self.request.user)
+        cart.delete()
+        new_cart = Cart.objects.create(user=self.request.user)
         self.session_manager.set_cart_id_if_not_exists(
             cart_id=new_cart.pk, forced=True)
 

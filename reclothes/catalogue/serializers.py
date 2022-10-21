@@ -204,3 +204,55 @@ class MyOrdersProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+
+class BestProductSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(read_only=True)
+    feature_image = serializers.CharField(read_only=True)
+    avg_rate = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            'title',
+            'description',
+            'regular_price',
+            'type',
+            'avg_rate',
+            'feature_image',
+        )
+
+
+class HotProductSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(read_only=True)
+    feature_image = serializers.CharField(read_only=True)
+    purchases = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            'title',
+            'description',
+            'regular_price',
+            'type',
+            'purchases',
+            'feature_image',
+        )
+
+
+class NewestProductSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(read_only=True)
+    feature_image = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            'title',
+            'description',
+            'type',
+            'regular_price',
+            'feature_image',
+        )

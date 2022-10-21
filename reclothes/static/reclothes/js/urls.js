@@ -4,15 +4,12 @@ const apiUrl = "/api";
 // Default api urls
 const defaultOrderUrl = `${apiUrl}/order`;
 const defaultUserUrl = `${apiUrl}/user`;
-const defaultProductUrl = `${apiUrl}/product`;
 const defaultCartUrl = `${apiUrl}/cart`;
-const defaultTagsUrl = `${apiUrl}/tag`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
-const defaultRootCategoriesUrl = `${defaultCategoriesUrl}/root`;
-const defaultCatalogueDataUrl = `${defaultProductUrl}/catalogue`;
+const defaultProductUrl = `${apiUrl}/product`;
 
 // Products
-const catalogueDataUrl = getUrlWithSearch(defaultCatalogueDataUrl);
+const catalogueDataUrl = getUrlWithSearch(defaultProductUrl);
 const homeProductsUrl = `${defaultProductUrl}/home`;
 // Cart and cart items
 const cartItemUrl = `${defaultCartUrl}/items`;

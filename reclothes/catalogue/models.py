@@ -10,6 +10,8 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from catalogue.consts import LINK_EXPIRE_HOURS
 from catalogue.utils import get_product_file_path, get_product_media_path
+from catalogue.managers import ActiveProductManager, ActiveCategoryManager
+from catalogue.querysets import ProductQuerySet
 
 
 class CustomBaseModel(models.Model):
@@ -55,6 +57,9 @@ class Category(MPTTModel):
     slug = models.SlugField(
         max_length=255, unique=True, help_text=_("Category safe URL"))
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
+
+    objects = models.Manager()
+    active = ActiveCategoryManager()
 
     class MPTTMeta:
         order_insertion_by = ["name"]
@@ -182,6 +187,10 @@ class Product(CustomBaseModel):
         ordering = ['-id']
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
+
+    # Custom managers & querysets
+    objects = ProductQuerySet.as_manager()
+    active = ActiveProductManager.from_queryset(ProductQuerySet)()
 
     def __str__(self):
         return f'{self.title} ({self.pk})'

@@ -1,13 +1,13 @@
 from django.urls import path
 
 from accounts.views import (AccountsLoginView, AccountsLogoutView,
-                            AccountsSignupView, CustomUserDetailView,
+                            AccountsSignupView, CustomUserDetailAPIView,
                             CustomUserProfileView)
 
 
 # 2-tuple contains list of patterns and app namespace
 api_urlpatterns = ([
-    path('<int:pk>/', CustomUserDetailView.as_view(), name='detail'),
+    path('<int:pk>/', CustomUserDetailAPIView.as_view(), name='detail'),
 ], 'user')
 
 urlpatterns = [

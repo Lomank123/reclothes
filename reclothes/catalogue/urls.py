@@ -1,12 +1,25 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-from catalogue import views, viewsets
+from catalogue import views
 
 
-router = DefaultRouter()
-router.register('product', viewsets.ProductViewSet, basename='product')
-router.register('category', viewsets.CategoryViewSet, basename='category')
-router.register('tag', viewsets.TagViewSet, basename='tag')
+product_api = ([
+    path('', views.ProductListAPIView.as_view(), name='product-list'),
+    path(
+        '<int:pk>/',
+        views.ProductDetailAPIView.as_view(),
+        name='product-detail',
+    ),
+    path('home/', views.HomeListAPIView.as_view(), name='home-list'),
+], 'catalogue')
+
+category_api = ([
+    path('', views.CategoryListAPIView.as_view(), name='category-list'),
+    path(
+        '<int:pk>/',
+        views.CategoryDetailAPIView.as_view(),
+        name='category-detail',
+    ),
+], 'catalogue')
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),

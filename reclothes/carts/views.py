@@ -21,7 +21,7 @@ class CartView(TemplateView):
     template_name = 'carts/cart.html'
 
 
-class CurrentCartView(APIView):
+class CurrentCartAPIView(APIView):
     """Fetch current session cart."""
 
     permission_classes = (AllowAny, )
@@ -33,7 +33,7 @@ class CurrentCartView(APIView):
         return Response(data=serializer.data)
 
 
-class CartItemListView(CreateModelMixin, GenericAPIView):
+class CartItemListAPIView(CreateModelMixin, GenericAPIView):
     permission_classes = (AllowAny, )
     pagination_class = DefaultCustomPagination
     filter_backends = [DjangoFilterBackend]
@@ -74,7 +74,7 @@ class CartItemListView(CreateModelMixin, GenericAPIView):
             serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class CartItemDetailView(DestroyModelMixin, UpdateModelMixin, GenericAPIView):
+class CartItemDetailAPIView(DestroyModelMixin, UpdateModelMixin, GenericAPIView):
     permission_classes = (AllowAny, )
     serializer_class = CartItemDetailSerializer
 
