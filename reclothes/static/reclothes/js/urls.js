@@ -7,6 +7,7 @@ const defaultUserUrl = `${apiUrl}/user`;
 const defaultCartUrl = `${apiUrl}/cart`;
 const defaultCategoriesUrl = `${apiUrl}/category`;
 const defaultProductUrl = `${apiUrl}/product`;
+const defaultCardUrl = `${apiUrl}/card`;
 
 // Products
 const catalogueDataUrl = getUrlWithSearch(defaultProductUrl);
@@ -15,8 +16,7 @@ const homeProductsUrl = `${defaultProductUrl}/home`;
 const cartItemUrl = `${defaultCartUrl}/items`;
 const currentCartUrl = `${defaultCartUrl}/current`;
 // Orders
-const orderFileUrl = `${defaultOrderUrl}/files`;
-const myOrdersUrl = getUrlWithSearch(defaultOrderUrl);
+const orderListUrl = getUrlWithSearch(defaultOrderUrl);
 
 // Non-api urls
 const cataloguePageUrl = `${baseUrl}/catalogue`;

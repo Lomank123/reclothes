@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class ProductQuerySet(models.QuerySet):
@@ -38,3 +39,15 @@ class ProductQuerySet(models.QuerySet):
             self.annotate(type=models.F('product_type__name'))
             .order_by('-created_at')
         )
+
+
+class OneTimeUrlQuerySet(models.QuerySet):
+
+    def active(self):
+        return self.filter(is_used=False, expired_at__gte=timezone.now())
+
+
+class ActivationKeyQuerySet(models.QuerySet):
+
+    def active(self):
+        return self.filter(order__isnull=True, expired_at__gte=timezone.now())

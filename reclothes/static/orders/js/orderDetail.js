@@ -3,8 +3,9 @@ const orderBlock = $('#order-detail-info-block');
 const orderId = filesBlock.data("order-id");
 
 
-function setFiles(products) {
-    products.forEach(product => {
+function setFiles(orderItems) {
+    orderItems.forEach(item => {
+        const product = item.cart_item.product;
         const productFile = $(`
             <div class="default-block">
                 <span class="product-label">
@@ -64,8 +65,8 @@ function setOrderInfo(order) {
 
 
 $(window).on('load', async () => {
-    const url = `${orderFileUrl}/${orderId}/`;
+    const url = `${defaultOrderUrl}/${orderId}/`;
     const orderData = await ajaxCall(url);
-    setFiles(orderData.detail.products);
-    setOrderInfo(orderData.detail.order);
+    setFiles(orderData.order_items);
+    setOrderInfo(orderData);
 });

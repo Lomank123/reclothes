@@ -10,19 +10,25 @@ function setTotalPrice(cart) {
 }
 
 
+async function checkCard() {
+    const cardData = getCardData();
+    try {
+        return await ajaxCall(`${defaultCardUrl}/`, 'POST', cardData);
+    } catch(err) {
+        setErrors(err.responseJSON);
+        return err.responseJSON;
+    }
+}
+
+
 paymentForm.submit(async (e) => {
     e.preventDefault();
 
-    // Add card credentials
-    const cardData = getCardData();
-    // Nested dicts should be converted to json
-    formData.card = JSON.stringify(cardData);
-
-    try {
+    const cardResponse = await checkCard();
+    // If card credentials were valid
+    if (cardResponse.detail) {
         const result = await ajaxCall(`${defaultOrderUrl}/`, 'POST', formData);
-        window.location.href = `${orderUrl}/${result.detail.id}/`;
-    } catch(err) {
-        setErrors(err.responseJSON);
+        window.location.href = `${orderUrl}/${result.id}/`;
     }
 });
 

@@ -1,4 +1,4 @@
-from catalogue.serializers import MyOrdersProductSerializer
+from catalogue.serializers import OrderProductDetailSerializer
 from rest_framework import serializers
 
 from carts.consts import (CURRENT_CART_ERROR_MSG, QUANTITY_MAX_ERROR_MSG,
@@ -40,6 +40,7 @@ class CartItemDetailSerializer(serializers.ModelSerializer):
 
     def validate_quantity(self, quantity):
         current_count = self.instance.product.active_keys.count()
+        # Here we use new quantity!
         required_count = quantity * self.instance.product.keys_limit
         if required_count > current_count:
             raise serializers.ValidationError(QUANTITY_MAX_ERROR_MSG)
@@ -62,8 +63,8 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         return cart
 
 
-class MyOrdersCartItemSerializer(serializers.ModelSerializer):
-    product = MyOrdersProductSerializer(required=False)
+class OrderCartItemDetailSerializer(serializers.ModelSerializer):
+    product = OrderProductDetailSerializer(required=False)
 
     class Meta:
         model = CartItem

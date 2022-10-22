@@ -1,5 +1,5 @@
-from datetime import timedelta
 import uuid
+from datetime import timedelta
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -9,9 +9,9 @@ from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from catalogue.consts import LINK_EXPIRE_HOURS
+from catalogue.managers import ActiveCategoryManager, ActiveProductManager, ActiveKeyManager
+from catalogue.querysets import OneTimeUrlQuerySet, ProductQuerySet, ActivationKeyQuerySet
 from catalogue.utils import get_product_file_path, get_product_media_path
-from catalogue.managers import ActiveProductManager, ActiveCategoryManager
-from catalogue.querysets import ProductQuerySet
 
 
 class CustomBaseModel(models.Model):
@@ -183,14 +183,14 @@ class Product(CustomBaseModel):
         help_text=_('How many keys should user get per purchase. If 0, then no keys required.'),
     )
 
+    # Custom managers & querysets
+    objects = ProductQuerySet.as_manager()
+    active = ActiveProductManager.from_queryset(ProductQuerySet)()
+
     class Meta:
         ordering = ['-id']
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
-
-    # Custom managers & querysets
-    objects = ProductQuerySet.as_manager()
-    active = ActiveProductManager.from_queryset(ProductQuerySet)()
 
     def __str__(self):
         return f'{self.title} ({self.pk})'
@@ -202,8 +202,7 @@ class Product(CustomBaseModel):
     @property
     def active_keys(self):
         """Return unexpired and unused keys."""
-        return self.activation_keys.filter(
-            order__isnull=True, expired_at__gte=timezone.now())
+        return self.activation_keys.active()
 
     @property
     def in_stock(self):
@@ -378,6 +377,8 @@ class OneTimeUrl(models.Model):
     is_used = models.BooleanField(
         default=False, verbose_name=_('Already used'))
 
+    objects = OneTimeUrlQuerySet.as_manager()
+
     class Meta:
         ordering = ['-id']
         verbose_name = _("One-Time Url")
@@ -420,6 +421,9 @@ class ActivationKey(models.Model):
     )
     expired_at = models.DateTimeField(
         null=True, blank=True, verbose_name=_('Expiry date'))
+
+    objects = ActivationKeyQuerySet.as_manager()
+    active = ActiveKeyManager.from_queryset(ActivationKeyQuerySet)()
 
     class Meta:
         ordering = ['-id']

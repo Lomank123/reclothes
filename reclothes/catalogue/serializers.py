@@ -1,5 +1,4 @@
 from accounts.serializers import CompanySerializer, CustomUserSerializer
-from django.utils import timezone
 from rest_framework import serializers
 
 from catalogue.models import (ActivationKey, Category, OneTimeUrl, Product,
@@ -142,18 +141,18 @@ class ProductCatalogueSerializer(serializers.ModelSerializer):
         )
 
 
-class ActivationKeySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ActivationKey
-        fields = ('key', )
-
-
 class OneTimeUrlSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OneTimeUrl
         fields = ('url_token', 'id')
+
+
+class ActivationKeySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ActivationKey
+        fields = ('key', )
 
 
 class ProductFileSerializer(serializers.ModelSerializer):
@@ -166,8 +165,7 @@ class ProductFileSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'size', 'is_main', 'link', 'token')
 
     def get_token(self, product_file):
-        url = product_file.one_time_urls.filter(
-            is_used=False, expired_at__gte=timezone.now()).first()
+        url = product_file.one_time_urls.active().first()
         if url is None:
             url = OneTimeUrl.objects.create(file=product_file)
         return url.url_token.hex
@@ -185,7 +183,7 @@ class ProductFileSerializer(serializers.ModelSerializer):
         return 0
 
 
-class DownloadProductSerializer(serializers.ModelSerializer):
+class OrderProductDetailSerializer(serializers.ModelSerializer):
     files = ProductFileSerializer(many=True, required=False)
     keys = serializers.SerializerMethodField()
 
@@ -197,13 +195,6 @@ class DownloadProductSerializer(serializers.ModelSerializer):
         order_id = self.context.get('order_id')
         keys = product.activation_keys.filter(order_id=order_id)
         return ActivationKeySerializer(keys, many=True).data
-
-
-class MyOrdersProductSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Product
-        fields = '__all__'
 
 
 class BestProductSerializer(serializers.ModelSerializer):

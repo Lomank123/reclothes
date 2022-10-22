@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from catalogue.urls import product_api, category_api
+from orders.urls import order_api
+from payment.urls import card_api
 
 
 api_urlpatterns = [
@@ -13,6 +15,8 @@ api_urlpatterns = [
     path('cart/', include(carts_api, namespace='cart-api')),
     path('product/', include(product_api, namespace='product-api')),
     path('category/', include(category_api, namespace='category-api')),
+    path('order/', include(order_api, namespace='order-api')),
+    path('card/', include(card_api, namespace='card-api')),
 ]
 
 urlpatterns = [

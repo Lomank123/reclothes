@@ -1,21 +1,25 @@
 from django.urls import path, re_path
-from rest_framework.routers import DefaultRouter
 
-from orders.views import (DownloadFileView, MyOrdersView, OrderDetailView,
-                          OrderView)
-from orders.viewsets import OrderViewSet
+from orders import views
 
-router = DefaultRouter()
-router.register('order', OrderViewSet, basename='order')
+
+order_api = ([
+    path('', views.OrderListAPIView.as_view(), name='order-list'),
+    path(
+        '<int:pk>/',
+        views.OrderDetailAPIView.as_view(),
+        name='order-detail',
+    ),
+], 'order')
 
 
 urlpatterns = [
-    path('', OrderView.as_view(), name='order'),
-    path('<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
-    path('my-orders/', MyOrdersView.as_view(), name='my-orders'),
+    path('', views.OrderView.as_view(), name='order'),
+    path('<int:pk>/', views.OrderDetailView.as_view(), name='my-order-detail'),
+    path('my-orders/', views.MyOrdersView.as_view(), name='my-orders'),
     re_path(
         r'^download/(?P<url_token>\w+)/$',
-        DownloadFileView.as_view(),
+        views.DownloadFileView.as_view(),
         name='download',
     ),
 ]

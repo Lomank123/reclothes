@@ -44,6 +44,10 @@ class Cart(CustomBaseModel):
         self.is_deleted = True
         self.save()
 
+    def archive(self):
+        self.is_archived = True
+        self.save()
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(
@@ -79,3 +83,8 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         return self.product.regular_price * self.quantity
+
+    @property
+    def keys_count(self):
+        """Required keys count."""
+        return self.product.keys_limit * self.quantity

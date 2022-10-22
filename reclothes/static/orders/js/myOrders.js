@@ -24,7 +24,7 @@ function setMyOrders(orders) {
 
 
 $(window).on('load', async () => {
-    const orders = await ajaxCall(myOrdersUrl);
+    const orders = await ajaxCall(orderListUrl);
     setMyOrders(orders.results);
     setPagination(orders);
 });
